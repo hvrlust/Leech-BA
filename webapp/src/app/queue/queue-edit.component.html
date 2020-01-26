@@ -1,0 +1,135 @@
+<h2 mat-dialog-title>Edit customer <fa-icon icon="times" class="float-right btn-close" (click)="onCloseClick()"></fa-icon></h2>
+<mat-dialog-content #content>
+  <div class="row">
+    <div class="col-md-7">
+      <mat-form-field class="full-width">
+        <mat-label>Add date (dd/mm/yyyy)</mat-label>
+        <input matInput [(ngModel)]="request.date" placeholder="dd/mm/yyyy" [matDatepicker]="datepicker" required>
+        <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+        <mat-datepicker #datepicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field class="full-width">
+        <mat-label>Customer RSN</mat-label>
+        <input matInput [(ngModel)]="request.rsn" (input)="validate()" placeholder="Enter rsn" maxlength="12" required>
+      </mat-form-field>
+      <mat-form-field class="full-width">
+        <mat-select [(ngModel)]="request.ba" (selectionChange)="validate()" placeholder="BA done" required>
+          <mat-option value="NM1">None - NM1</mat-option>
+          <mat-option value="HM1">Killed queen - HM1</mat-option>
+          <mat-option value="HM6">Can access w6 - HM6</mat-option>
+          <mat-option value="HM10">Can access king - HM10</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div *ngIf="selected.bxp">
+        <mat-form-field *ngIf="selectedBxp.agility" class="full-width">
+          <mat-label>Agility</mat-label>
+          <input matInput type="number" (input)="validate()" [(ngModel)]=request.services.bxp.agility placeholder="Amount of agility bxp" required>
+        </mat-form-field>
+        <mat-form-field *ngIf="selectedBxp.mining" class="full-width">
+          <mat-label>Mining</mat-label>
+          <input matInput type="number" (input)="validate()" [(ngModel)]=request.services.bxp.mining placeholder="Amount of mining bxp" required>
+        </mat-form-field>
+        <mat-form-field *ngIf="selectedBxp.firemaking" class="full-width">
+          <mat-label>Firemaking</mat-label>
+          <input matInput type="number" (input)="validate()" [(ngModel)]=request.services.bxp.firemaking placeholder="Amount of firemaking bxp" required>
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="selected.points">
+        <mat-form-field *ngIf="selectedPoints.attack" class="full-width">
+          <mat-label>Attack</mat-label>
+          <input matInput type="number" (input)="validate()" [(ngModel)]=request.services.points.attack placeholder="Attack points" required>
+        </mat-form-field>
+        <mat-form-field *ngIf="selectedPoints.collector" class="full-width">
+          <mat-label>Collector</mat-label>
+          <input matInput type="number" (input)="validate()" [(ngModel)]=request.services.points.collector placeholder="Collector points" required>
+        </mat-form-field>
+        <mat-form-field *ngIf="selectedPoints.defender" class="full-width">
+          <mat-label>Defender</mat-label>
+          <input matInput type="number" (input)="validate()" [(ngModel)]=request.services.points.defender placeholder="Defender points" required>
+        </mat-form-field>
+        <mat-form-field *ngIf="selectedPoints.healer" class="full-width">
+          <mat-label>Healer</mat-label>
+          <input matInput type="number" (input)="validate()" [(ngModel)]=request.services.points.healer placeholder="Healer points" required>
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="selected.king" class="full-width custom-form-field-container row">
+        <mat-label class="label col-5">King kills</mat-label>
+        <div class="col">
+          <span class="counter-right label noselect" (click)="changeKing(-1)"><fa-icon icon="minus-circle"></fa-icon></span>
+          <input class="counter modal" [(ngModel)]=request.services.king disabled>
+          <span class="counter-right label noselect" (click)="changeKing(1)"><fa-icon icon="plus-circle"></fa-icon></span>
+        </div>
+      </div>
+
+      <div *ngIf="selected.queen" class="full-width custom-form-field-container row">
+        <mat-label class="label col-5">Queen kills</mat-label>
+        <div class="col">
+          <span class="counter-right label noselect" (click)="changeQueen(-1)"><fa-icon icon="minus-circle"></fa-icon></span>
+          <input class="counter modal" [(ngModel)]=request.services.queen disabled>
+          <span class="counter-right label noselect" (click)="changeQueen(1)"><fa-icon icon="plus-circle"></fa-icon></span>
+        </div>
+      </div>
+
+      <div>
+        <mat-form-field class="full-width">
+          <mat-label>Notes (optional)</mat-label>
+          <textarea matInput [(ngModel)]=request.notes placeholder="Notes regarding customer" maxlength="80"></textarea>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field class="full-width">
+        <mat-label>Discord tag (optional)</mat-label>
+        <input matInput [(ngModel)]="request.discord" placeholder="Enter discord tag" maxlength="20">
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-5">
+      <div class="checkbox-container full-width row ">
+        <div class="col-6">
+          <mat-checkbox (change)="validate()" [(ngModel)]="selected.bxp" color="primary" class="margin">BXP</mat-checkbox>
+          <mat-checkbox (change)="validate()" [(ngModel)]="selected.points" color="primary" class="margin">Points</mat-checkbox>
+        </div>
+        <div class="col-6">
+          <mat-checkbox (change)="validate()" [(ngModel)]="selected.king" color="primary" class="margin">King</mat-checkbox>
+          <mat-checkbox (change)="validate()" [(ngModel)]="selected.queen" color="primary" class="margin">Queen</mat-checkbox>
+        </div>
+      </div>
+
+      <div *ngIf="selected.bxp" class="checkbox-container full-width row checkbox-padding">
+        <div class="col">
+          <mat-checkbox (change)="validate()" [(ngModel)]="selectedBxp.agility" color="primary" class="margin">Agility</mat-checkbox>
+          <mat-checkbox (change)="validate()" [(ngModel)]="selectedBxp.mining" color="primary" class="margin">Mining</mat-checkbox>
+          <mat-checkbox (change)="validate()" [(ngModel)]="selectedBxp.firemaking" color="primary" class="margin">Firemaking</mat-checkbox>
+        </div>
+      </div>
+
+      <div *ngIf="selected.points" class="checkbox-container full-width row checkbox-padding">
+        <div class="col">
+          <mat-checkbox (change)="validate()" [(ngModel)]="selectedPoints.all" color="primary" (change)="selectAll($event)" class="margin row">All</mat-checkbox>
+          <div class="row">
+            <div class="col-6">
+              <mat-checkbox (change)="validate()" [(ngModel)]="selectedPoints.attack" color="primary" (change)="checkAll()" class="margin">Att</mat-checkbox>
+              <mat-checkbox (change)="validate()" [(ngModel)]="selectedPoints.collector" color="primary" (change)="checkAll()" class="margin">Col</mat-checkbox>
+            </div>
+            <div class="col-6">
+              <mat-checkbox (change)="validate()" [(ngModel)]="selectedPoints.defender" color="primary" (change)="checkAll()" class="margin">Def</mat-checkbox>
+              <mat-checkbox (change)="validate()" [(ngModel)]="selectedPoints.healer" color="primary" (change)="checkAll()" class="margin">Heal</mat-checkbox>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<div *ngIf="scrollable" class="float-right scrolldown">
+  scroll down <fa-icon icon="arrow-down"></fa-icon>
+</div>
+<mat-dialog-actions>
+  <a mat-button (click)="onCloseClick()">Cancel</a>
+  <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+  <a mat-button (click)="onSubmitClick()" [disabled]="!isValid">Save</a>
+</mat-dialog-actions>

@@ -1,0 +1,104 @@
+.menu {
+  text-align: center;
+}
+.form-container:nth-child(1) {
+  margin-top: 20px;
+}
+.form-container {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: left;
+
+  padding-bottom: 20px;
+}
+
+.form-container > * {
+  // min-width: 400px;
+  // max-width: 640px;
+  width: 640px;
+}
+
+.remove-padding {
+  padding-left: 0;
+}
+
+.icon-cancel {
+  color: red;
+  float: right;
+  cursor: pointer;
+}
+mat-form-field.restrict-width .mat-form-field {
+  width: 500px;
+}
+
+.radio-button-label {
+  margin: 5px 5px 5px 8px;
+}
+
+.radio-button {
+  margin: 5px;
+}
+
+.button {
+  float: right;
+}
+
+.custom-form-field-container {
+  padding: 10px 10px 10px 0;
+}
+.label {
+  margin-right: 20px;
+}
+.btn-menu {
+  margin-left: 4px;
+}
+.role-input {
+  width: 125px;
+}
+.role-head {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.role:nth-child(2), .role:nth-child(3) {
+  background-color: #fbfbfb;
+}
+.role-form{
+  width: 320px;
+}
+
+.counter {
+  padding: 4px;
+  text-align: center;
+  font-size: 18px;
+  width: 50px;
+  border: 1px solid #f0f0f0;
+}
+
+.counter-left, .counter-right {
+  font-size: 20px;
+  cursor: pointer;
+  margin: 8px;
+}
+
+.counter-left {
+  border-radius: 10px 0 0 10px;
+}
+.counter-right {
+  border-radius: 0 10px 10px 0;
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}

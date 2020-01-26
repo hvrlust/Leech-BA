@@ -1,0 +1,8 @@
+<h6 mat-dialog-title>Confirm</h6>
+<mat-dialog-content>
+  Are you sure you want to remove <strong>{{rsn}}</strong>?
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="dialogRef.close()">Cancel</button>
+  <button mat-button (click)="deleteCustomer(id,rsn)">Confirm</button>
+</mat-dialog-actions>

@@ -1,0 +1,62 @@
+body{
+  height: auto;
+}
+.float-right {
+  float:right;
+}
+.btn-close {
+  cursor: pointer;
+}
+.text-left {
+  text-align: left;
+}
+
+.full-width {
+  width: 100%;
+}
+.checkbox-container {
+  display: flex;
+  align-content: center;
+  align-items: center;
+}
+.checkbox-padding {
+  padding-top: 20px;
+}
+.margin {
+  margin: 0 10px;
+}
+.custom-form-field-container {
+  padding: 10px 10px 10px 0;
+}
+.counter {
+  padding: 4px;
+  text-align: center;
+  font-size: 18px;
+  width: 50px;
+  border: none;
+}
+
+.counter-left, .counter-right {
+  font-size: 20px;
+  cursor: pointer;
+  margin: 6px;
+}
+
+.counter-left {
+  border-radius: 8px 0 0 8px;
+}
+.counter-right {
+  border-radius: 0 8px 8px 0;
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.scrolldown {
+  font-size: 14px;
+}

@@ -1,0 +1,141 @@
+<h1 *ngIf="services.length==0">What do you require?</h1>
+<div class="menu">
+  <button class="btn-menu" mat-stroked-button (click)="add(['bxp'])">BXP</button>
+  <button class="btn-menu" mat-stroked-button (click)="add(['points'])">Points</button>
+  <button class="btn-menu" mat-stroked-button (click)="add(['points', 'king'])">Insignia</button>
+  <button class="btn-menu" mat-stroked-button (click)="add(['queen'])">Queen</button>
+  <button class="btn-menu" mat-stroked-button (click)="add(['king'])">King</button>
+  <button class="btn-menu" mat-stroked-button (click)="add(['points', 'king'])">Trim req</button>
+  <button class="btn-menu" mat-stroked-button (click)="add(['points'])">Hat</button>
+</div>
+
+<div *ngFor="let service of services">
+  <div class="form-container" *ngIf="service==='info'">
+    <h3>A little about you...</h3>
+    <mat-form-field class="restrict-width">
+      <mat-select [(ngModel)]="customerInfo.ba" placeholder="How much BA have you done since the rework?" required>
+        <mat-option value="idk">I'm not sure</mat-option>
+        <mat-option value="0">None</mat-option>
+        <mat-option value="1">Killed queen</mat-option>
+        <mat-option value="2">Unlocked up to king/completed HM wave 9</mat-option>
+        <mat-option value="3">Killed king</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="restrict-width">
+      <mat-label>RSN (optional)</mat-label>
+      <input [(ngModel)]="customerInfo.rsn" matInput placeholder="This helps us get your levels ready for request">
+    </mat-form-field>
+
+    <div class="custom-form-field-container">
+      <mat-label class="label">Are you an Ironman?</mat-label>
+      <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="customerInfo.ironman">
+        <mat-button-toggle value="yes">
+          Yes
+        </mat-button-toggle>
+        <mat-button-toggle value="no">
+          No
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </div>
+
+  <div class="form-container bxp" *ngIf="service==='bxp'">
+    <h3> BXP <fa-icon icon="times" class="icon-cancel" (click)="cancel('bxp')"></fa-icon></h3>
+
+    <div class="button-toggle-container">
+      <mat-label class="label">Skill*</mat-label>
+      <mat-button-toggle-group #group="matButtonToggleGroup" [(value)]="requestBxp.skill">
+        <mat-button-toggle value="agility">
+          Agility
+        </mat-button-toggle>
+        <mat-button-toggle value="firemaking">
+          Firemaking
+        </mat-button-toggle>
+        <mat-button-toggle value="mining">
+          Mining
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+    <div class="row justify-content-start">
+
+      <mat-form-field class="col remove-padding" >
+        <mat-label>Level</mat-label>
+        <input [(ngModel)]="requestBxp.level" matInput placeholder="Type or select level" [matAutocomplete]="bxplevel" (input)="filterLevels($event.target.value)" required>
+        <mat-autocomplete autoActiveFirstOption #bxplevel>
+          <mat-option *ngFor="let level of filteredLevels" [value]="level">{{level}}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field class="col">
+        <input [(ngModel)]="requestBxp.amount" matInput placeholder="Amount" (input)="formatNumber($event.target)" required>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="form-container points" *ngIf="service==='points'">
+    <h3> Points <fa-icon icon="times" class="icon-cancel" (click)="cancel('points')"></fa-icon></h3>
+    <div class="row">
+      <div class="col role" *ngFor="let role of roles">
+        <div class="row role-head justify-content-center">
+          {{titleCase(role)}}
+        </div>
+        <div class="row role-form">
+          <div class="col">
+            <mat-form-field class="role-input">
+              <mat-select [(ngModel)]="request.points.current[role].level" placeholder="Current level" required>
+                <mat-option value="1">1</mat-option>
+                <mat-option value="2">2</mat-option>
+                <mat-option value="3">3</mat-option>
+                <mat-option value="4">4</mat-option>
+                <mat-option value="5">5</mat-option>
+              </mat-select><br>
+            </mat-form-field>
+            <mat-form-field class="role-input">
+              <input matInput placeholder="Current amount" [(ngModel)]="request.points.current[role].amount" required>
+            </mat-form-field>
+          </div>
+          <div class="col">
+            <mat-form-field class="role-input">
+              <mat-select [(ngModel)]="request.points.need[role].level" placeholder="Need level" required>
+                <mat-option value="1">1</mat-option>
+                <mat-option value="2">2</mat-option>
+                <mat-option value="3">3</mat-option>
+                <mat-option value="4">4</mat-option>
+                <mat-option value="5">5</mat-option>
+              </mat-select>
+            </mat-form-field><br>
+            <mat-form-field class="role-input">
+              <input matInput placeholder="Need amount" [(ngModel)]="request.points.need[role].amount" required>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-container queen" *ngIf="service==='queen'">
+    <h3>Queen <fa-icon icon="times" class="icon-cancel" (click)="cancel('queen')"></fa-icon></h3>
+    <div class="custom-form-field-container">
+      <mat-label class="label">How many queen kills do you need?</mat-label>
+      <span class="counter-left noselect" (click)="changeQueen(-1)"><fa-icon icon="minus-circle"></fa-icon></span>
+      <input class="counter" disabled [(ngModel)]="request.queen">
+      <span class="counter-right noselect" (click)="changeQueen(1)"><fa-icon icon="plus-circle"></fa-icon></span>
+    </div>
+  </div>
+
+  <div class="form-container king" *ngIf="service==='king'">
+    <h3>King <fa-icon icon="times" class="icon-cancel" (click)="cancel('king')"></fa-icon></h3>
+    <div class="custom-form-field-container">
+      <mat-label class="label">How many king kills do you need?</mat-label>
+      <span class="counter-right label noselect" (click)="changeKing(-1)"><fa-icon icon="minus-circle"></fa-icon></span>
+      <input class="counter" disabled [(ngModel)]="request.king">
+      <span class="counter-right label noselect" (click)="changeKing(1)"><fa-icon icon="plus-circle"></fa-icon></span>
+    </div>
+  </div>
+</div>
+
+<button class="button" (click)="onCalculateClick()" *ngIf="services.length>0" mat-button>Calculate</button>
+<button class="button" (click)="onClearClick()" *ngIf="services.length>0" mat-button>Clear</button>
+
+<div *ngIf="cost !== undefined && cost !== ''"> {{cost}}</div>

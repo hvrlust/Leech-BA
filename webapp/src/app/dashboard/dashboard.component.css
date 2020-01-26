@@ -1,0 +1,38 @@
+.dash-thumbnail {
+  width: 70px;
+  height: 70px;
+}
+
+
+.banner {
+  margin-left: -20px;
+  margin-top: -10px;
+  width: 900px;
+  border-radius: 10px 10px 0 0;
+}
+
+@media (min-width: 576px) {
+  .banner {
+    width: 540px;
+  }
+}
+@media (min-width: 768px) {
+  .banner {
+    width: 720px;
+  }
+}
+@media (min-width: 992px) {
+  .banner {
+    width: 900px;
+  }
+}
+
+
+
+a > img:hover {
+  -webkit-animation-name: hoverOver;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: 1;
+  -webkit-box-shadow: 0 0 9px #262626;
+  border-radius: 100%;
+}

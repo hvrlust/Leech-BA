@@ -1,0 +1,9 @@
+<h6 mat-dialog-title>Confirm</h6>
+<mat-dialog-content>
+  Are you sure you want to move <strong>{{rsn}}</strong> to the bottom of the queue?<br><br>
+  <small>Note: this is not reversible</small>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="dialogRef.close()">Cancel</button>
+  <button mat-button (click)="demoteCustomer(id,rsn)">Confirm</button>
+</mat-dialog-actions>

@@ -1,0 +1,17 @@
+<div id="nav">
+  <mat-toolbar color="primary">
+    <mat-toolbar-row>
+      <span><a class='logo no-select' [routerLink]="['/']" routerLinkActive="active">Leech BA</a><span class="rsn-container no-select" *ngIf="username">|</span> <span class="rsn">{{username}}</span></span>
+
+      <span class="spacer"></span>
+
+      <a mat-button [routerLink]="['/']" routerLinkActive="active">Home</a>
+      <a mat-button [routerLink]="['/info']" routerLinkActive="active">Customer Information</a>
+      <a mat-button [routerLink]="['/calculator']" routerLinkActive="active">Calculator</a>
+      <a mat-button [routerLink]="['/queue']" routerLinkActive="active" *ngIf="user">Queue</a>
+      <a mat-button [routerLink]="['/mgwqueue']" routerLinkActive="active" *ngIf="user">MGW Queue</a>
+      <a mat-button [routerLink]="['/splits']" routerLinkActive="active" *ngIf="user">Splits</a>
+      <a mat-button [routerLink]="['/']" routerLinkActive="active" *ngIf="user" (click)="logout()">Logout</a>
+    </mat-toolbar-row>
+  </mat-toolbar>
+</div>

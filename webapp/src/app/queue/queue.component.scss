@@ -1,0 +1,43 @@
+
+.text-left {
+  text-align: left;
+}
+.float-right {
+  float:right;
+}
+
+.float-left {
+  float:left;
+}
+
+.icn {
+  padding-left: 10px;
+  margin-top: 10px;
+}
+.icn:hover {
+  color: #323232;
+}
+.refresh {
+  color: lightblue;
+}
+.add {
+  color: lightgreen;
+}
+.ag-cell-focus,.ag-cell-no-focus{
+  border:none !important;
+}
+.update-container{
+  font-size: 12px;
+  width: 100%;
+  margin-top: 10px;
+  padding-bottom: 10px;
+}
+
+.filter-bar {
+  float: right;
+  padding: 4px;
+  border: none;
+  margin-top: 12px;
+  margin-right: 10px;
+  font-size: 14px;
+}

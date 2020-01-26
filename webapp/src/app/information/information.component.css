@@ -1,0 +1,16 @@
+li{
+  margin: 14px 0;
+}
+ol li {
+  margin: 18px 0;
+}
+ol li br {
+  display: block;
+  margin: 6px 0;
+  content: "";
+}
+
+a {
+  color: white;
+  text-decoration: underline;
+}
