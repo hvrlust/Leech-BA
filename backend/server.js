@@ -1,5 +1,11 @@
+const args = process.argv.slice(2);
+let configFile = './config.json';
+if(args[0] === "--config" && args.length > 1) {
+    configFile = args[1]
+}
+
 const fs = require('fs');
-const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+const config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 
 const Database = require('./src/database');
 const database = new Database();
