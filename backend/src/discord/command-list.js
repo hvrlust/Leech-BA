@@ -528,10 +528,10 @@ function getRoleId(member, role) {
  *
  *
 */
-function init(mailClient, queueChannel, adminChannel) {
-	mailParser = new MAIL_PARSER_MODULE.MailParser(mailClient, queueChannel, adminChannel);
-	mailParser.init();
-}
+// function init(mailClient, queueChannel, adminChannel) {
+// 	mailParser = new MAIL_PARSER_MODULE.MailParser(mailClient, queueChannel, adminChannel);
+// 	mailParser.init();
+// }
 
 module.exports = {
 	commands,
@@ -539,5 +539,5 @@ module.exports = {
 	isPermitted,
 	getRoleId,
 	hasRole, //maybe don't need this
-	init
+	// init
 };

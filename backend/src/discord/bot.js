@@ -62,13 +62,18 @@ function handleQueueChannelSupport(message) {
 
 }
 
-exports.run = function (token, mailClient, database) {
+exports.run = function (token, database) {
+	let resolve, reject;
+	let p = new Promise(function(res, rej) {
+		resolve = res;
+		reject = rej;
+	});
 	bot.on('ready', () => {
 		console.log('bot ready');
-		let adminChannel = bot.channels.find(channel => channel.name === "test");
-		let queueChannel = bot.channels.find(channel => channel.name === "queue");
-
-		commandList.init(mailClient, queueChannel, adminChannel);
+		resolve({
+			adminChannel: bot.channels.find(channel => channel.name === "test"),
+			queueChannel: bot.channels.find(channel => channel.name === "queue"),
+		});
 	});
 
 	bot.on('disconnect', function (erMsg, code) {
@@ -102,7 +107,7 @@ exports.run = function (token, mailClient, database) {
 
 	//load other modules
     site.run(bot, database);
-
+	
 	// log our bot in
-	bot.login(token);
+	return bot.login(token).then(() => p);
 };

@@ -3,14 +3,10 @@ const database = new Database();
 
 // the token of your bot - https://discordapp.com/developers/applications/me
 const bot = require("./src/discord/bot");
-const token = '';
-
-const MAIL_CLIENT = {
-    username: '', //email client details
-    password: '',
-    host: '' // Host server.  See server that your mail client uses.
-};
-bot.run(token, MAIL_CLIENT, database);
+const token = ''; //for token in commerical use
 
 const site = require("./src/site/main");
-site.run(database);
+bot.run(token, database)
+    .then((c) => {
+        site.run(database, c.adminChannel, c.queueChannel);
+    });
