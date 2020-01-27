@@ -1,7 +1,10 @@
+const fs = require('fs');
+const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+
 const send = require('gmail-send')({
-	user: 'leechba1@gmail.com',
-	pass: 'shadowsucks',
-	to:   'leechba1@gmail.com',
+	user: config['email'],
+	pass: config['password'],
+	to:   config['email'],
 	from: 'leechbasite',
 	subject: 'test subject',
 	text:    'gmail-send example 1',         // Plain text
