@@ -143,8 +143,8 @@ const commands = {
     },
     'ok': {
         description: 'replies with a standard leech response',
-        parameters: ["ranks"],
-        permittedRoles: [],
+        parameters: [],
+        permittedRoles: ["ranks"],
         execute: function (message, params) {
             message.delete().then(msg => {
                 msg.channel.send('Ok, we work with a queue system, I\'ll add you to it. If you can, guest in the ' +
