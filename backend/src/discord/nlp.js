@@ -8,5 +8,3 @@ const console = (function () {
         log: this.console.log.bind(this.console, '%s', timestamp)
     }
 })();
-
-f

@@ -38,7 +38,7 @@ const commands = {
                 return;
             }
             leeches.forEach(function (leech) {
-                var rolesToAdd = [];
+                const rolesToAdd = [];
                 message.guild.fetchMember(leech).then(member => {
                     //if leech has a permitted role (is a rank), stop this action
                     if (isPermitted(member, commands['add'].permittedRoles)) {
@@ -87,11 +87,12 @@ const commands = {
                         return;
                     }
 
-                    member.removeRole(message.channel.guild.roles.find(x => x.name === 'Q').id, "remove leech").then(function (value) {
-                        message.channel.send("Removed Q role from " + member);
-                    }, function (error) {
-                        message.channel.send("Error removing customer role.  Error: " + error.message);
-                    });
+                    member.removeRole(message.channel.guild.roles.find(x => x.name === 'Q').id, "remove leech")
+                        .then(function (value) {
+                            message.channel.send("Removed Q role from " + member);
+                        }, function (error) {
+                            message.channel.send("Error removing customer role.  Error: " + error.message);
+                        });
                 }).catch(error => {
                     console.log(error);
                 });
@@ -103,7 +104,7 @@ const commands = {
         parameters: [],
         permittedRoles: [],
         execute: function (message, params) {
-            let response = "```Available Commands \n ====================";
+            let response = "```asciidoc\nAvailable Commands \n====================";
             for (let command in commands) {
                 if (commands.hasOwnProperty(command)) { //sanity check
                     /* check permissions */
@@ -131,25 +132,27 @@ const commands = {
         }
     },
     'trial': {
-        description: 'trial information',
+        description: 'shows trial information and posts',
         parameters: [],
-        help: 'shows trial information and posts.',
         permittedRoles: [],
         execute: function (message, params) {
-            message.channel.send('\nFor trial information, please read the information in #attacker-trial, #healer-trial, #defender-trial, and #king-information');
+            message.channel.send('\nFor trial information, please read the information in <#527662247892484116>, ' +
+                '<#527679260010479621>, <#527679195816656896>, and <#531173841553195018>.\n\nIf you want to apply then ' +
+                'please ask in <#531835331448930304>.');
         }
     },
-	'ok': {
-		description: 'Leech copypasta',
-		parameters: ["ranks"],
-		help: 'replies with a standard leech response',
-		permittedRoles: [],
-		execute: function (message, params) {
-			message.delete().then(msg => {
-				msg.channel.send('Ok, we work with a queue system, I\'ll add you to it. If you can, guest in the CC (Leech BA) when free - we prioritize leeches there over leeches on disc. We will call you by name if we have a team you can join. Please respond even if you\'re not free, it helps us and other leeches. ')
-			});
-		}
-	},
+    'ok': {
+        description: 'replies with a standard leech response',
+        parameters: ["ranks"],
+        permittedRoles: [],
+        execute: function (message, params) {
+            message.delete().then(msg => {
+                msg.channel.send('Ok, we work with a queue system, I\'ll add you to it. If you can, guest in the ' +
+                    'CC (Leech BA) when free - we prioritize leeches there over leeches on disc. We will call you by name ' +
+                    'if we have a team you can join. Please respond even if you\'re not free, it helps us and other leeches. ')
+            });
+        }
+    },
     'timezone': {
         description: 'allows you to add/change your timezone role',
         parameters: ["USA AUS or EU"],
@@ -182,7 +185,7 @@ const commands = {
         }
     },
     'confirm': {
-        description: "Confirms a leech to be added onto the queue",
+        description: "acknowledge you have added the leech to the queue",
         parameters: [],
         help: "Use this in the queue channel to remove the pin",
         permittedRoles: ["ranks"],
