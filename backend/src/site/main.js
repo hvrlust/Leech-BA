@@ -277,8 +277,13 @@ exports.run = function (database, adminChannel, queueChannel) {
   app.use(express.static(legacy));
   const legacyQueueProcessor = require('./legacy-queue');
   app.post('/legacy/queue', async (req, res) => {
-    await legacyQueueProcessor.process(req, database, adminChannel, queueChannel);
-    res.sendFile(legacy + '/success.html');
+    legacyQueueProcessor.process(req, database, adminChannel, queueChannel)
+      .then(() => {
+        res.sendFile(legacy + '/success.html');
+      })
+      .catch(() => {
+        res.status(500);
+      });
   });
 
   app.get('/legacy', (req, res) => {

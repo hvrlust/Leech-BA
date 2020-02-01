@@ -1,9 +1,9 @@
-const BOT_UID = 2;
+const BOT_UID = 1;
 
 function process(req, database, adminChannel, queueChannel) {
 	const data = req.body;
 	if(data['xp_rsn']) {
-		processQueueReq({
+		return processQueueReq({
 			subject: 'xp',
 			text: {
 				rsn: data['xp_rsn'],
@@ -15,7 +15,7 @@ function process(req, database, adminChannel, queueChannel) {
 		}, database, adminChannel, queueChannel);
 
 	} else if(data['points_rsn']) {
-        processQueueReq({
+        return processQueueReq({
 			subject: 'item',
 			text: {
 				rsn: data['points_rsn'],
@@ -42,8 +42,8 @@ function process(req, database, adminChannel, queueChannel) {
 				kingkills: parseInt(data['kingskilled'], 10),
 			},
 		}, database, adminChannel, queueChannel);
-	}
-	return true;
+    }
+    return Promise.reject(false);
 }
 
 async function processQueueReq(mail, database, adminChannel, queueChannel) {
@@ -54,7 +54,7 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
     var message = "";
     if (mail.subject == "admin-test") {
         adminChannel.send("Request acknowledged and received.\nMessage: " + mail.text);
-        return;
+        return Promise.resolve(true);
     }
 
     // XP REQUEST =================================================================================================================================================
@@ -77,35 +77,35 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
                 break;
         }
         var amount = parseInt(data.amount.split(',').join(''));
-        if (amount > 0 && data.rsn) {
-            amount = nFormatter(amount, 2);
+        if (amount <= 0 || !data.rsn) {
+            return Promise.reject(false);
+        }
+
+        amount = nFormatter(amount, 2);
+        return database.newCustomer(BOT_UID, {
+            date: new Date(),
+            rsn: data.rsn,
+            ba: ba.replace(/[()]/g, "").trim(),
+            services: {
+                bxp: {
+                    [data.skill]: data.amount.split(',').join(''),
+                },
+            },
+            notes: "(unconfirmed)", //TODO: confirmed field
+        }).then(status => {
             var rsn_bxp = data.rsn;
             var s0 = "RSN: " + data.rsn + "\nLeech: BXP\nSkill: " + data.skill + "\nLevel: " + data.level + "\nAmount: " + data.amount + "\nBA completed up to: " + ba + "\n\n\n";
             var s1 = "Summary: \n" + date + "/" + month + ": " + rsn_bxp + " - " + amount + " " + data.skill + " bxp " + ba + "\n\n";
             var s2 = "";
 
-            const status = await database.newCustomer(BOT_UID, { // TODO: create bot user
-                date: new Date(),
-                rsn: data.rsn,
-                ba: ba.replace(/[()]/g, ""),
-                services: {
-                    bxp: {
-                        [data.skill]: data.amount.split(',').join(''),
-                    },
-                },
-                notes: "(unconfirmed)", //TODO: confirmed field
-            });
-
-            if (typeof status != "number") { //TODO: is it really an number or a str?
-                s2 = "Status: " + status;
+            if (typeof status != "number") {
+                s2 = "Status: " + status + ". Please insert/update the current request for this rsn.";
             } else {
                 s2 = "Status: Inserted into queue, please confirm (and remove the unconfirmed note)";
             }
 
-            message = "```"+ s0 + s1 + s2 + "```";
-            queueChannel.send(message).then(m => m.pin()).catch(console.error);
-        }
-        return;
+            return queueChannel.send("```"+ s0 + s1 + s2 + "```");
+        }).then(m => m.pin());
     }
 
     // ITEM REQUEST =================================================================================================================================================
@@ -243,6 +243,7 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
 
             kingskilled = data.kingkills;
             kingsneeded = 5 - kingskilled;
+            _kingsneeded = kingsneeded;
             var points = "";
             var role = "";
             insignia = true;
@@ -272,27 +273,27 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
                     role = ":BA_H:";
                     break;
             }
-            if (kingsneeded > 0) {
+            if (_kingsneeded > 0) {
                 //work out how many kings as role
                 var kingsasrole = 0;
-                for (var i = kingsneeded; i > 0; i--) {
+                for (var i = _kingsneeded; i > 0; i--) {
                     if (points < 0) break;
                     points -= 210;
                     kingsasrole++;
-                    kingsneeded--;
+                    _kingsneeded--;
                 }
-                leech += "/" + (kingsneeded + kingsasrole) + " king kills ";
+                leech += "/" + (_kingsneeded + kingsasrole) + " king kills ";
                 leech_simple += ": " + kingsasrole;
                 if (kingsasrole > 1) {
                     leech_simple += " kings as " + role;
                 } else {
                     leech_simple += " king as " + role;
                 }
-                if (kingsneeded > 0) {
-                    if (kingsneeded > 1) {
-                        leech_simple += " + " + kingsneeded + " kings as any";
+                if (_kingsneeded > 0) {
+                    if (_kingsneeded > 1) {
+                        leech_simple += " + " + _kingsneeded + " kings as any";
                     } else {
-                        leech_simple += " + " + kingsneeded + " king as any";
+                        leech_simple += " + " + _kingsneeded + " king as any";
                     }
                 }
                 if (points > 0) leech_simple += " + " + points + " " + role + " ";
@@ -318,8 +319,6 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
         if (data.enhancer > 0) s0 += "Enhancer charges:" + enhancer.replace(/[{()}]/g, '') + "\n";
         s0 += "BA completed up to:" + ba.replace(/[{()}]/g, '') + "\n";
         s0 += "\n\n";
-        var s1 = "Summary: \n" + date + "/" + month + ": " + data.rsn + " - " + leech_simple + ironsimple + enhancer + ba + "\n\n";
-        var s2 = "";
 
         var notes = ["(unconfirmed)"];
         if (data.ironman == "yes") {
@@ -328,32 +327,33 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
         if (data.enhancer > 0) {
             notes.push(enhancer.replace(/[{()}]/g, ''));
         }
-
-        const status = await database.newCustomer(BOT_UID, { // TODO: create bot user
+        console.log("KINGS", kingsneeded);
+        return database.newCustomer(BOT_UID, {
             date: new Date(),
             rsn: data.rsn,
-            ba: ba.replace(/[()]/g, ""),
+            ba: ba.replace(/[()]/g, "").trim(),
             services: {
                 points: {
-                    attack: needA,		//TODO: not sure how the FE copes with 0 amounts
-                    collector: needC,	//TODO: not sure how the FE copes with 0 amounts
-                    healer: needH,		//TODO: not sure how the FE copes with 0 amounts
-                    defender: needD,	//TODO: not sure how the FE copes with 0 amounts
+                    attack: needA,
+                    collector: needC,
+                    healer: needH,
+                    defender: needD,
                 },
                 king: kingsneeded,
             },
             notes: notes.join("; "), //TODO: confirmed field
-        });
+        }).then(status => {
+            var s1 = "Summary: \n" + date + "/" + month + ": " + data.rsn + " - " + leech_simple + ironsimple + enhancer + ba + "\n\n";
+            var s2 = "";
 
-        if (typeof status != "number") { //TODO: is it really an number or a str?
-            s2 = "Status: " + status;
-        } else {
-            s2 = "Status: Inserted into queue, please confirm"
-        }
+            if (typeof status != "number") {
+                s2 = "Status: " + status + ". Please insert/update the current request for this rsn.";
+            } else {
+                s2 = "Status: Inserted into queue, please confirm (and remove the unconfirmed note)";
+            }
 
-        message = "```"+ s0 + s1 + s2 + "```";
-        queueChannel.send(message).then(m => m.pin()).catch(console.error);
-        return;
+            return queueChannel.send("```"+ s0 + s1 + s2 + "```");
+        }).then(m => m.pin());
     }
 
     // TRIAL REQUEST =================================================================================================================================================
@@ -377,8 +377,10 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
         message += "\n";
         message += "```";
         message += "Link to stats: http://services.runescape.com/m=hiscore/compare?user1=" + (data.rsn).replace(/\s/g, "%20");
-        queueChannel.guild.channels.find("name", "trials").send(message);
+       return  queueChannel.guild.channels.find("name", "trials").send(message);
     }
+
+    return Promise.reject(false);
 }
 
 function nFormatter(num, digits) {

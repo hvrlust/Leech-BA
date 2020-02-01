@@ -62,7 +62,7 @@ function handleQueueChannelSupport(message) {
 
 }
 
-exports.run = function (token, database) {
+exports.run = function (token, database, guildId) {
 	let resolve, reject;
 	let p = new Promise(function(res, rej) {
 		resolve = res;
@@ -106,7 +106,7 @@ exports.run = function (token, database) {
 	});
 
 	//load other modules
-    site.run(bot, database);
+    site.run(bot, database, guildId);
 	
 	// log our bot in
 	return bot.login(token).then(() => p);
