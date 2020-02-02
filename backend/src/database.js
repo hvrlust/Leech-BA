@@ -3,8 +3,6 @@ const sqlite3 = require('sqlite3').verbose();
 class Database {
     // https://gist.github.com/yizhang82/2ab802f1439490984eb998af3d96b16b
     constructor(path) {
-        // this.db = new sqlite3.Database('/usr/leechba/database.db', sqlite3.OPEN_READWRITE, (err) => {
-        // this.db = new sqlite3.Database('./data/database.db', sqlite3.OPEN_READWRITE, (err) => {
         this.db = new sqlite3.Database(path, sqlite3.OPEN_READWRITE, (err) => {
             if (err) {
                 return console.error(err.message);

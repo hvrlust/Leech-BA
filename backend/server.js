@@ -16,5 +16,5 @@ const bot = require("./src/discord/bot");
 const site = require("./src/site/main");
 bot.run(config['token'], database, config['guildId'])
     .then((c) => {
-        site.run(database, c.adminChannel, c.queueChannel);
+        site.run(database, c.queueChannel);
     });

@@ -1,6 +1,6 @@
 const BOT_UID = 1;
 
-function process(req, database, adminChannel, queueChannel) {
+function process(req, database, queueChannel) {
 	const data = req.body;
 	if(data['xp_rsn']) {
 		return processQueueReq({
@@ -12,7 +12,7 @@ function process(req, database, adminChannel, queueChannel) {
 				ba: data['xp_ba'],
 				amount: data['xp_amount'],
 			},
-		}, database, adminChannel, queueChannel);
+		}, database, queueChannel);
 
 	} else if(data['points_rsn']) {
         return processQueueReq({
@@ -41,21 +41,14 @@ function process(req, database, adminChannel, queueChannel) {
 				ironman: data['ironman'],
 				kingkills: parseInt(data['kingskilled'], 10),
 			},
-		}, database, adminChannel, queueChannel);
+		}, database, queueChannel);
     }
     return Promise.reject(false);
 }
 
-async function processQueueReq(mail, database, adminChannel, queueChannel) {
-	console.log("processQueueReq", mail);
-    //var channel = this.bot.channels.find("name", this.queueChannel);
+async function processQueueReq(mail, database, queueChannel) {
     var month = ('0' + (new Date().getMonth() + 1)).slice(-2);
     var date = ('0' + new Date().getDate()).slice(-2);
-    var message = "";
-    if (mail.subject == "admin-test") {
-        adminChannel.send("Request acknowledged and received.\nMessage: " + mail.text);
-        return Promise.resolve(true);
-    }
 
     // XP REQUEST =================================================================================================================================================
     if (mail.subject == "xp") {
@@ -202,7 +195,7 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
             need += "C[L" + want_collvl + "," + want_col + "] ";
             need += "D[L" + want_deflvl + "," + want_def + "] ";
             need += "H[L" + want_heallvl + "," + want_heal + "] ";
-            //@@@@
+
             var needs = [];
             if (needA > 0) {
                 needs.push(needA + " att");
@@ -221,10 +214,7 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
             current += "\n";
             need += "\n";
             net += n + "\n";
-            // n = n.replace("att", ":BA_A:");
-            // n = n.replace("def", ":BA_D:");
-            // n = n.replace("heal", ":BA_H:");
-            // n = n.replace("col", " :BA_C:");
+
             if (!insignia) {
                 leech_simple = n;
             }
@@ -310,7 +300,6 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
             ironsimple = " (Ironman)";
         }
 
-        //end of relevancy
         var s0 = "RSN: " + data.rsn + "\nLeech: " + leech + "\n";
         s0 += current;
         s0 += need;
@@ -327,7 +316,7 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
         if (data.enhancer > 0) {
             notes.push(enhancer.replace(/[{()}]/g, ''));
         }
-        console.log("KINGS", kingsneeded);
+
         return database.newCustomer(BOT_UID, {
             date: new Date(),
             rsn: data.rsn,
@@ -354,30 +343,6 @@ async function processQueueReq(mail, database, adminChannel, queueChannel) {
 
             return queueChannel.send("```"+ s0 + s1 + s2 + "```");
         }).then(m => m.pin());
-    }
-
-    // TRIAL REQUEST =================================================================================================================================================
-    if (mail.subject == "trial") {
-        var data = mail.text;
-        var message = "```";
-        message += "RSN: " + data.rsn + "\n";
-        message += "Trialled before: " + data.before + "\n";
-        message += "Timezone: GMT" + data.timezone + "\n";
-        message += "Will guest in cc: " + data.guest + "\n";
-
-        var roles = (data.roles.replace("[", "").replace("]", "")).split(",");
-        message += "Roles: ";
-        for (var i = 0; i < roles.length - 1; i++) {
-            message += roles[i] + " ";
-            if (roles.length - 2 > i) {
-                message += "| ";
-            }
-            //Do something
-        }
-        message += "\n";
-        message += "```";
-        message += "Link to stats: http://services.runescape.com/m=hiscore/compare?user1=" + (data.rsn).replace(/\s/g, "%20");
-       return  queueChannel.guild.channels.find("name", "trials").send(message);
     }
 
     return Promise.reject(false);

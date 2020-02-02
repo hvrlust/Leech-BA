@@ -10,8 +10,6 @@ const console = (function () {
     }
 })();
 
-const MAIL_PARSER_MODULE = require('./mail-parser.js');
-
 const commandUtils = require('./common/command-utils');
 const DEFAULTPREFIX = commandUtils.DEFAULTPREFIX;
 const ADMINPREFIX = commandUtils.ADMINPREFIX;
