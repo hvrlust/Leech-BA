@@ -282,7 +282,7 @@ exports.run = function (database, adminChannel, queueChannel) {
         res.sendFile(legacy + '/success.html');
       })
       .catch(() => {
-        res.status(500);
+        res.status(500).send("error");
       });
   });
 
