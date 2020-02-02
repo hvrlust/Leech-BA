@@ -14,7 +14,6 @@ const commandUtils = require('./common/command-utils');
 const DEFAULTPREFIX = commandUtils.DEFAULTPREFIX;
 const ADMINPREFIX = commandUtils.ADMINPREFIX;
 let currentQueueChannel = "queue";
-let mailParser;
 
 /*
  * list of commands, descriptions and functions
@@ -235,7 +234,7 @@ var adminCommands = {
         description: 'clears chat of last 50 messages',
         parameters: [],
         permittedRoles: ["stuff", "Server admin"],
-        execute: function (message, params) {
+        execute: function (bot, message, params) {
             message.channel.fetchMessages().then(messages => message.channel.bulkDelete(messages)).catch(console.error);
         }
     },
@@ -243,7 +242,7 @@ var adminCommands = {
         description: 'Displays list of commands for admins',
         parameters: [],
         permittedRoles: ["stuff", "Server admin", "developer"],
-        execute: function (message, params) {
+        execute: function (bot, message, params) {
             var response = "command list:";
             for (var command in adminCommands) {
                 if (adminCommands.hasOwnProperty(command)) { //sanity check
@@ -265,7 +264,7 @@ var adminCommands = {
         description: 'Sends Discord.js document link',
         parameters: [],
         permittedRoles: ["Server admin"],
-        execute: function (message, params) {
+        execute: function (bot, message, params) {
             message.channel.send('<https://discord.js.org/#/docs/main/stable/general/welcome>');
         }
     },
@@ -273,7 +272,7 @@ var adminCommands = {
         description: 'Pins message in the channel after the command',
         parameters: [],
         permittedRoles: ["stuff", "Server admin"],
-        execute: function (message, params) {
+        execute: function (bot, message, params) {
             params.args.splice(0, 1);
             var pinnedMessage = params.args.join(" ");
             message.channel.send(pinnedMessage).then(m => m.pin()).catch(function () {
@@ -282,20 +281,11 @@ var adminCommands = {
             });
         }
     },
-    'ping': {
-        description: 'checks the status of the requests module',
-        parameters: [],
-        permittedRoles: ["stuff", "Server admin", "developer"],
-        execute: function (message, params) {
-            mailParser.setAdminChannel(message.channel);
-            mailParser.ping(message);
-        }
-    },
     'poll': {
         description: 'posts and pins a message, adding :thumbsup: :thumbsdown: :shrug: for people to vote',
         parameters: [],
         permittedRoles: ["stuff", "Server admin"],
-        execute: function (message, params) {
+        execute: function (bot, message, params) {
             message.channel.send(params.args.slice(1).join(' ')).then(async function (message) {
                 await message.react("👍");
                 await message.react("👎");
@@ -308,7 +298,7 @@ var adminCommands = {
         description: 'loads the embedded information message',
         parameters: [],
         permittedRoles: ["Server admin"],
-        execute: async function (message, params) {
+        execute: async function (bot, message, params) {
             await message.channel.send({
                     embed: {
                         color: 2263842,
@@ -361,7 +351,7 @@ var adminCommands = {
         parameters: ['-default', '-get', '-set'],
         help: '',
         permittedRoles: ["Server admin", "developer"],
-        execute: function (message, params) {
+        execute: function (bot, message, params) {
             const args = message.content.split(' ');
             if (args[1] === params.parameters[0]) {
                 currentQueueChannel = "queue";
@@ -387,17 +377,8 @@ var adminCommands = {
                 );
                 return;
             }
-            mailParser.setQueueChannel(message.client.channels.find(channel => channel.name === currentQueueChannel));
+            bot.setQueueChannel(message.client.channels.find(channel => channel.name === currentQueueChannel));
 
-        }
-    },
-    'reload': {
-        description: 'reconnects requests module',
-        parameters: [],
-        permittedRoles: ["stuff", "Server admin"],
-        execute: function (message, params) {
-            mailParser.stop(); //mailparser autoreboots when disconnected
-            message.channel.send("reloaded requests module");
         }
     }
 };
