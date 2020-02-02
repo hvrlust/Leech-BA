@@ -14,7 +14,5 @@ const database = new Database(config['dbPath']);
 const bot = require("./src/discord/bot");
 
 const site = require("./src/site/main");
-bot.run(config['token'], database, config['guildId'])
-    .then((c) => {
-        site.run(database, c.queueChannel);
-    });
+bot.run(config['token'], database, config['guildId']);
+site.run(database, bot.getQueueChannel);

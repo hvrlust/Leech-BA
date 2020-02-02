@@ -1,4 +1,4 @@
-exports.run = function (database, queueChannel) {
+exports.run = function (database, getQueueChannel) {
   'use strict';
   const express = require('express');
   const utils = require('../utils');
@@ -277,7 +277,7 @@ exports.run = function (database, queueChannel) {
   app.use(express.static(legacy));
   const legacyQueueProcessor = require('./legacy-queue');
   app.post('/legacy/queue', async (req, res) => {
-    legacyQueueProcessor.process(req, database, queueChannel)
+    legacyQueueProcessor.process(req, database, getQueueChannel)
       .then(() => {
         res.sendFile(legacy + '/success.html');
       })

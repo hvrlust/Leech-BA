@@ -1,9 +1,9 @@
 const BOT_UID = 1;
 
-function process(req, database, queueChannel) {
+function process(req, database, getQueueChannel) {
 	const data = req.body;
 	if(data['xp_rsn']) {
-		return processQueueReq({
+		return getQueueChannel().then(queueChannel => processQueueReq({
 			subject: 'xp',
 			text: {
 				rsn: data['xp_rsn'],
@@ -12,10 +12,10 @@ function process(req, database, queueChannel) {
 				ba: data['xp_ba'],
 				amount: data['xp_amount'],
 			},
-		}, database, queueChannel);
+		}, database, queueChannel));
 
 	} else if(data['points_rsn']) {
-        return processQueueReq({
+		return getQueueChannel().then(queueChannel => processQueueReq({
 			subject: 'item',
 			text: {
 				rsn: data['points_rsn'],
@@ -41,7 +41,7 @@ function process(req, database, queueChannel) {
 				ironman: data['ironman'],
 				kingkills: parseInt(data['kingskilled'], 10),
 			},
-		}, database, queueChannel);
+		}, database, queueChannel));
     }
     return Promise.reject(false);
 }
