@@ -8,7 +8,7 @@ const fs = require('fs');
 const config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
 
 const Database = require('./src/database');
-const database = new Database();
+const database = new Database(config['dbPath']);
 
 // the token of your bot - https://discordapp.com/developers/applications/me
 const bot = require("./src/discord/bot");

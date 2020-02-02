@@ -7,4 +7,8 @@ const console = (function () {
     return {
         log: this.console.log.bind(this.console, '%s', timestamp)
     }
+<<<<<<< HEAD
 })();
+=======
+})();
+>>>>>>> upstream/master

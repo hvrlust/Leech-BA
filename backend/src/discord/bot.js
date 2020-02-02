@@ -1,6 +1,7 @@
 // debugging
 const console = (function () {
-	var timestamp = function () { };
+	const timestamp = function () {
+	};
 	timestamp.toString = function () {
 		return "[" + (new Date).toLocaleTimeString() + "]";
 	};
@@ -10,10 +11,8 @@ const console = (function () {
 })();
 
 const Discord = require('discord.js');
-
 const bot = new Discord.Client();
 
-var last = 0;
 const commandList = require('./command-list.js');
 const commandUtils = require('./common/command-utils.js');
 const site = require('./site-api/main.js');
@@ -26,10 +25,10 @@ const site = require('./site-api/main.js');
 function handleCommand(message, params) {
 	params[0] = params[0].substr(1);//drop prefix
 	if (params[0] in commandList.commands) {
-		var command = commandList.commands[params[0]];
+		const command = commandList.commands[params[0]];
 		//if the user has the permissions to execute the command
 		if (commandUtils.isPermitted(message.member, command.permittedRoles)) {
-			var commandParams = {
+			const commandParams = {
 				args: params,
 				parameters: command.parameters
 			};
@@ -44,22 +43,15 @@ function handleCommand(message, params) {
 function handleAdminCommand(message, params) {
 	params[0] = params[0].substr(1);//drop prefix
 	if (params[0] in commandList.adminCommands) {
-		var command = commandList.adminCommands[params[0]];
+		const command = commandList.adminCommands[params[0]];
 		if (commandUtils.isPermitted(message.member, command.permittedRoles)) {
-			var commandParams = {
+			const commandParams = {
 				args: params,
 				parameters: command.parameters
 			};
 			command.execute(message, commandParams);
 		}
 	}
-}
-
-/*
- *
- */
-function handleQueueChannelSupport(message) {
-
 }
 
 exports.run = function (token, database, guildId) {
@@ -85,7 +77,7 @@ exports.run = function (token, database, guildId) {
 	});
 
 	bot.on('message', message => {
-		var args = message.content.split(" ");
+		const args = message.content.split(" ");
 		/* commands */
 		if (args[0].startsWith(commandUtils.DEFAULTPREFIX)) {
 			handleCommand(message, args);
@@ -102,7 +94,6 @@ exports.run = function (token, database, guildId) {
 		}
 
 		/* moderation commands */
-		//TODO
 	});
 
 	//load other modules
