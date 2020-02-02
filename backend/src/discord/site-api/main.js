@@ -2,10 +2,10 @@ const CommandHandler = require('./commandhandler');
 const commandUtils = require('../common/command-utils');
 
 
-exports.run = function (bot, database, guildId) {
+exports.run = function (bot, database) {
     this.commandHandler = new CommandHandler(database);
     bot.on('message', message => {
-        if(message.guild === null || message.guild.id !== guildId) {
+        if(message.guild === null || message.guild.id !== '296560431416213504') {
             return;
         }
 

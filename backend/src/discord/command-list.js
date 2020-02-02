@@ -10,6 +10,8 @@ const console = (function () {
     }
 })();
 
+const MAIL_PARSER_MODULE = require('./mail-parser.js');
+
 const commandUtils = require('./common/command-utils');
 const DEFAULTPREFIX = commandUtils.DEFAULTPREFIX;
 const ADMINPREFIX = commandUtils.ADMINPREFIX;
@@ -469,6 +471,10 @@ function getRoleId(member, role) {
  *
  *
 */
+function init(mailClient, queueChannel, adminChannel) {
+    mailParser = new MAIL_PARSER_MODULE.MailParser(mailClient, queueChannel, adminChannel);
+    mailParser.init();
+}
 
 module.exports = {
     commands,
@@ -476,4 +482,5 @@ module.exports = {
     isPermitted,
     getRoleId,
     hasRole, //maybe don't need this
+    init
 };

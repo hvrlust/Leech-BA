@@ -54,18 +54,13 @@ function handleAdminCommand(message, params) {
 	}
 }
 
-exports.run = function (token, database, guildId) {
-	let resolve, reject;
-	let p = new Promise(function(res, rej) {
-		resolve = res;
-		reject = rej;
-	});
+exports.run = function (token, mailClient, database) {
 	bot.on('ready', () => {
 		console.log('bot ready');
-		resolve({
-			adminChannel: bot.channels.find(channel => channel.name === "test"),
-			queueChannel: bot.channels.find(channel => channel.name === "queue"),
-		});
+		let adminChannel = bot.channels.find(channel => channel.name === "test");
+		let queueChannel = bot.channels.find(channel => channel.name === "queue");
+
+		commandList.init(mailClient, queueChannel, adminChannel);
 	});
 
 	bot.on('disconnect', function (erMsg, code) {
@@ -97,8 +92,8 @@ exports.run = function (token, database, guildId) {
 	});
 
 	//load other modules
-    site.run(bot, database, guildId);
-	
+    site.run(bot, database);
+
 	// log our bot in
-	return bot.login(token).then(() => p);
+	bot.login(token).then(r => {});
 };
