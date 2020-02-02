@@ -281,7 +281,8 @@ exports.run = function (database, getQueueChannel) {
       .then(() => {
         res.sendFile(legacy + '/success.html');
       })
-      .catch(() => {
+      .catch((e) => {
+        console.error("unable to process queue request ", req.body, e);
         res.status(500).send("error");
       });
   });
