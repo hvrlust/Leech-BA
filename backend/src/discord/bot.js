@@ -40,7 +40,7 @@ function handleCommand(message, params) {
 /*
  * see handleCommand
  */
-function handleAdminCommand(message, params) {
+function handleAdminCommand(bot, message, params) {
 	params[0] = params[0].substr(1);//drop prefix
 	if (params[0] in commandList.adminCommands) {
 		const command = commandList.adminCommands[params[0]];
@@ -49,18 +49,32 @@ function handleAdminCommand(message, params) {
 				args: params,
 				parameters: command.parameters
 			};
-			command.execute(message, commandParams);
+			command.execute(bot, message, commandParams);
 		}
 	}
 }
 
-exports.run = function (token, mailClient, database) {
+exports.run = function (token, database, guildId) {
+	let resolve, reject;
+	let p = new Promise(function(res, rej) {
+		resolve = res;
+		reject = rej;
+	});
+
+	let queueChannel;
+
+	this.setQueueChannel = (q) => {
+		queueChannel = q;
+	}
+
+	this.getQueueChannel = () => {
+		return p.then(() => queueChannel)
+	}
+
 	bot.on('ready', () => {
 		console.log('bot ready');
-		let adminChannel = bot.channels.find(channel => channel.name === "test");
-		let queueChannel = bot.channels.find(channel => channel.name === "queue");
-
-		commandList.init(mailClient, queueChannel, adminChannel);
+		queueChannel = bot.channels.find(channel => channel.name === "queue");
+		resolve();
 	});
 
 	bot.on('disconnect', function (erMsg, code) {
@@ -79,7 +93,7 @@ exports.run = function (token, mailClient, database) {
 		}
 		/* admin/mod commands */
 		if (args[0].startsWith(commandUtils.ADMINPREFIX)) {
-			handleAdminCommand(message, args);
+			handleAdminCommand(this, message, args);
 		}
 
 		/* AI responses */
@@ -92,8 +106,8 @@ exports.run = function (token, mailClient, database) {
 	});
 
 	//load other modules
-    site.run(bot, database);
-
+    site.run(bot, database, guildId);
+	
 	// log our bot in
-	bot.login(token).then(r => {});
+	return bot.login(token).then(() => p);
 };

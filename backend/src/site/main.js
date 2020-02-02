@@ -1,4 +1,4 @@
-exports.run = function (database) {
+exports.run = function (database, getQueueChannel) {
   'use strict';
   const express = require('express');
   const utils = require('../utils');
@@ -277,8 +277,14 @@ exports.run = function (database) {
   app.use(express.static(legacy));
   const legacyQueueProcessor = require('./legacy-queue');
   app.post('/legacy/queue', async (req, res) => {
-    legacyQueueProcessor.process(req);
-    res.sendFile(legacy + '/success.html');
+    legacyQueueProcessor.process(req, database, getQueueChannel)
+      .then(() => {
+        res.sendFile(legacy + '/success.html');
+      })
+      .catch((e) => {
+        console.error("unable to process queue request ", req.body, e);
+        res.status(500).send("error");
+      });
   });
 
   app.get('/legacy', (req, res) => {
