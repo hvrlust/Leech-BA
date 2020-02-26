@@ -2,7 +2,7 @@ const BOT_UID = 1;
 
 function process(req, database, getQueueChannel) {
 	const data = req.body;
-	if(data['xp_rsn']) {
+	if (data['xp_rsn']) {
 		return getQueueChannel().then(queueChannel => processQueueReq({
 			subject: 'xp',
 			text: {
@@ -14,7 +14,7 @@ function process(req, database, getQueueChannel) {
 			},
 		}, database, queueChannel));
 
-	} else if(data['points_rsn']) {
+	} else if (data['points_rsn']) {
 		return getQueueChannel().then(queueChannel => processQueueReq({
 			subject: 'item',
 			text: {
@@ -42,320 +42,289 @@ function process(req, database, getQueueChannel) {
 				kingkills: parseInt(data['kingskilled'], 10),
 			},
 		}, database, queueChannel));
-    }
-    return Promise.reject(false);
+	}
+	return Promise.reject(false);
 }
 
 async function processQueueReq(mail, database, queueChannel) {
-    var month = ('0' + (new Date().getMonth() + 1)).slice(-2);
-    var date = ('0' + new Date().getDate()).slice(-2);
+	let month = ('0' + (new Date().getMonth() + 1)).slice(-2);
+	let date = ('0' + new Date().getDate()).slice(-2);
 
-    // XP REQUEST =================================================================================================================================================
-    if (mail.subject == "xp") {
-        var data = mail.text;
-        //filter ba
-        var ba = "(NM1)";
-        switch (data.ba) {
-            case "none":
-                ba = "(NM1)";
-                break;
-            case "queen":
-                ba = "(HM1)";
-                break;
-            case "hardmode":
-                ba = "(HM6)";
-                break;
-            default:
-                ba = "(HM10)";
-                break;
-        }
-        var amount = parseInt(data.amount.split(',').join(''));
-        if (amount <= 0 || !data.rsn) {
-            return Promise.reject(false);
-        }
+	// XP REQUEST =================================================================================================================================================
+	if (mail.subject == "xp") {
+		let data = mail.text;
+		//filter ba
+		let ba = "(NM1)";
+		switch (data.ba) {
+			case "none":
+				ba = "(NM1)";
+				break;
+			case "queen":
+				ba = "(HM1)";
+				break;
+			case "hardmode":
+				ba = "(HM6)";
+				break;
+			default:
+				ba = "(HM10)";
+				break;
+		}
+		let amount = parseInt(data.amount.split(',').join(''));
+		if (amount <= 0 || !data.rsn) {
+			return Promise.reject(false);
+		}
 
-        amount = nFormatter(amount, 2);
-        return database.newCustomer(BOT_UID, {
-            date: new Date(),
-            rsn: data.rsn,
-            ba: ba.replace(/[()]/g, "").trim(),
-            services: {
-                bxp: {
-                    [data.skill]: data.amount.split(',').join(''),
-                },
-            },
-            notes: "(unconfirmed)", //TODO: confirmed field
-        }).then(status => {
-            var rsn_bxp = data.rsn;
-            var s0 = "RSN: " + data.rsn + "\nLeech: BXP\nSkill: " + data.skill + "\nLevel: " + data.level + "\nAmount: " + data.amount + "\nBA completed up to: " + ba + "\n\n\n";
-            var s1 = "Summary: \n" + date + "/" + month + ": " + rsn_bxp + " - " + amount + " " + data.skill + " bxp " + ba + "\n\n";
-            var s2 = "";
+		amount = nFormatter(amount, 2);
+		return database.newCustomer(BOT_UID, {
+			date: new Date(),
+			rsn: data.rsn,
+			ba: ba.replace(/[()]/g, "").trim(),
+			services: {
+				bxp: {
+					[data.skill]: data.amount.split(',').join(''),
+				},
+			},
+			notes: "(unconfirmed)", //TODO: confirmed field
+		}).then(status => {
+			let rsn_bxp = data.rsn;
+			let s0 = "RSN: " + data.rsn + "\nLeech: BXP\nSkill: " + data.skill + "\nLevel: " + data.level + "\nAmount: " + data.amount + "\nBA completed up to: " + ba + "\n\n\n";
+			let s1 = "Summary: \n" + date + "/" + month + ": " + rsn_bxp + " - " + amount + " " + data.skill + " bxp " + ba + "\n\n";
+			let s2 = "";
 
-            if (typeof status != "number") {
-                s2 = "Status: " + status + ". Please insert/update the current request for this rsn.";
-            } else {
-                s2 = "Status: Inserted into queue, please confirm (and remove the unconfirmed note)";
-            }
+			if (typeof status != "number") {
+				s2 = "Status: " + status + ". Please insert/update the current request for this rsn.";
+			} else {
+				s2 = "Status: Inserted into queue, please confirm (and remove the unconfirmed note)";
+			}
 
-            return queueChannel.send("```"+ s0 + s1 + s2 + "```");
-        }).then(m => m.pin());
-    }
+			return queueChannel.send("```" + s0 + s1 + s2 + "```");
+		}).then(m => m.pin());
+	}
 
-    // ITEM REQUEST =================================================================================================================================================
-    if (mail.subject == "item") {
-        var data = mail.text;
-        var ba = "(NM1)";
-        var current = "";
-        var need = "";
-        var net = "";
-        var n = "";
-        var enhancer = "";
-        var ironman = "";
-        var needA = 0;
-        var needD = 0;
-        var needH = 0;
-        var needC = 0;
+	// ITEM REQUEST =================================================================================================================================================
+	if (mail.subject == "item") {
+		let data = mail.text;
+		let ba = "(NM1)";
+		let current = "";
+		let need = "";
+		let net = "";
+		let n = "";
+		let enhancer = "";
+		let ironman = "";
+		let needA = 0;
+		let needD = 0;
+		let needH = 0;
+		let needC = 0;
 
-        switch (data.ba) {
-            case "none":
-                ba = " (NM1)";
-                break;
-            case "queen":
-                ba = " (HM1)";
-                break;
-            case "hardmode":
-                ba = " (HM6)";
-                break;
-            default:
-                ba = " (HM10)";
-                break;
-        }
-        var leech = data.preset;
-        var king = "";
-        var leech_simple = data.preset;
-        var insignia = false;
+		switch (data.ba) {
+			case "none":
+				ba = " (NM1)";
+				break;
+			case "queen":
+				ba = " (HM1)";
+				break;
+			case "hardmode":
+				ba = " (HM6)";
+				break;
+			default:
+				ba = " (HM10)";
+				break;
+		}
+		let leech = data.preset;
+		let leech_simple = data.preset;
+		let insignia = false;
 
-        if (leech == "levels") {
-            leech = "points";
-            leech_simple = leech;
-        }
-        //calculate relevant information of want and needs
-        var attlvl = data.alevel;
-        var collvl = data.clevel;
-        var heallvl = data.hlevel;
-        var deflvl = data.dlevel;
+		if (leech == "levels") {
+			leech = "points";
+			leech_simple = leech;
+		}
 
-        var att = data.apoints;
-        var col = data.cpoints;
-        var heal = data.hpoints;
-        var def = data.dpoints;
+		//calculate relevant information of want and needs
+		let attlvl = data.alevel;
+		let collvl = data.clevel;
+		let heallvl = data.hlevel;
+		let deflvl = data.dlevel;
 
-        var want_attlvl = data.want_alevel;
-        var want_collvl = data.want_clevel;
-        var want_heallvl = data.want_hlevel;
-        var want_deflvl = data.want_dlevel;
+		let att = data.apoints;
+		let col = data.cpoints;
+		let heal = data.hpoints;
+		let def = data.dpoints;
 
-        var want_att = data.want_apoints;
-        var want_col = data.want_cpoints;
-        var want_heal = data.want_hpoints;
-        var want_def = data.want_dpoints;
+		let want_attlvl = data.want_alevel;
+		let want_collvl = data.want_clevel;
+		let want_heallvl = data.want_hlevel;
+		let want_deflvl = data.want_dlevel;
+
+		let want_att = data.want_apoints;
+		let want_col = data.want_cpoints;
+		let want_heal = data.want_hpoints;
+		let want_def = data.want_dpoints;
 
 
-        //if appropriate
-        //convert all into points
-        const leveldifference = [0, 200, 300, 400, 500, 0];
-        for (i = attlvl; i < want_attlvl; i++) {
-            needA = needA + leveldifference[i];
-        }
-        for (i = collvl; i < want_collvl; i++) {
-            needC = needC + leveldifference[i];
-        }
-        for (i = heallvl; i < want_heallvl; i++) {
-            needH = needH + leveldifference[i];
-        }
-        for (i = deflvl; i < want_deflvl; i++) {
-            needD = needD + leveldifference[i];
-        }
-        needA = needA - att + want_att;
-        needC = needC - col + want_col;
-        needD = needD - def + want_def;
-        needH = needH - heal + want_heal;
+		//if appropriate
+		//convert all into points
+		const leveldifference = [0, 200, 300, 400, 500, 0];
+		for (i = attlvl; i < want_attlvl; i++) {
+			needA = needA + leveldifference[i];
+		}
+		for (i = collvl; i < want_collvl; i++) {
+			needC = needC + leveldifference[i];
+		}
+		for (i = heallvl; i < want_heallvl; i++) {
+			needH = needH + leveldifference[i];
+		}
+		for (i = deflvl; i < want_deflvl; i++) {
+			needD = needD + leveldifference[i];
+		}
+		needA = needA - att + want_att;
+		needC = needC - col + want_col;
+		needD = needD - def + want_def;
+		needH = needH - heal + want_heal;
 
-        if (needA > 0 || needC > 0 || needD > 0 || needH > 0) {
-            current = "Current: ";
-            need = "Needs: ";
-            net = "Net: ";
+		if (needA > 0 || needC > 0 || needD > 0 || needH > 0) {
+			current = "Current: ";
+			need = "Needs: ";
+			net = "Net: ";
 
-            current += "A[L" + attlvl + "," + att + "] ";
-            current += "C[L" + collvl + "," + col + "] ";
-            current += "D[L" + deflvl + "," + def + "] ";
-            current += "H[L" + heallvl + "," + heal + "] ";
+			current += "A[L" + attlvl + "," + att + "] ";
+			current += "C[L" + collvl + "," + col + "] ";
+			current += "D[L" + deflvl + "," + def + "] ";
+			current += "H[L" + heallvl + "," + heal + "] ";
 
-            need += "A[L" + want_attlvl + "," + want_att + "] ";
-            need += "C[L" + want_collvl + "," + want_col + "] ";
-            need += "D[L" + want_deflvl + "," + want_def + "] ";
-            need += "H[L" + want_heallvl + "," + want_heal + "] ";
+			need += "A[L" + want_attlvl + "," + want_att + "] ";
+			need += "C[L" + want_collvl + "," + want_col + "] ";
+			need += "D[L" + want_deflvl + "," + want_def + "] ";
+			need += "H[L" + want_heallvl + "," + want_heal + "] ";
 
-            var needs = [];
-            if (needA > 0) {
-                needs.push(needA + " att");
-            }
-            if (needC > 0) {
-                needs.push(needC + " col");
-            }
-            if (needD > 0) {
-                needs.push(needD + " def");
-            }
-            if (needH > 0) {
-                needs.push(needH + " heal");
-            }
-            n = needs.join(" + ");
+			let needs = [];
+			if (needA > 0) {
+				needs.push(needA + " att");
+			}
+			if (needC > 0) {
+				needs.push(needC + " col");
+			}
+			if (needD > 0) {
+				needs.push(needD + " def");
+			}
+			if (needH > 0) {
+				needs.push(needH + " heal");
+			}
+			n = needs.join(" + ");
 
-            current += "\n";
-            need += "\n";
-            net += n + "\n";
+			current += "\n";
+			need += "\n";
+			net += n + "\n";
 
-            if (!insignia) {
-                leech_simple = n;
-            }
-            if (data.enhancer > 0)
-                enhancer = " (" + data.enhancer + " charges)"
-        }
+			if (!insignia) {
+				leech_simple = n;
+			}
+			if (data.enhancer > 0)
+				enhancer = " (" + data.enhancer + " charges)"
+		}
+		
+		if (leech.includes("insignia")) {
+			let temp = leech.split("_");
 
-        var kingsneeded;
-        if (leech.includes("insignia")) {
-            var temp = leech.split("_");
-            var points = n;
-            //calculate amount of kings
-            var kingpoints = 0;
-            if (data.ba == "hardmode")
-                ba = " (HM10)";
+			//calculate amount of kings
+			if (data.ba == "hardmode")
+				ba = " (HM10)";
 
-            kingskilled = data.kingkills;
-            kingsneeded = 5 - kingskilled;
-            _kingsneeded = kingsneeded;
-            var points = "";
-            var role = "";
-            insignia = true;
-            switch (temp[1]) {
-                case 'A':
-                    leech = "Attacker's insignia";
-                    leech_simple = ":BA_A: Insignia";
-                    points = needA;
-                    role = ":BA_A:";
-                    break;
-                case 'C':
-                    leech = "Collector's insignia";
-                    leech_simple = ":BA_C: Insignia";
-                    points = needC;
-                    role = ":BA_C:";
-                    break;
-                case 'D':
-                    leech = "Defender's insignia";
-                    leech_simple = ":BA_D: Insignia";
-                    points = needD;
-                    role = ":BA_D:";
-                    break;
-                case 'H':
-                    leech = "Healer's insignia";
-                    leech_simple = ":BA_H: Insignia";
-                    points = needH;
-                    role = ":BA_H:";
-                    break;
-            }
-            if (_kingsneeded > 0) {
-                //work out how many kings as role
-                var kingsasrole = 0;
-                for (var i = _kingsneeded; i > 0; i--) {
-                    if (points < 0) break;
-                    points -= 210;
-                    kingsasrole++;
-                    _kingsneeded--;
-                }
-                leech += "/" + (_kingsneeded + kingsasrole) + " king kills ";
-                leech_simple += ": " + kingsasrole;
-                if (kingsasrole > 1) {
-                    leech_simple += " kings as " + role;
-                } else {
-                    leech_simple += " king as " + role;
-                }
-                if (_kingsneeded > 0) {
-                    if (_kingsneeded > 1) {
-                        leech_simple += " + " + _kingsneeded + " kings as any";
-                    } else {
-                        leech_simple += " + " + _kingsneeded + " king as any";
-                    }
-                }
-                if (points > 0) leech_simple += " + " + points + " " + role + " ";
-            }
-        }
+			let kingskilled = data.kingkills;
+			let kingsneeded = 5 - kingskilled;
+			let points = "";
+			let role = "";
+			switch (temp[1]) {
+				case 'A':
+					leech = "Attacker's insignia";
+					leech_simple = ":BA_A: Insignia";
+					points = needA;
+					role = ":BA_A:";
+					break;
+				case 'C':
+					leech = "Collector's insignia";
+					leech_simple = ":BA_C: Insignia";
+					points = needC;
+					role = ":BA_C:";
+					break;
+				case 'D':
+					leech = "Defender's insignia";
+					leech_simple = ":BA_D: Insignia";
+					points = needD;
+					role = ":BA_D:";
+					break;
+				case 'H':
+					leech = "Healer's insignia";
+					leech_simple = ":BA_H: Insignia";
+					points = needH;
+					role = ":BA_H:";
+					break;
+			}
+			if (_kingsneeded > 0) {
+				//work out how many kings as role
+				let kingsasrole = 0;
+				for (let i = _kingsneeded; i > 0; i--) {
+					if (points < 0) break;
+					points -= 210;
+					kingsasrole++;
+					kingsneeded--;
+				}
+				leech += "/" + (_kingsneeded + kingsasrole) + " king kills ";
+				leech_simple += ": " + kingsasrole;
+				if (kingsasrole > 1) {
+					leech_simple += " kings as " + role;
+				} else {
+					leech_simple += " king as " + role;
+				}
+				if (kingsneeded > 0) {
+					if (kingsneeded > 1) {
+						leech_simple += " + " + kingsneeded + " kings as any";
+					} else {
+						leech_simple += " + " + kingsneeded + " king as any";
+					}
+				}
+				if (points > 0) leech_simple += " + " + points + " " + role + " ";
+			}
+		}
 
-        if (leech == "king") {
-            kingsneeded = 1;
-        }
+		let ironsimple = "";
+		if (data.ironman == "yes") {
+			ironman = "Ironman: yes\n";
+			ironsimple = " (Ironman)";
+		}
 
-        var ironsimple = "";
-        if (data.ironman == "yes") {
-            ironman = "Ironman: yes\n";
-            ironsimple = " (Ironman)";
-        }
+		let s0 = "RSN: " + data.rsn + "\nLeech: " + leech + "\n";
+		s0 += current;
+		s0 += need;
+		s0 += net;
+		s0 += ironman;
+		if (data.enhancer > 0) s0 += "Enhancer charges:" + enhancer.replace(/[{()}]/g, '') + "\n";
+		s0 += "BA completed up to:" + ba.replace(/[{()}]/g, '') + "\n";
+		s0 += "\n\n";
 
-        var s0 = "RSN: " + data.rsn + "\nLeech: " + leech + "\n";
-        s0 += current;
-        s0 += need;
-        s0 += net;
-        s0 += ironman;
-        if (data.enhancer > 0) s0 += "Enhancer charges:" + enhancer.replace(/[{()}]/g, '') + "\n";
-        s0 += "BA completed up to:" + ba.replace(/[{()}]/g, '') + "\n";
-        s0 += "\n\n";
+		let notes = ["(unconfirmed)"];
+		if (data.ironman == "yes") {
+			notes.push("IM");
+		}
+		if (data.enhancer > 0) {
+			notes.push(enhancer.replace(/[{()}]/g, ''));
+		}
 
-        var notes = ["(unconfirmed)"];
-        if (data.ironman == "yes") {
-            notes.push("IM");
-        }
-        if (data.enhancer > 0) {
-            notes.push(enhancer.replace(/[{()}]/g, ''));
-        }
+		let s1 = "Summary: \n" + date + "/" + month + ": " + data.rsn + " - " + leech_simple + ironsimple + enhancer + ba + "\n\n";
+		return queueChannel.send("```" + s0 + s1 + "```")
+			.then(m => m.pin());
+	}
 
-        return database.newCustomer(BOT_UID, {
-            date: new Date(),
-            rsn: data.rsn,
-            ba: ba.replace(/[()]/g, "").trim(),
-            services: {
-                points: {
-                    attack: needA,
-                    collector: needC,
-                    healer: needH,
-                    defender: needD,
-                },
-                king: kingsneeded,
-            },
-            notes: notes.join("; "), //TODO: confirmed field
-        }).then(status => {
-            var s1 = "Summary: \n" + date + "/" + month + ": " + data.rsn + " - " + leech_simple + ironsimple + enhancer + ba + "\n\n";
-            var s2 = "";
-
-            if (typeof status != "number") {
-                s2 = "Status: " + status + ". Please insert/update the current request for this rsn.";
-            } else {
-                s2 = "Status: Inserted into queue, please confirm (and remove the unconfirmed note)";
-            }
-
-            return queueChannel.send("```"+ s0 + s1 + s2 + "```");
-        }).then(m => m.pin());
-    }
-
-    return Promise.reject(false);
+	return Promise.reject(false);
 }
 
 function nFormatter(num, digits) {
-	var si = [
-		{ value: 1E18, symbol: "E" },
-		{ value: 1E15, symbol: "P" },
-		{ value: 1E12, symbol: "T" },
-		{ value: 1E9, symbol: "G" },
-		{ value: 1E6, symbol: "M" },
-		{ value: 1E3, symbol: "k" }
+	let si = [
+		{value: 1E18, symbol: "E"},
+		{value: 1E15, symbol: "P"},
+		{value: 1E12, symbol: "T"},
+		{value: 1E9, symbol: "G"},
+		{value: 1E6, symbol: "M"},
+		{value: 1E3, symbol: "k"}
 	], rx = /\.0+$|(\.[0-9]*[1-9])0+$/, i;
 	for (i = 0; i < si.length; i++) {
 		if (num >= si[i].value) {
