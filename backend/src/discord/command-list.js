@@ -211,7 +211,7 @@ const commands = {
                 message.channel.send(this.help);
                 return;
             }
-            const rsn = params.args[1];
+            const rsn = params.args.slice(1).join(" ");
 
             if (await bot.database.setRsn(message.member.id, rsn, message.member.displayName)) {
                 message.channel.send(`I have set your rsn to ${rsn}`).catch(() => {
@@ -478,7 +478,7 @@ const adminCommands = {
                 return;
             }
             const user = message.mentions.members.first();
-            const rsn = params.args[2];
+            const rsn = params.args.slice(2).join(" ");
 
             if (await bot.database.setRsn(user.id, rsn, user.displayName)) {
                 message.channel.send(`I have set ${user}'s rsn to ${rsn}`).catch(() => {

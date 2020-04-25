@@ -167,7 +167,7 @@ class Database {
     }
 
     async getRanks() {
-        return await this.db.getAllAsync(`SELECT display_name, rsn FROM users WHERE rank=1 and rsn!='DEFAULT'`);
+        return await this.db.getAllAsync(`SELECT display_name, rsn FROM users WHERE rank=1 and rsn!='DEFAULT' ORDER BY display_name ASC`);
     }
 
     async getLastUpdate(mgw) {
@@ -188,8 +188,7 @@ class Database {
     }
 
     async getSplits() {
-        const rows = await this.db.getAllAsync(`SELECT * FROM splits`);
-        return rows;
+        return await this.db.getAllAsync(`SELECT * FROM splits`);
     }
 
     async generateCode(discordId, discordName) {
@@ -197,7 +196,7 @@ class Database {
         const code = this.makeid();
 
         const db = await this.db.runAsync(`INSERT INTO authentication(user_id,code) VALUES(?,?)`, [id,code]);
-        return db.lastID == undefined ? 'error generating code' : code;
+        return db.lastID === undefined ? 'error generating code' : code;
     }
 
     async getUserId(discordId, discordName) {
