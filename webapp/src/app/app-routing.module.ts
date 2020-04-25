@@ -9,12 +9,14 @@ import {SplitsComponent} from './splits/splits.component';
 import {LegacyCalculatorComponent} from './legacy-calculator/legacy-calculator.component';
 import {InformationComponent} from './information/information.component';
 import {LeechingGuideComponent} from './leeching-guide/leeching-guide.component';
+import {RankListComponent} from "./rank-list/rank-list.component";
 
 const routes: Routes = [
   { path: '',  component: DashboardComponent},
   { path: 'splits', component: SplitsComponent},
   { path: 'info',  component: InformationComponent},
   { path: 'howtoleech',  component: LeechingGuideComponent},
+  { path: 'ranks',  component: RankListComponent},
   { path: 'calculator',  component: LegacyCalculatorComponent},
   { path: 'queue',  component: QueueComponent},
   { path: 'mgwqueue',  component: MgwQueueComponent},

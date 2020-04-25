@@ -96,7 +96,7 @@ exports.run = function (database, getQueueChannel) {
 
     app.get('/logout', async (req, res) => {
         req.session = null;
-        res.json({response: true});
+        await res.json({response: true});
     });
 
     app.post('/api/deletecustomer', async (req, res) => {
@@ -106,14 +106,13 @@ exports.run = function (database, getQueueChannel) {
                 return;
             }
             const success = await database.deleteCustomer(req.session.user.uid, req.body.id, req.body.rsn);
-            res.json({response: success});
+            await res.json({response: success});
         } else {
             res.status(403).json({error: 'who are you?'});
         }
     });
     app.post('/api/savecustomer', async (req, res) => {
         if (req.session.user) {
-            // TODO more checks
             if (req.body.services.bxp) {
                 if (req.body.services.bxp.agility === '' ||
                     req.body.services.bxp.mining === '' ||
@@ -124,7 +123,7 @@ exports.run = function (database, getQueueChannel) {
                 }
             }
             const success = await database.saveCustomer(req.session.user.uid, req.body); //TODO add handling for if rsn already exists
-            res.json({response: true});
+            await res.json({response: true});
         } else {
             res.status(403).json({error: 'who are you?'});
         }
@@ -142,7 +141,7 @@ exports.run = function (database, getQueueChannel) {
                 }
             }
             const success = await database.newCustomer(req.session.user.uid, req.body); //TODO add handling for if rsn already exists
-            res.json({response: true});
+            await res.json({response: true});
         } else {
             res.status(403).json({error: 'who are you?'});
         }
@@ -150,15 +149,19 @@ exports.run = function (database, getQueueChannel) {
 
     app.get('/api/amiloggedin', async (req, res) => {
         if (req.session.user && await database.checkRank(req.session.user.uid)) {
-            res.json({response: true, user: req.session.user['dname']});
+            await res.json({response: true, user: req.session.user['dname']});
         } else {
-            res.json({response: false});
+            await res.json({response: false});
         }
+    });
+
+    app.get('/api/ranks', async (req, res) => {
+        await res.json({response: await database.getRanks()});
     });
 
     app.get('/api/queue', async (req, res) => {
         if (req.session.user) {
-            res.json({response: await database.getQueue(), update: await database.getLastUpdate()});
+            await res.json({response: await database.getQueue(), update: await database.getLastUpdate()});
         } else {
             res.status(403).json({error: 'not logged in'});
         }
@@ -166,7 +169,7 @@ exports.run = function (database, getQueueChannel) {
 
     app.get('/api/mgw/queue', async (req, res) => {
         if (req.session.user) {
-            res.json({response: await database.getQueue(true), update: await database.getLastUpdate(true)});
+            await res.json({response: await database.getQueue(true), update: await database.getLastUpdate(true)});
         } else {
             res.status(403).json({error: 'not logged in'});
         }
@@ -179,7 +182,7 @@ exports.run = function (database, getQueueChannel) {
                 return;
             }
             const success = await database.deleteCustomer(req.session.user.uid, req.body.id, req.body.rsn, true);
-            res.json({response: success});
+            await res.json({response: success});
         } else {
             res.status(403).json({error: 'who are you?'});
         }
@@ -197,7 +200,7 @@ exports.run = function (database, getQueueChannel) {
                 }
             }
             const success = await database.saveCustomer(req.session.user.uid, req.body, true); //TODO add handling for if rsn already exists
-            res.json({response: true});
+            await res.json({response: true});
         } else {
             res.status(403).json({error: 'who are you?'});
         }
@@ -215,7 +218,7 @@ exports.run = function (database, getQueueChannel) {
                 }
             }
             const success = await database.newCustomer(req.session.user.uid, req.body, true); //TODO add handling for if rsn already exists
-            res.json({response: true});
+            await res.json({response: true});
         } else {
             res.status(403).json({error: 'who are you?'});
         }
@@ -235,7 +238,7 @@ exports.run = function (database, getQueueChannel) {
 
     app.get('/api/splits', async (req, res) => {
         if (req.session.user) {
-            res.json({response: await database.getSplits()});
+            await res.json({response: await database.getSplits()});
         } else {
             res.status(403).json({error: 'not logged in'});
         }

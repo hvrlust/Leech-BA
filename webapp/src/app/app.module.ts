@@ -12,11 +12,11 @@ import {QueueModule} from './queue/queue.module';
 import {MgwQueueModule} from './mgwqueue/mgw.queue.module';
 import {MAT_DATE_LOCALE} from '@angular/material';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import {SplitsComponent} from './splits/splits.component';
 import {SplitsModule} from './splits/splits.module';
 import {LegacyCalculatorComponent} from './legacy-calculator/legacy-calculator.component';
 import {InformationComponent} from './information/information.component';
 import {LeechingGuideComponent} from './leeching-guide/leeching-guide.component';
+import {RankListModule} from "./rank-list/rank-list.module";
 
 @NgModule({
   declarations: [
@@ -24,7 +24,7 @@ import {LeechingGuideComponent} from './leeching-guide/leeching-guide.component'
     DashboardComponent,
     LegacyCalculatorComponent,
     InformationComponent,
-    LeechingGuideComponent
+    LeechingGuideComponent,
   ],
   imports: [
     BrowserModule,
@@ -35,6 +35,7 @@ import {LeechingGuideComponent} from './leeching-guide/leeching-guide.component'
     MgwQueueModule,
     SplitsModule,
     NavModule,
+    RankListModule,
     FontAwesomeModule,
     MaterialModule
   ],
