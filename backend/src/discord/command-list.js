@@ -480,7 +480,7 @@ const adminCommands = {
             const user = message.mentions.members.first();
             const rsn = params.args[2];
 
-            if (await bot.database.setRsn(user.id, rsn, message.member.displayName)) {
+            if (await bot.database.setRsn(user.id, rsn, user.displayName)) {
                 message.channel.send(`I have set ${user}'s rsn to ${rsn}`).catch(() => {
                     console.error("unable to send message to respond to setrsn");
                 });
