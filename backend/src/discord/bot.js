@@ -65,11 +65,11 @@ exports.run = function (token, database, guildId) {
 
 	this.setQueueChannel = (q) => {
 		queueChannel = q;
-	}
+	};
 
 	this.getQueueChannel = () => {
 		return p.then(() => queueChannel)
-	}
+	};
 
 	bot.on('ready', () => {
 		console.log('bot ready');

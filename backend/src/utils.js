@@ -4,8 +4,8 @@ const cheerio = require('cheerio');
 module.exports = {
   getLevels: function (user, callback) {
     request('http://services.runescape.com/m=hiscore/index_lite.ws?player=' + user, function (error, response, html) {
-      if (!error && response.statusCode == 200) {
-        var $ = cheerio.load(html);
+      if (!error && response.statusCode === 200) {
+        const $ = cheerio.load(html);
 
         callback.send($.text());
       }
@@ -14,8 +14,8 @@ module.exports = {
 
   getPrice: function (id, callback) {
     request('http://services.runescape.com/m=itemdb_rs/api/graph/' + id + '.json', function (error, response, html) {
-      if (!error && response.statusCode == 200) {
-        var $ = cheerio.load(html);
+      if (!error && response.statusCode === 200) {
+        const $ = cheerio.load(html);
 
         callback.send($.text());
       }

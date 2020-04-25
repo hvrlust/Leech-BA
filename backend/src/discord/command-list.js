@@ -1,6 +1,6 @@
 // debugging
 const console = (function () {
-    var timestamp = function () {
+    const timestamp = function () {
     };
     timestamp.toString = function () {
         return "[" + (new Date).toLocaleTimeString() + "]";
@@ -71,7 +71,7 @@ const commands = {
         help: 'example use: `' + DEFAULTPREFIX + 'complete @Queuebot#1337`',
         permittedRoles: ["ranks"],
         execute: function (message, params) {
-            var leeches = message.mentions.users;
+            const leeches = message.mentions.users;
             if (leeches.size === 0) {
                 message.channel.send(this.help);
                 return;
@@ -169,15 +169,12 @@ const commands = {
                     removeTimezone(user,
                         function () {
                             user.addRole(message.channel.guild.roles.find("name", timezone).id, "added " + timezone)
-                                .then(function () {
-                                    message.channel.send("Timezone successfully changed to " + timezone
-                                    );
-                                }).catch(console.error);
+                                .then(() => message.channel.send("Timezone successfully changed to " + timezone))
+                                .catch(console.error);
                         });
                     break;
                 default:
                     message.channel.send(this.help);
-                    break;
             }
         }
     },
@@ -229,7 +226,7 @@ const commands = {
     }
 };
 
-var adminCommands = {
+const adminCommands = {
     'clearchat': {
         description: 'clears chat of last 50 messages',
         parameters: [],
@@ -340,7 +337,7 @@ var adminCommands = {
                     }
                 }
             );
-            message.delete().catch(error => {
+            message.delete().catch(() => {
                 console.log('Error deleting message using !info');
             });
             message.channel.send('https://discord.gg/j4DgZBj');
@@ -389,10 +386,8 @@ var adminCommands = {
  * @callback: a function that gets executed upon completion
  */
 function removeTimezone(user, callback) {
-    var timezones = ["EU", "USA", "AUS"];
-    var roles = [];
-    var i = 0;
-    var removing = false;
+    const timezones = ["EU", "USA", "AUS"];
+    const roles = [];
     timezones.forEach(function (timezone) {
         if (user.roles.find('name', timezone)) {
             roles.push(user.guild.roles.find("name", timezone).id)
@@ -412,10 +407,10 @@ function removeTimezone(user, callback) {
  * checks if a user has at least one of the set of roles
  */
 function isPermitted(member, roles) {
-    if (roles.length == -0)
+    if (roles.length === -0)
         return true;
 
-    for (var i = 0; i < roles.length; i++) {
+    for (let i = 0; i < roles.length; i++) {
         if (hasRole(member, roles[i]))
             return true;
     }
@@ -438,8 +433,8 @@ function hasRole(member, role) {
  * @role: role string name
  * returns id
  */
-function getRoleId(member, role) {
-    var role = member.guild.roles.find(x => x.name === role);
+function getRoleId(member, name) {
+    const role = member.guild.roles.find(x => x.name === name);
     if (role)
         return role.id;
     else
