@@ -2,7 +2,7 @@ import {ActivatedRouteSnapshot, DetachedRouteHandle, RouteReuseStrategy} from '@
 
 // https://stackoverflow.com/questions/41280471/how-to-implement-routereusestrategy-shoulddetach-for-specific-routes-in-angular
 export class CustomReuseStrategy implements RouteReuseStrategy {
-  routesToCache: string[] = ['', '/', 'calculator', 'splits', 'queue', 'info'];
+  routesToCache: string[] = ['', '/', 'calculator', 'splits', 'queue', 'info', 'ranks'];
   storedRouteHandles = new Map<string, DetachedRouteHandle>();
 
   // Decides if the route should be stored
