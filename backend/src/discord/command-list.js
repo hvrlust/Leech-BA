@@ -11,6 +11,8 @@ const console = (function () {
 })();
 
 const commandUtils = require('./common/command-utils');
+const {hasRole} = require("./common/command-utils");
+const {isPermitted} = require("./common/command-utils");
 const DEFAULTPREFIX = commandUtils.DEFAULTPREFIX;
 const ADMINPREFIX = commandUtils.ADMINPREFIX;
 let currentQueueChannel = "queue";
@@ -27,7 +29,7 @@ const commands = {
         require: [],
         help: 'example use: `' + DEFAULTPREFIX + 'add @Queuebot#2414`',
         permittedRoles: ["ranks", "Bots"],
-        execute: function (message, params) {
+        execute: function (bot, message) {
             const leeches = message.mentions.users;
             const rolesList = message.channel.guild.roles;
             if (leeches.size === 0) {
@@ -70,7 +72,7 @@ const commands = {
         parameters: ["user tag"],
         help: 'example use: `' + DEFAULTPREFIX + 'complete @Queuebot#1337`',
         permittedRoles: ["ranks"],
-        execute: function (message, params) {
+        execute: function (bot, message) {
             const leeches = message.mentions.users;
             if (leeches.size === 0) {
                 message.channel.send(this.help);
@@ -100,7 +102,7 @@ const commands = {
         description: 'displays this list of commands the person called me can use',
         parameters: [],
         permittedRoles: [],
-        execute: function (message, params) {
+        execute: function (bot, message) {
             let response = "```asciidoc\nAvailable Commands \n====================";
             for (let command in commands) {
                 if (commands.hasOwnProperty(command)) { //sanity check
@@ -120,29 +122,70 @@ const commands = {
             message.channel.send(response);
         }
     },
-    'queue': {
-        description: 'replies with queue url',
+    'confirm': {
+        description: "acknowledge you have added the leech to the queue",
         parameters: [],
+        help: "Use this in the queue channel to remove the pin",
         permittedRoles: ["ranks"],
-        execute: function (message, params) {
-            message.channel.send('Queue available here: <https://leechba.site/queue>');
+        execute: function (bot, message) {
+            if (message.channel.name !== currentQueueChannel) {
+                console.log(message.author.username + " attempted to use the confirm command in the wrong channel.");
+                return;
+            }
+            const args = message.content.split(' ');
+
+            message.channel.fetchPinnedMessages().then(messages => {
+                if (messages.size > 0) {
+                    if (!args[1]) {
+                        message.channel.send('Please enter the rsn of the person you are confirming or use the word "-all.');
+                    } else if (args[1] === '-all') {
+                        messages.forEach(function (m) {
+                            if (m.author.bot) {
+                                m.unpin().catch(error => {
+                                    console.log('error from fetching pinned messages in confirm all' + error);
+                                });
+                            }
+                        });
+                        message.channel.send('Confirmed.  Remember to confirm with the customer in FC/CC.');
+                    } else {
+                        const userRequests = messages.filter(m => m.content.toLowerCase().includes(args[1].toLowerCase()));
+
+                        if (userRequests.size === 0) {
+                            message.channel.send('No request exists.');
+                            message.delete();
+                        } else {
+                            userRequests.forEach(function (m) {
+                                m.unpin().catch(error => {
+                                    console.log('error from fetching pinned messages in confirm all' + error);
+                                });
+                            });
+                            message.channel.send('Confirmed. Remember to confirm with the customer in FC/CC.')
+                        }
+                    }
+                } else {
+                    message.channel.send('There are no entries to confirm.')
+                }
+            }).catch(console.error)
         }
     },
-    'trial': {
-        description: 'shows trial information and posts',
+    'login': {
+        description: 'generates a login link',
         parameters: [],
-        permittedRoles: [],
-        execute: function (message, params) {
-            message.channel.send('\nFor trial information, please read the information in <#527662247892484116>, ' +
-                '<#527679260010479621>, <#527679195816656896>, and <#531173841553195018>.\n\nIf you want to apply then ' +
-                'please ask in <#531835331448930304>.');
+        require: [],
+        help: 'example use: add @Queuebot#2414`',
+        permittedRoles: ["ranks", "Bots", "developer", "Jia", "stuff"],
+        execute: async function (bot, message) {
+            const code = await bot.database.generateCode(message.author.id, message.author.username);
+            message.author.send('Your generated login code is here: \n https://leechba.site/login/' + code + ' \n This will expire in 5 minutes.')
+                .then(() => message.reply('check your pm!'))
+                .catch(() => message.reply('oops, couldn\'t pm you, can you check your server privacy settings?'));
         }
     },
     'ok': {
         description: 'replies with a standard leech response',
         parameters: [],
         permittedRoles: ["ranks"],
-        execute: function (message, params) {
+        execute: function (bot, message) {
             message.delete().then(msg => {
                 msg.channel.send('Ok, we work with a queue system, I\'ll add you to it. If you can, guest in the ' +
                     'CC (Leech BA) when free - we prioritize leeches there over leeches on disc. We will call you by name ' +
@@ -150,12 +193,49 @@ const commands = {
             });
         }
     },
+    'queue': {
+        description: 'replies with queue url',
+        parameters: [],
+        permittedRoles: ["ranks"],
+        execute: function (bot, message) {
+            message.channel.send('Queue available here: <https://leechba.site/queue>');
+        }
+    },
+    'setrsn': {
+        description: 'sets your own rsn for the rank list',
+        parameters: ["rsn"],
+        help: 'Example of usage: `' + DEFAULTPREFIX + 'setrsn Shadowstream`',
+        permittedRoles: ["ranks"],
+        execute: async function (bot, message, params) {
+            if (typeof (params.args[1]) === 'undefined') {
+                message.channel.send(this.help);
+                return;
+            }
+            const rsn = params.args[1];
+
+            if (await bot.database.setRsn(message.member.id, rsn, message.member.displayName)) {
+                message.channel.send(`I have set your rsn to ${rsn}`).catch(() => {
+                    console.error("unable to send message to respond to setrsn");
+                });
+            }
+        }
+    },
+    'trial': {
+        description: 'shows trial information and posts',
+        parameters: [],
+        permittedRoles: [],
+        execute: function (bot, message) {
+            message.channel.send('\nFor trial information, please read the information in <#527662247892484116>, ' +
+                '<#527679260010479621>, <#527679195816656896>, and <#531173841553195018>.\n\nIf you want to apply then ' +
+                'please ask in <#531835331448930304>.');
+        }
+    },
     'timezone': {
         description: 'allows you to add/change your timezone role',
         parameters: ["USA AUS or EU"],
         help: 'timezones to choose from: USA, AUS, and EU. \n Example of usage: `' + DEFAULTPREFIX + 'timezone EU`',
         permittedRoles: [],
-        execute: function (message, params) {
+        execute: function (bot, message, params) {
             if (typeof (params.args[1]) === 'undefined') {
                 message.channel.send(this.help);
                 return;
@@ -177,56 +257,47 @@ const commands = {
                     message.channel.send(this.help);
             }
         }
-    },
-    'confirm': {
-        description: "acknowledge you have added the leech to the queue",
-        parameters: [],
-        help: "Use this in the queue channel to remove the pin",
-        permittedRoles: ["ranks"],
-        execute: function (message, params) {
-            if (message.channel.name !== currentQueueChannel) {
-                console.log(message.author.username + " attempted to use the confirm command in the wrong channel.");
-                return;
-            }
-            const args = message.content.split(' ');
-
-            message.channel.fetchPinnedMessages().then(messages => {
-                if (messages.size > 0) {
-                    if (!args[1]) {
-                        message.channel.send('Please enter the rsn of the person you are confirming or use the word "-all.');
-                    } else if (args[1] === '-all') {
-                        messages.forEach(function (m) {
-                            if (m.author.bot) {
-                                m.unpin().catch(error => {
-                                    console.log('error from fetching pinned messages in confirm all' + error);
-                                });
-                            }
-                        });
-                        message.channel.send('Confirmed.  Remember to confirm with the customer in FC/CC.');
-                    } else {
-                        var userRequests = messages.filter(m => m.content.toLowerCase().includes(args[1].toLowerCase()));
-
-                        if (userRequests.size === 0) {
-                            message.channel.send('No request exists.');
-                            message.delete();
-                        } else {
-                            userRequests.forEach(function (m) {
-                                m.unpin().catch(error => {
-                                    console.log('error from fetching pinned messages in confirm all' + error);
-                                });
-                            });
-                            message.channel.send('Confirmed. Remember to confirm with the customer in FC/CC.')
-                        }
-                    }
-                } else {
-                    message.channel.send('There are no entries to confirm.')
-                }
-            }).catch(console.error)
-        }
     }
 };
 
 const adminCommands = {
+    'addrank': {
+        description: 'grant rank access for the site to the specified discord user',
+        parameters: [],
+        require: [],
+        help: 'example use: /addrank @Queuebot#2414`',
+        permittedRoles: ["stuff", "Server admin"],
+        execute: async function (message, params, db) {
+            const users = message.mentions.users;
+            if(users[0]) {
+                const success = await db.grantRank(users[0].id);
+
+                if (success) {
+                    await message.reply('successfully granted rank');
+                } else {
+                    await message.reply('user already has or some other bs');
+                }
+            }
+        }
+    },
+    'revokerank': {
+        description: 'remove rank access for the site to the specified discord user',
+        parameters: [],
+        require: [],
+        help: 'example use: /revokerank @Queuebot#2414`',
+        permittedRoles: ["stuff", "Server admin"],
+        execute: async function (message, params, db) {
+            const users = message.mentions.users;
+            if(users[0]) {
+                const success = await db.revokeRank(users[0].id);
+                if (success) {
+                    await message.reply('successfully removed rank');
+                } else {
+                    await message.reply(`user doesn't have rank`);
+                }
+            }
+        }
+    },
     'clearchat': {
         description: 'clears chat of last 50 messages',
         parameters: [],
@@ -240,20 +311,22 @@ const adminCommands = {
         parameters: [],
         permittedRoles: ["stuff", "Server admin", "developer"],
         execute: function (bot, message, params) {
-            var response = "command list:";
-            for (var command in adminCommands) {
+            let response = "```asciidoc\nAvailable Commands \n====================";
+            for (const command in adminCommands) {
                 if (adminCommands.hasOwnProperty(command)) { //sanity check
                     /* check permissions */
-                    var permitted = isPermitted(message.member, adminCommands[command].permittedRoles);
+                    const permitted = isPermitted(message.member, adminCommands[command].permittedRoles);
                     if (!permitted) continue;
-                    /* appends command to commandlist */
+
+                    /* appends command to command list */
                     response += '\n' + ADMINPREFIX + command;
-                    for (var i = 0; i < adminCommands[command].parameters.length; i++) {
+                    for (let i = 0; i < adminCommands[command].parameters.length; i++) {
                         response += ' <' + adminCommands[command].parameters[i] + '>';
                     }
                 }
-                response += ": " + adminCommands[command].description;
+                response += " :: " + adminCommands[command].description;
             }
+            response += "```";
             message.channel.send(response);
         }
     },
@@ -279,7 +352,7 @@ const adminCommands = {
         }
     },
     'poll': {
-        description: 'posts and pins a message, adding :thumbsup: :thumbsdown: :shrug: for people to vote',
+        description: 'posts and pins a message, adding :thumbsup: :thumbsdown: :shrug: for voting',
         parameters: [],
         permittedRoles: ["stuff", "Server admin"],
         execute: function (bot, message, params) {
@@ -404,52 +477,11 @@ function removeTimezone(user, callback) {
 }
 
 /*
- * checks if a user has at least one of the set of roles
- */
-function isPermitted(member, roles) {
-    if (roles.length === -0)
-        return true;
-
-    for (let i = 0; i < roles.length; i++) {
-        if (hasRole(member, roles[i]))
-            return true;
-    }
-    return false;
-}
-
-/*
- * a user has a permission role
- * @member: guild member object
- * @role: role as a string (their name)
- * returns boolean
- */
-function hasRole(member, role) {
-    return member.roles.has(getRoleId(member, role));
-}
-
-/*
- * gets the id of a role
- * @member: guild member object
- * @role: role string name
- * returns id
- */
-function getRoleId(member, name) {
-    const role = member.guild.roles.find(x => x.name === name);
-    if (role)
-        return role.id;
-    else
-        return null;
-}
-
-/*
  *
  *
 */
 
 module.exports = {
     commands,
-    adminCommands,
-    isPermitted,
-    getRoleId,
-    hasRole, //maybe don't need this
+    adminCommands
 };

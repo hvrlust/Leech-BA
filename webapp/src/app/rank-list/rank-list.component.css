@@ -1,0 +1,15 @@
+ol li {
+  margin: 14px 0;
+}
+
+.justify-content-center {
+  text-align: center;
+}
+
+.back {
+  text-decoration: none;
+  color: lightblue;
+}
+.float-left {
+  float: left;
+}

@@ -1,0 +1,2 @@
+select editLogs.id, users.display_name, editType.type, editLogs.date, editLogs.notes from editLogs join users on users.id = editLogs.user_id join editType on editLogs.edit_type_id = editType.id;
+select editLogs.date || ': ' || users.display_name || ' ' || editType.type || ' '|| editLogs.notes from editLogs join users on users.id = editLogs.user_id join editType on editLogs.edit_type_id = editType.id;

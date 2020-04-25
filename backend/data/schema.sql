@@ -37,8 +37,6 @@ CREATE TABLE editLogs (
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY (edit_type_id) REFERENCES editType (id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
-select editLogs.id  users.display_name, editType.type, editLogs.date, editLogs.notes from editLogs join users on users.id = editLogs.user_id join editType on editLogs.edit_type_id = editType.id;
-select editLogs.date || ': ' || users.display_name || ' ' || editType.type || ' '|| editLogs.notes from editLogs join users on users.id = editLogs.user_id join editType on editLogs.edit_type_id = editType.id;
 
 DROP TABLE editType;
 CREATE TABLE  editType (

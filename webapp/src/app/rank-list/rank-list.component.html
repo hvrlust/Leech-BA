@@ -1,0 +1,11 @@
+<h2>Rank List</h2>
+  <ag-grid-angular
+    style="width: 100%;"
+    class="ag-theme-dark text-left"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [gridOptions]="gridOptions"
+    (gridReady)="onGridReady($event)"
+    gridAutoHeight=true
+  >
+  </ag-grid-angular>

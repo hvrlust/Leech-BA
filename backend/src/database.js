@@ -85,13 +85,13 @@ class Database {
                 const db = await this.db.runAsync(`DELETE FROM queue WHERE id=?`, [id]);
                 numberOfChanges = db.changes;
 
-                this.db.runAsync(`INSERT INTO editLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 3,
+                await this.db.runAsync(`INSERT INTO editLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 3,
                     rsn]);
             } else {
                 const db = await this.db.runAsync(`DELETE FROM mgwqueue WHERE id=?`, [id]);
                 numberOfChanges = db.changes;
 
-                this.db.runAsync(`INSERT INTO mgwEditLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 3,
+                await this.db.runAsync(`INSERT INTO mgwEditLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 3,
                     rsn]);
             }
             return numberOfChanges > 0;
@@ -109,16 +109,16 @@ class Database {
                 if (insertedId == undefined) {
                     return 'error'
                 }
-                this.db.runAsync(`INSERT INTO editLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 2,
+                await this.db.runAsync(`INSERT INTO editLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 2,
                     request.rsn]);
             }else {
                 const db = await this.db.runAsync(`UPDATE mgwQueue SET date=?, rsn=?, services=?, ba=?, notes=?, discord=? WHERE id=?`,
                     [request.date, request.rsn, JSON.stringify(request.services), request.ba, request.notes, request.discord, request.id]);
                 insertedId = db.lastID;
-                if (insertedId == undefined) {
+                if (insertedId === undefined) {
                     return 'error'
                 }
-                this.db.runAsync(`INSERT INTO mgwEditLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 2,
+                await this.db.runAsync(`INSERT INTO mgwEditLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 2,
                     request.rsn]);
             }
             return insertedId;
@@ -133,20 +133,20 @@ class Database {
                 const db = await this.db.runAsync(`INSERT INTO queue(date, rsn, services, ba, notes, discord) VALUES(?,?,?,?,?,?)`,
                     [request.date, request.rsn, JSON.stringify(request.services), request.ba, request.notes, request.discord]);
                 insertedId = db.lastID;
-                if (insertedId == undefined) {
+                if (insertedId === undefined) {
                     return 'error'
                 }
 
-                this.db.runAsync(`INSERT INTO editLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 1, request.rsn]);
+                await this.db.runAsync(`INSERT INTO editLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 1, request.rsn]);
             } else {
                 const db = await this.db.runAsync(`INSERT INTO mgwQueue(date, rsn, services, ba, notes, discord) VALUES(?,?,?,?,?,?)`,
                     [request.date, request.rsn, JSON.stringify(request.services), request.ba, request.notes, request.discord]);
                 insertedId = db.lastID;
-                if (insertedId == undefined) {
+                if (insertedId === undefined) {
                     return 'error'
                 }
 
-                this.db.runAsync(`INSERT INTO mgwEditLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 1, request.rsn]);
+                await this.db.runAsync(`INSERT INTO mgwEditLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 1, request.rsn]);
             }
 
             return insertedId;
@@ -155,24 +155,35 @@ class Database {
         }
     }
 
+    async setRsn(discord_id, rsn, display_name) {
+        try {
+            await this.db.runAsync(`UPDATE users SET rsn=?, display_name=? WHERE discord_tag=?`,
+                [rsn, display_name, discord_id]);
+            return true;
+        } catch(error) {
+            console.log(`unable to set rsn for discord_id ${discord_id} and rsn ${rsn}`);
+            return false;
+        }
+    }
+
+    async getRanks() {
+        return await this.db.getAllAsync(`SELECT display_name, rsn FROM users WHERE rank=1 and rsn!='DEFAULT'`);
+    }
+
     async getLastUpdate(mgw) {
         if(!mgw) {
-            const row = await this.db.getAsync(`SELECT editLogs.id, users.display_name, editType.type, editLogs.date, editLogs.notes
+            return await this.db.getAsync(`SELECT editLogs.id, users.display_name, editType.type, editLogs.date, editLogs.notes
             FROM editLogs join users on users.id = editLogs.user_id join editType on editLogs.edit_type_id = editType.id ORDER BY editLogs.date DESC`);
-            return row;
         } else{
-            const row = await this.db.getAsync(`SELECT mgwEditLogs.id, users.display_name, editType.type, mgwEditLogs.date, mgwEditLogs.notes
+            return await this.db.getAsync(`SELECT mgwEditLogs.id, users.display_name, editType.type, mgwEditLogs.date, mgwEditLogs.notes
             FROM mgwEditLogs join users on users.id = mgwEditLogs.user_id join editType on mgwEditLogs.edit_type_id = editType.id ORDER BY mgwEditLogs.date DESC`);
-            return row;
         }
     }
     async getQueue(mgw) {
         if(!mgw) {
-            const rows = await this.db.getAllAsync(`SELECT * FROM queue`);
-            return rows;
+            return await this.db.getAllAsync(`SELECT * FROM queue`);
         } else {
-            const rows = await this.db.getAllAsync(`SELECT * FROM mgwQueue`);
-            return rows;
+            return await this.db.getAllAsync(`SELECT * FROM mgwQueue`);
         }
     }
 
@@ -245,8 +256,8 @@ class Database {
         return text.join('');
     }
     randomString(length, chars) {
-        var result = '';
-        for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+        let result = '';
+        for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
         return result;
     }
 }
