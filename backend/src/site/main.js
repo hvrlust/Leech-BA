@@ -60,13 +60,13 @@ exports.run = function (database, getQueueChannel) {
     app.get('/howtoleech', (req, res) => {
         res.sendFile(root + '/index.html');
     });
+    app.get('/ranks', (req, res) => {
+        res.sendFile(root + '/index.html');
+    });
     app.get('/queue', sessionChecker, (req, res) => {
         res.sendFile(root + '/index.html');
     });
     app.get('/splits', sessionChecker, (req, res) => {
-        res.sendFile(root + '/index.html');
-    });
-    app.get('/ranks', sessionChecker, (req, res) => {
         res.sendFile(root + '/index.html');
     });
     app.use(express.static(root));
