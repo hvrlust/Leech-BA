@@ -56,7 +56,7 @@ const commands = {
                         return;
                     }
 
-                    member.addRoles(rolesToAdd, "Added relevant customer roles").then(function (success) {
+                    member.addRoles(rolesToAdd, "Added relevant customer roles").then(function () {
                         message.channel.send("Added roles to " + member);
                     }, function (error) {
                         message.channel.send("Error adding customer role.  Error: " + error.message);
@@ -87,7 +87,7 @@ const commands = {
                     }
 
                     member.removeRole(message.channel.guild.roles.find(x => x.name === 'Q').id, "remove leech")
-                        .then(function (value) {
+                        .then(function() {
                             message.channel.send("Removed Q role from " + member);
                         }, function (error) {
                             message.channel.send("Error removing customer role.  Error: " + error.message);
@@ -268,9 +268,9 @@ const adminCommands = {
         help: 'example use: /addrank @Queuebot#2414`',
         permittedRoles: ["stuff", "Server admin"],
         execute: async function (message, params, db) {
-            const users = message.mentions.users;
-            if(users[0]) {
-                const success = await db.grantRank(users[0].id);
+            const user = message.mentions.users.first();
+            if(user) {
+                const success = await db.grantRank(user.id);
 
                 if (success) {
                     await message.reply('successfully granted rank');
@@ -287,9 +287,9 @@ const adminCommands = {
         help: 'example use: /revokerank @Queuebot#2414`',
         permittedRoles: ["stuff", "Server admin"],
         execute: async function (message, params, db) {
-            const users = message.mentions.users;
-            if(users[0]) {
-                const success = await db.revokeRank(users[0].id);
+            const user = message.mentions.users.first();
+            if(user) {
+                const success = await db.revokeRank(user.id);
                 if (success) {
                     await message.reply('successfully removed rank');
                 } else {
@@ -302,7 +302,7 @@ const adminCommands = {
         description: 'clears chat of last 50 messages',
         parameters: [],
         permittedRoles: ["stuff", "Server admin"],
-        execute: function (bot, message, params) {
+        execute: function (bot, message) {
             message.channel.fetchMessages().then(messages => message.channel.bulkDelete(messages)).catch(console.error);
         }
     },
@@ -310,7 +310,7 @@ const adminCommands = {
         description: 'Displays list of commands for admins',
         parameters: [],
         permittedRoles: ["stuff", "Server admin", "developer"],
-        execute: function (bot, message, params) {
+        execute: function (bot, message) {
             let response = "```asciidoc\nAvailable Commands \n====================";
             for (const command in adminCommands) {
                 if (adminCommands.hasOwnProperty(command)) { //sanity check
@@ -334,7 +334,7 @@ const adminCommands = {
         description: 'Sends Discord.js document link',
         parameters: [],
         permittedRoles: ["Server admin"],
-        execute: function (bot, message, params) {
+        execute: function (bot, message) {
             message.channel.send('<https://discord.js.org/#/docs/main/stable/general/welcome>');
         }
     },
@@ -368,7 +368,7 @@ const adminCommands = {
         description: 'loads the embedded information message',
         parameters: [],
         permittedRoles: ["Server admin"],
-        execute: async function (bot, message, params) {
+        execute: async function (bot, message) {
             await message.channel.send({
                     embed: {
                         color: 2263842,
@@ -449,6 +449,42 @@ const adminCommands = {
             }
             bot.setQueueChannel(message.client.channels.find(channel => channel.name === currentQueueChannel));
 
+        }
+    },
+    'refreshranks': {
+        description: 'refresh rank list for website',
+        parameters: [],
+        permittedRoles: ["stuff", "Server admin"],
+        execute: function (bot, message) {
+            message.reply("Refreshing rank list");
+            message.guild.members.forEach(member => {
+               if(hasRole(member, "ranks")) {
+                   bot.database.grantRank(member.id).then(() => {});
+               } else {
+                   bot.database.revokeRank(member.id).then(() => {});
+               }
+            });
+        }
+    },
+    'setrsn': {
+        description: 'sets your own rsn for the rank list',
+        parameters: ["user", "rsn"],
+        help: 'Example of usage: `' + ADMINPREFIX + 'setrsn @<user> Shadowstream`',
+        permittedRoles: ["stuff", "Server admin"],
+        execute: async function (bot, message, params) {
+            if (typeof (params.args[1]) === 'undefined' || typeof (params.args[2]) === 'undefined' ||
+                message.mentions.users.size === 0) {
+                message.channel.send("Insufficient parameters! \n" + this.help);
+                return;
+            }
+            const user = message.mentions.members.first();
+            const rsn = params.args[2];
+
+            if (await bot.database.setRsn(user.id, rsn, message.member.displayName)) {
+                message.channel.send(`I have set ${user}'s rsn to ${rsn}`).catch(() => {
+                    console.error("unable to send message to respond to setrsn");
+                });
+            }
         }
     }
 };

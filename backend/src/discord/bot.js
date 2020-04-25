@@ -62,6 +62,17 @@ exports.run = function (token, database) {
 			await handleCommand(commandList.adminCommands, this, message, args);
 		}
 	});
+
+	bot.on('guildMemberUpdate', async (oldMember, newMember) => {
+		if(oldMember.roles.some((role) => role.name === "ranks") &&
+			!newMember.roles.some((role) => role.name === "ranks")) {
+			await database.revokeRank(newMember.id);
+		}
+		if(!oldMember.roles.some((role) => role.name === "ranks") &&
+			newMember.roles.some((role) => role.name === "ranks")) {
+			await database.grantRank(newMember.id);
+		}
+	});
 	
 	// log our bot in
 	return bot.login(token).then(() => p);

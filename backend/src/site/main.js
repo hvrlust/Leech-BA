@@ -63,10 +63,10 @@ exports.run = function (database, getQueueChannel) {
     app.get('/queue', sessionChecker, (req, res) => {
         res.sendFile(root + '/index.html');
     });
-    app.get('/mgwqueue', (req, res) => {
+    app.get('/splits', sessionChecker, (req, res) => {
         res.sendFile(root + '/index.html');
     });
-    app.get('/splits', sessionChecker, (req, res) => {
+    app.get('/ranks', sessionChecker, (req, res) => {
         res.sendFile(root + '/index.html');
     });
     app.use(express.static(root));
@@ -122,7 +122,7 @@ exports.run = function (database, getQueueChannel) {
                     return;
                 }
             }
-            const success = await database.saveCustomer(req.session.user.uid, req.body); //TODO add handling for if rsn already exists
+            await database.saveCustomer(req.session.user.uid, req.body); //TODO add handling for if rsn already exists
             await res.json({response: true});
         } else {
             res.status(403).json({error: 'who are you?'});
@@ -140,7 +140,8 @@ exports.run = function (database, getQueueChannel) {
                     return;
                 }
             }
-            const success = await database.newCustomer(req.session.user.uid, req.body); //TODO add handling for if rsn already exists
+            await database.newCustomer(req.session.user.uid, req.body);
+            //TODO add handling for if rsn already exists
             await res.json({response: true});
         } else {
             res.status(403).json({error: 'who are you?'});
@@ -199,7 +200,7 @@ exports.run = function (database, getQueueChannel) {
                     return;
                 }
             }
-            const success = await database.saveCustomer(req.session.user.uid, req.body, true); //TODO add handling for if rsn already exists
+            await database.saveCustomer(req.session.user.uid, req.body, true); //TODO add handling for if rsn already exists
             await res.json({response: true});
         } else {
             res.status(403).json({error: 'who are you?'});
@@ -217,7 +218,7 @@ exports.run = function (database, getQueueChannel) {
                     return;
                 }
             }
-            const success = await database.newCustomer(req.session.user.uid, req.body, true); //TODO add handling for if rsn already exists
+            await database.newCustomer(req.session.user.uid, req.body, true); //TODO add handling for if rsn already exists
             await res.json({response: true});
         } else {
             res.status(403).json({error: 'who are you?'});
@@ -294,7 +295,7 @@ exports.run = function (database, getQueueChannel) {
 
     // anything else
     // route for handling 404 requests(unavailable routes)
-    app.use(function (req, res, next) {
+    app.use(function (req, res) {
         res.status(404).send("Cannot find url")
     });
 
