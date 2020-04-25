@@ -31,6 +31,7 @@
     "morgan": "^1.9.1",
     "natural": "^0.6.3",
     "nodemailer": "^4.6.0",
-    "sqlite3": "^4.0.4"
+    "sqlite3": "^4.0.4",
+    "request": "latest"
   }
 }
