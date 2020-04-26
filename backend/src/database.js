@@ -171,6 +171,10 @@ class Database {
         return await this.db.getAllAsync(`SELECT display_name, rsn FROM users WHERE rank=1 and rsn!='DEFAULT' ORDER BY display_name ASC`);
     }
 
+    async getRankDiscordTags() {
+        return await this.db.getAllAsync(`SELECT discord_tag FROM users WHERE rank=1`);
+    }
+
     async getLastUpdate(mgw) {
         if(!mgw) {
             return await this.db.getAsync(`SELECT editLogs.id, users.display_name, editType.type, editLogs.date, editLogs.notes

@@ -489,6 +489,13 @@ const adminCommands = {
                         await bot.database.revokeRank(member.id);
                     }
                 }));
+                bot.database.getRankDiscordTags().then(async rows => {
+                    rows.forEach(row => {
+                        if(message.guild.members.filter(member => member.id === row['discord_tag']).size === 0) {
+                            bot.database.revokeRank(row['discord_tag']).catch(e => console.error(e));
+                        }
+                    });
+                });
                 bot.database.getRanksWithNoRsnSet().then(async rows => {
                     await response.edit(rows.length === 0 ? `${message.member}, **nice**! All active ranks have a set RSN!` :
                         `${message.member}, the following have no RSN set ${rows
