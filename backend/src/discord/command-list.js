@@ -492,7 +492,6 @@ const adminCommands = {
                 bot.database.getRankDiscordTags().then(async rows => {
                     for (const row of rows) {
                         if(message.guild.members.filter(member => member.id === row['discord_tag']).size === 0) {
-                            console.log("hi");
                             bot.database.revokeRank(row['discord_tag']).catch(e => console.error(e));
                         }
                     }
