@@ -18,7 +18,7 @@ const commands = {
         parameters: ["user tag"],
         require: [],
         help: 'example use: `' + DEFAULTPREFIX + 'add @Queuebot#2414`',
-        permittedRoles: ["ranks", "Bots"],
+        permittedRoles: ["ranks"],
         execute: function (bot, message) {
             const leeches = message.mentions.users;
             const rolesList = message.channel.guild.roles;
@@ -158,6 +158,19 @@ const commands = {
             }).catch(console.error)
         }
     },
+    'eta': {
+        description: 'copypasta for eta information',
+        parameters: [],
+        require: [],
+        permittedRoles: ["ranks"],
+        execute: async function (bot, message) {
+            message.delete().then(() => {
+                message.channel.send('We can\'t estimate wait times. It depends on when there are enough ranks and ' +
+                    'leeches available to form a team, and we can\'t predict either variable.\n' +
+                    'We don\'t schedule leeches');
+            });
+        }
+    },
     'login': {
         description: 'generates a login link',
         parameters: [],
@@ -169,6 +182,18 @@ const commands = {
             message.author.send('Your generated login code is here: \n https://leechba.site/login/' + code + ' \n This will expire in 5 minutes.')
                 .then(() => message.reply('check your pm!'))
                 .catch(() => message.reply('oops, couldn\'t pm you, can you check your server privacy settings?'));
+        }
+    },
+    'nm': {
+        description: 'copypasta for normal mode information',
+        parameters: [],
+        permittedRoles: ["ranks"],
+        execute: function (bot, message) {
+            message.delete().then(msg => {
+                msg.channel.send("Normal Mode is 12m if you want to be paired with another leech, or 24m if " +
+                    "you leech solo. The solo leech may get it done sooner since we'd only need you+ranks available " +
+                    "rather than you+ranks+another leech.");
+            });
         }
     },
     'ok': {
@@ -208,6 +233,16 @@ const commands = {
                     console.error("unable to send message to respond to setrsn");
                 });
             }
+        }
+    },
+    'site': {
+        description: 'copypasta for customer information',
+        parameters: [],
+        permittedRoles: ["ranks"],
+        execute: function (bot, message) {
+            message.delete().then(() => {
+                message.channel.send('You can view prices and info, as well as request a leech, at https://leechba.site/calculator');
+            });
         }
     },
     'trial': {
@@ -457,9 +492,9 @@ const adminCommands = {
                 bot.database.getRanksWithNoRsnSet().then(async rows => {
                     await response.edit(rows.length === 0 ? `${message.member}, **nice**! All active ranks have a set RSN!` :
                         `${message.member}, the following have no RSN set ${rows
-                            .map(row => {return row['discord_tag']})
-                            .filter(row => {return row !== undefined && row.length > 10})
-                            .map(row => {return `\n - <@${row}>`})
+                            .map(row => row['discord_tag'])
+                            .filter(row =>  row !== undefined && row.length > 10)
+                            .map(row =>  `\n - <@${row}>`)
                             .join(" ")}`)
                         .catch(() => console.error('unable to edit message'));
                 });
