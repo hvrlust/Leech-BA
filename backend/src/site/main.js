@@ -1,3 +1,5 @@
+const {console} = require('../utils');
+
 exports.run = function (database, getQueueChannel) {
     'use strict';
     const express = require('express');
@@ -306,8 +308,8 @@ exports.run = function (database, getQueueChannel) {
         const httpsServer = https.createServer(credentials, app);
         httpsServer.listen(8443, HOST);
     } catch (error) {
-        console.log('unable to start up HTTPS');
-        console.log(error);
+        console.log('Unable to start up HTTPS');
+        console.log(error.message);
     }
 
     const httpServer = http.createServer(app);

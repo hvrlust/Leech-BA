@@ -1,14 +1,5 @@
 // debugging
-const console = (function () {
-	const timestamp = function () {
-	};
-	timestamp.toString = function () {
-		return "[" + (new Date).toLocaleTimeString() + "]";
-	};
-	return {
-		log: this.console.log.bind(this.console, '%s', timestamp)
-	}
-})();
+const {console} = require('../utils');
 
 const Discord = require('discord.js');
 const bot = new Discord.Client();

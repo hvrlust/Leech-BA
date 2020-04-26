@@ -1,14 +1,4 @@
-// debugging
-const console = (function () {
-    const timestamp = function () {
-    };
-    timestamp.toString = function () {
-        return "[" + (new Date).toLocaleTimeString() + "]";
-    };
-    return {
-        log: this.console.log.bind(this.console, '%s', timestamp)
-    }
-})();
+const {console} = require('../utils');
 
 const commandUtils = require('./common/command-utils');
 const {hasRole} = require("./common/command-utils");
@@ -87,7 +77,7 @@ const commands = {
                     }
 
                     member.removeRole(message.channel.guild.roles.find(x => x.name === 'Q').id, "remove leech")
-                        .then(function() {
+                        .then(function () {
                             message.channel.send("Removed Q role from " + member);
                         }, function (error) {
                             message.channel.send("Error removing customer role.  Error: " + error.message);
@@ -269,7 +259,7 @@ const adminCommands = {
         permittedRoles: ["stuff", "Server admin"],
         execute: async function (message, params, db) {
             const user = message.mentions.users.first();
-            if(user) {
+            if (user) {
                 const success = await db.grantRank(user.id);
 
                 if (success) {
@@ -288,7 +278,7 @@ const adminCommands = {
         permittedRoles: ["stuff", "Server admin"],
         execute: async function (message, params, db) {
             const user = message.mentions.users.first();
-            if(user) {
+            if (user) {
                 const success = await db.revokeRank(user.id);
                 if (success) {
                     await message.reply('successfully removed rank');
@@ -456,18 +446,18 @@ const adminCommands = {
         parameters: [],
         permittedRoles: ["stuff", "Server admin"],
         execute: function (bot, message) {
-            message.reply("Refreshing rank list");
-            message.guild.members.forEach(member => {
-               if(hasRole(member, "ranks")) {
-                   bot.database.grantRank(member.id).then(() => {});
-               } else {
-                   bot.database.revokeRank(member.id).then(() => {});
-               }
+            message.reply("refreshing rank list...");
+            message.guild.members.forEach(async member => {
+                if (hasRole(member, "ranks")) { // consider using a transaction
+                    await bot.database.grantRank(member.id);
+                } else {
+                    await bot.database.revokeRank(member.id);
+                }
             });
         }
     },
     'setrsn': {
-        description: 'sets your own rsn for the rank list',
+        description: 'sets somebody else\'s rsn for the rank list',
         parameters: ["user", "rsn"],
         help: 'Example of usage: `' + ADMINPREFIX + 'setrsn @<user> Shadowstream`',
         permittedRoles: ["stuff", "Server admin"],
