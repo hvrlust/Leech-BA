@@ -1,11 +1,23 @@
 .wrapper {
   text-align: center;
   width: 100%;
+  min-height: calc(100vh - 40px); //to keep footer at the bottom (pls find a better way to do this future me)
+  padding-top: 62px; //because of sticky nav bar (yikes!!!)
 }
 .container {
   width: 900px;
-  margin:0 auto;
-  margin-top: 14px;
+  margin: 14px auto;
   padding: 10px 20px 20px 20px;
 }
 
+.version {
+  font-size: 15px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.footer-bar {
+  height: 40px;
+}

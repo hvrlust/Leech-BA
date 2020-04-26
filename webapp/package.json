@@ -1,9 +1,10 @@
 {
   "name": "leech-ba",
-  "version": "0.0.0",
+  "version": "1.0.2",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
+    "prebuild": "npm --no-git-tag-version version patch",
     "build": "ng build --prod --aot --buildOptimizer",
     "test": "ng test",
     "lint": "ng lint",
@@ -43,7 +44,7 @@
     "zone.js": "^0.8.26"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.11.4",
+    "@angular-devkit/build-angular": "^0.13.0",
     "@angular/cli": "^7.1.4",
     "@angular/compiler-cli": "^7.1.4",
     "@angular/language-service": "^7.1.4",
