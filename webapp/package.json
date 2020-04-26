@@ -1,10 +1,9 @@
 {
   "name": "leech-ba",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
-    "prebuild": "npm --no-git-tag-version version patch",
     "build": "ng build --prod --aot --buildOptimizer",
     "test": "ng test",
     "lint": "ng lint",

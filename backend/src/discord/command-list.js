@@ -411,7 +411,7 @@ const adminCommands = {
         parameters: ['-default', '-get', '-set'],
         help: '',
         permittedRoles: ["Server admin", "developer"],
-        execute: function (bot, message, params) {
+        execute: async function (bot, message, params) {
             const args = message.content.split(' ');
             if (args[1] === params.parameters[0]) {
                 currentQueueChannel = "queue";
@@ -445,14 +445,24 @@ const adminCommands = {
         description: 'refresh rank list for website',
         parameters: [],
         permittedRoles: ["stuff", "Server admin"],
-        execute: function (bot, message) {
-            message.reply("refreshing rank list...");
-            message.guild.members.forEach(async member => {
-                if (hasRole(member, "ranks")) { // consider using a transaction
-                    await bot.database.grantRank(member.id);
-                } else {
-                    await bot.database.revokeRank(member.id);
-                }
+        execute: async function (bot, message) {
+            await message.reply("refreshing rank list...").then(async (response) => {
+                await Promise.all(message.guild.members.map(async member => {
+                    if (hasRole(member, "ranks")) {
+                        await bot.database.grantRank(member.id);
+                    } else {
+                        await bot.database.revokeRank(member.id);
+                    }
+                }));
+                bot.database.getRanksWithNoRsnSet().then(async rows => {
+                    await response.edit(rows.length === 0 ? `${message.member}, **nice**! All active ranks have a set RSN!` :
+                        `${message.member}, the following have no RSN set ${rows
+                            .map(row => {return row['discord_tag']})
+                            .filter(row => {return row !== undefined && row.length > 10})
+                            .map(row => {return `\n - <@${row}>`})
+                            .join(" ")}`)
+                        .catch(() => console.error('unable to edit message'));
+                });
             });
         }
     },
