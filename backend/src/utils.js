@@ -1,6 +1,17 @@
 const request = require("request");
 const cheerio = require('cheerio');
 
+const console = (function () {
+    const timestamp = function () {
+    };
+    timestamp.toString = function () {
+        return "[" + (new Date).toLocaleTimeString() + "]";
+    };
+    return {
+        log: this.console.log.bind(this.console, '%s', timestamp)
+    }
+})();
+
 module.exports = {
     getLevels: function (user, callback) {
         request('http://services.runescape.com/m=hiscore/index_lite.ws?player=' + user, function (error, response, html) {
@@ -22,14 +33,5 @@ module.exports = {
         });
     },
 
-    console: function () {
-        const timestamp = function () {
-        };
-        timestamp.toString = function () {
-            return "[" + (new Date).toLocaleTimeString() + "]";
-        };
-        return {
-            log: this.console.log.bind(this.console, '%s', timestamp)
-        }
-    }
+    console
 };

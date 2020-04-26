@@ -7,7 +7,8 @@ const ADMINPREFIX = '!';
  * @params: list of strings split up by spaces
  */
 async function handleCommand(commands, bot, message, params) {
-	params[0] = params[0].substr(1);//drop prefix
+	params[0] = params[0].substr(1); //drop prefix
+    params = params.filter((e) => { return e !== "" }); //remove extra spaces
 	if (params[0] in commands) {
 		const command = commands[params[0]];
 		//if the user has the permissions to execute the command
@@ -64,7 +65,6 @@ module.exports = {
     DEFAULTPREFIX,
     ADMINPREFIX,
     isPermitted,
-    getRoleId,
     hasRole,
 	handleCommand
 };

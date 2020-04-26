@@ -1,4 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
+const {console} = require('./utils');
 
 class Database {
     // https://gist.github.com/yizhang82/2ab802f1439490984eb998af3d96b16b
@@ -106,7 +107,7 @@ class Database {
                 const db = await this.db.runAsync(`UPDATE queue SET date=?, rsn=?, services=?, ba=?, notes=?, discord=? WHERE id=?`,
                     [request.date, request.rsn, JSON.stringify(request.services), request.ba, request.notes, request.discord, request.id]);
                 insertedId = db.lastID;
-                if (insertedId == undefined) {
+                if (insertedId === undefined) {
                     return 'error'
                 }
                 await this.db.runAsync(`INSERT INTO editLogs(user_id, edit_type_id, notes) VALUES(?,?,?)`, [userId, 2,
