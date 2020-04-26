@@ -227,6 +227,10 @@ class Database {
         return false;
     }
 
+    async getRanksWithNoRsnSet() {
+        return await this.db.getAllAsync(`SELECT discord_tag FROM users WHERE rsn='DEFAULT' AND rank=1`, []);
+    }
+
     async grantRank(discordId) {
         const db = await this.db.runAsync(`UPDATE users SET rank=1 WHERE discord_tag=? AND rank=0`, [discordId]);
         return db.changes !== 0;
