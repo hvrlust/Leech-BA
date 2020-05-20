@@ -273,7 +273,8 @@ const commands = {
                 case 'AUS':
                     removeTimezone(user,
                         function () {
-                            user.addRole(message.channel.guild.roles.find("name", timezone).id, "added " + timezone)
+                            const role = message.channel.guild.roles.find(x => x.name === timezone);
+                            user.addRole(role.id, "added " + timezone)
                                 .then(() => message.channel.send("Timezone successfully changed to " + timezone))
                                 .catch(console.error);
                         });
@@ -541,8 +542,9 @@ function removeTimezone(user, callback) {
     const timezones = ["EU", "USA", "AUS"];
     const roles = [];
     timezones.forEach(function (timezone) {
-        if (user.roles.find('name', timezone)) {
-            roles.push(user.guild.roles.find("name", timezone).id)
+        const role = user.roles.find(x => x.name === timezone);
+        if (role) {
+            roles.push(role);
         }
     });
     if (roles.length > 0) {
