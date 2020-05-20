@@ -5,7 +5,7 @@ const console = (function () {
     const timestamp = function () {
     };
     timestamp.toString = function () {
-        return "[" + (new Date).toLocaleString() + "]";
+        return "[" + (new Date).toISOString() + "]";
     };
     return {
         log: this.console.log.bind(this.console, '%s', timestamp)
