@@ -2,7 +2,7 @@ module.exports = {
     name: 'queue',
     description: 'modify the channel where queue requests are sent to',
     parameters: ['-default', '-get', '-set'],
-    help: '',
+    help: '```TODO```',
     permittedRoles: ["Server admin", "developer"],
     execute: async function (bot, message, params) {
         const args = message.content.split(' ');

@@ -3,6 +3,7 @@ const {console} = require('../../../utils');
 module.exports = {
     name: 'info',
     description: 'loads the embedded information message',
+    help: '!info',
     parameters: [],
     permittedRoles: ["Server admin"],
     execute: async (bot, message) => {

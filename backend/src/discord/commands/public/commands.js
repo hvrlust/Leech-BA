@@ -4,8 +4,8 @@ module.exports = {
     description: 'displays this list of commands the person called me can use',
     parameters: [],
     permittedRoles: [],
-    execute: (bot, message) => {
+    execute: async (bot, message) => {
         let response = generateCommandList(DEFAULT_PREFIX, bot.commands, message.member);
-        message.channel.send(response);
+        await message.channel.send(response);
     }
 };
