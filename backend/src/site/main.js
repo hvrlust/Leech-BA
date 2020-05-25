@@ -308,8 +308,8 @@ exports.run = function (database, getQueueChannel) {
         const httpsServer = https.createServer(credentials, app);
         httpsServer.listen(8443, HOST);
     } catch (error) {
-        console.log('Unable to start up HTTPS');
-        console.log(error.message);
+        console.warn('Unable to start up HTTPS');
+        console.warn(error.message);
     }
 
     const httpServer = http.createServer(app);

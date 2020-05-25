@@ -8,7 +8,9 @@ const console = (function () {
         return "[" + (new Date).toISOString() + "]";
     };
     return {
-        log: this.console.log.bind(this.console, '%s', timestamp)
+        log: this.console.log.bind(this.console, '%s INFO - ', timestamp),
+        error: this.console.error.bind(this.console, '%s ERROR - ', timestamp),
+        warn: this.console.warn.bind(this.console, '%s WARN - ', timestamp)
     }
 })();
 
