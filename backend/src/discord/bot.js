@@ -1,13 +1,18 @@
 // debugging
 const {console} = require('../utils');
 
+const fs = require('fs');
 const Discord = require('discord.js');
 const bot = new Discord.Client();
 
-const commandList = require('./command-list.js');
-const commandUtils = require('./common/command-utils.js');
-const {handleCommand} = require("./common/command-utils");
+const commandUtils = require('./commands/utils.js');
+const {createCustomCommand} = require("./commands/utils");
+const {handleCommand} = require("./commands/utils");
 
+function requireUncached(module) {
+	delete require.cache[require.resolve(module)];
+	return require(module);
+}
 
 exports.run = function (token, database) {
 	let resolve, reject;
@@ -26,6 +31,28 @@ exports.run = function (token, database) {
 		return p.then(() => queueChannel)
 	};
 
+	this.loadCommands = async () => {
+		this.commands = new Discord.Collection();
+		this.adminCommands = new Discord.Collection();
+
+		let commandFiles = fs.readdirSync(process.cwd() + '/src/discord/commands/public').filter(file => file.endsWith('.js'));
+		for (const file of commandFiles) {
+			const command = requireUncached(process.cwd() + `/src/discord/commands/public/${file}`);
+			this.commands.set(command.name, command);
+		}
+		commandFiles = fs.readdirSync(process.cwd() + '/src/discord/commands/admin').filter(file => file.endsWith('.js'));
+		for (const file of commandFiles) {
+			const command = requireUncached(process.cwd() + `/src/discord/commands/admin/${file}`);
+			this.adminCommands.set(command.name, command);
+		}
+
+		const commands = await this.database.loadCommands();
+		for(let i in commands) {
+			const command = commands[i];
+			this.commands.set(command.command, createCustomCommand(command.command, command.roles, command.response, command.description, command.delete_after));
+		}
+	};
+
 	this.database = database;
 
 	bot.on('ready', () => {
@@ -38,20 +65,22 @@ exports.run = function (token, database) {
 		console.log('----- Bot disconnected from Discord with code', code, 'for reason:', erMsg, '-----');
 	});
 
-	bot.on('error', function (message) {
-		console.log(new Date().toString() + 'error recieved', message);
+	bot.on('error', function (e) {
+		console.error('Bot error event', e.stack)
 	});
 
 	bot.on('message', async (message) => {
 		const args = message.content.split(" ");
+
 		/* commands */
-		if (args[0].startsWith(commandUtils.DEFAULTPREFIX)) {
-			await handleCommand(commandList.commands, this, message, args);
+		if (args[0].startsWith(commandUtils.DEFAULT_PREFIX)) {
+			await handleCommand(this.commands, this, message, args);
 		}
 		/* admin/mod commands */
-		if (args[0].startsWith(commandUtils.ADMINPREFIX)) {
-			await handleCommand(commandList.adminCommands, this, message, args);
+		if (args[0].startsWith(commandUtils.ADMIN_PREFIX)) {
+			await handleCommand(this.adminCommands, this, message, args);
 		}
+
 	});
 
 	bot.on('guildMemberUpdate', async (oldMember, newMember) => {
@@ -66,5 +95,8 @@ exports.run = function (token, database) {
 	});
 	
 	// log our bot in
-	return bot.login(token).then(() => p);
+	return bot.login(token).then(() => {
+		this.loadCommands();
+		return p;
+	});
 };
