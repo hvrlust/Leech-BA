@@ -51,6 +51,8 @@ exports.run = function (token, database) {
 			const command = commands[i];
 			this.commands.set(command.command, createCustomCommand(command.command, command.roles, command.response, command.description, command.delete_after));
 		}
+		//sort alphabetically
+		this.commands = this.commands.sort((a, b) => a.name.localeCompare(b.name));
 	};
 
 	this.database = database;
