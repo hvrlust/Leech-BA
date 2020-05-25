@@ -16,7 +16,7 @@ function requireUncached(module) {
 
 exports.run = function (token, database) {
 	let resolve, reject;
-	let p = new Promise(function(res, rej) {
+	let p = new Promise((res, rej) => {
 		resolve = res;
 		reject = rej;
 	});
@@ -63,11 +63,11 @@ exports.run = function (token, database) {
 		resolve();
 	});
 
-	bot.on('disconnect', function (erMsg, code) {
-		console.log('----- Bot disconnected from Discord with code', code, 'for reason:', erMsg, '-----');
+	bot.on('disconnect', (error, code) => {
+		console.log('----- Bot disconnected from Discord with code', code, 'for reason:', error, '-----');
 	});
 
-	bot.on('error', function (e) {
+	bot.on('error',  (e) => {
 		console.error('Bot error event', e.stack)
 	});
 
@@ -95,10 +95,13 @@ exports.run = function (token, database) {
 			await database.grantRank(newMember.id);
 		}
 	});
+
+	bot.on('guildMemberRemove', async (member) => {
+		await database.revokeRank(member.id);
+	});
 	
 	// log our bot in
 	return bot.login(token).then(() => {
-		this.loadCommands();
-		return p;
+		this.loadCommands().then(() => p);
 	});
 };

@@ -48,15 +48,18 @@ async function handleCommand(commands, bot, message, params) {
  * generates the help message given a prefix, command list and the member (to obtain their roles and check whether they can use them)
  * only displays the commands the caller can view
  */
-function generateCommandList(prefix, commands, member) {
+function generateCommandList(prefix, commands, member, all) {
     let response = "```asciidoc\nAvailable Commands \n====================";
     commands.forEach(command => {
         /* check permissions */
-        if (!isPermitted(member, command.permittedRoles)) return;
+        if(!isPermitted(member, command.permittedRoles)) return;
+
+        /* skip if hidden */
+        if(!all && command.hidden) return;
 
         /* appends command to command list */
         response += '\n' + prefix + command.name;
-        for (let i = 0; i < command.parameters.length; i++) {
+        for(let i = 0; i < command.parameters.length; i++) {
             response += ' <' + command.parameters[i] + '>';
         }
         response += " :: " + command.description;

@@ -1,3 +1,4 @@
+const {console} = require('../../../utils');
 const {hasRole, DEFAULT_PREFIX} = require("../utils");
 module.exports = {
     name: 'complete',
@@ -5,13 +6,13 @@ module.exports = {
     parameters: ["user tag"],
     help: 'example use: `' + DEFAULT_PREFIX + 'complete @Queuebot#1337`',
     permittedRoles: ["ranks"],
-    execute: (bot, message) => {
+    execute: async (bot, message) => {
         const leeches = message.mentions.users;
         if (leeches.size === 0) {
-            message.channel.send(module.exports.help);
+            await message.channel.send(module.exports.help);
             return;
         }
-        leeches.forEach(function (leech) {
+        leeches.forEach(leech => {
             //check they have role
             message.guild.fetchMember(leech).then(member => {
                 if (!hasRole(member, "Q")) {
@@ -20,9 +21,9 @@ module.exports = {
                 }
 
                 member.removeRole(message.channel.guild.roles.find(x => x.name === 'Q').id, "remove leech")
-                    .then(function () {
+                    .then(() => {
                         message.channel.send("Removed Q role from " + member);
-                    }, function (error) {
+                    }, (error) => {
                         message.channel.send("Error removing customer role.  Error: " + error.message);
                     });
             }).catch(error => {

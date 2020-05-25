@@ -2,8 +2,8 @@ const {ADMIN_PREFIX} = require("../utils");
 module.exports = {
     name: 'deletecommand',
     description: 'removes custom command',
-    parameters: ["command"],
     help: 'example use: `'+ADMIN_PREFIX+'removecommand eta`',
+    parameters: ["command"],
     permittedRoles: ["Server admin"],
     execute: async (bot, message, params) => {
         if(params.args.length < 2) {

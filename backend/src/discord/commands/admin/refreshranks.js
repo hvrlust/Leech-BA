@@ -4,6 +4,7 @@ module.exports = {
     name: 'refreshranks',
     description: 'refresh rank list for website',
     parameters: [],
+    help: 'self explanatory',
     permittedRoles: ["stuff", "Server admin"],
     execute: async function (bot, message) {
         await message.reply("refreshing rank list...").then(async (response) => {
