@@ -47,10 +47,12 @@ exports.run = function (token, database) {
 		}
 
 		const commands = await this.database.loadCommands();
-		for(let i in commands) {
+		for(let i = 0; i < commands.length; i++) {
 			const command = commands[i];
 			this.commands.set(command.command, createCustomCommand(command.command, command.roles, command.response, command.description, command.delete_after));
 		}
+		//sort alphabetically
+		this.commands = this.commands.sort((a, b) => a.name.localeCompare(b.name));
 	};
 
 	this.database = database;

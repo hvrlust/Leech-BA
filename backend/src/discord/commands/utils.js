@@ -24,6 +24,7 @@ function createCustomCommand(name, roles, response, description, deleteAfter) {
  */
 async function handleCommand(commands, bot, message, params) {
     try {
+
         params[0] = params[0].substr(1); //drop prefix
         params = params.filter((e) => { return e !== "" }); //remove extra spaces
         if (commands.has(params[0])){

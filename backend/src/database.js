@@ -262,8 +262,9 @@ class Database {
     }
 
     async addCommand(command, roles, text, description, deleteAfter) {
+        let response = text.join(" ");
         const statements = [
-            [`INSERT INTO commands(command, response, description, delete_after) VALUES (?, ?, ?, ?);`, [command, text.join(" "), description.join(" "), deleteAfter]]
+            [`INSERT INTO commands(command, response, description, delete_after) VALUES (?, ?, ?, ?);`, [command, response, description.join(" "), deleteAfter]]
         ];
         for(const role of roles) {
             statements.push([`INSERT INTO commands_roles(command_id, role) VALUES ((SELECT id FROM commands where command=?), ?);`, [command, role]]);
