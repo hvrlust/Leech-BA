@@ -13,9 +13,10 @@ function areRealRoles(member, roles) {
 function extractArgs(word, args) {
     const parsedArgs = [];
     const index = args.indexOf(word);
+    const params = module.exports.parameters.map(param => param.split(' ')[0]);
     if(index === -1) return parsedArgs;
     for(let i=index+1; i<args.length; i++){
-        if(module.exports.parameters.includes(args[i])){
+        if(params.includes(args[i])){
             return parsedArgs;
         }
         parsedArgs.push(args[i]);
