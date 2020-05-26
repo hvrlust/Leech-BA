@@ -9,6 +9,7 @@ class Database {
                 return console.error(err.message);
             }
             console.log('Connected to database.');
+            this.db.exec("PRAGMA foreign_keys=ON");
         });
         this.db.getAsync = function (sql, params) {
             const that = this;
