@@ -3,7 +3,7 @@ const {ADMIN_PREFIX} = require("../utils");
 module.exports = {
     name: 'addrank',
     description: 'grant rank access for the site to the specified discord user',
-    parameters: [],
+    parameters: ['@user'],
     help: 'example use: `'+ADMIN_PREFIX+'addrank @Queuebot#2414`',
     permittedRoles: ["stuff", "Server admin"],
     execute: async (bot, message) => {

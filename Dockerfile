@@ -30,7 +30,7 @@ RUN npm run-script build
 WORKDIR /usr/src/backend
 COPY ./backend ./
 
-EXPOSE 8080
-EXPOSE 8443
+EXPOSE 80
+EXPOSE 443
 
 CMD [ "npm", "start" ]

@@ -2,8 +2,7 @@ const {ADMIN_PREFIX} = require("../utils");
 module.exports = {
     name: 'revokerank',
     description: 'remove rank access for the site to the specified discord user',
-    parameters: [],
-    require: [],
+    parameters: ['@user'],
     help: 'example use: `'+ADMIN_PREFIX+'revokerank @Queuebot#2414`',
     permittedRoles: ["stuff", "Server admin"],
     execute: async (bot, message) => {

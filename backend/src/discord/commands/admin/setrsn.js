@@ -2,7 +2,7 @@ const {ADMIN_PREFIX} = require("../utils");
 module.exports = {
     name: 'setrsn',
     description: 'sets somebody else\'s rsn for the rank list',
-    parameters: ["user", "rsn"],
+    parameters: ["@user", "rsn"],
     help: 'Example of usage: `' + ADMIN_PREFIX + 'setrsn @<user> Shadowstream`',
     permittedRoles: ["stuff", "Server admin"],
     execute: async (bot, message, params) => {
