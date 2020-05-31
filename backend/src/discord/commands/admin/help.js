@@ -9,7 +9,7 @@ module.exports = {
         const command = params.args[1];
         if(params.args.length < 2 || !bot.adminCommands.has(command)) {
             message.channel.send(module.exports.help);
-            return
+            return;
         }
         await message.channel.send(bot.adminCommands.get(command).help).catch(e => {
             console.error(e);

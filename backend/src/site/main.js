@@ -306,12 +306,12 @@ exports.run = function (database, getQueueChannel) {
         const certificate = fs.readFileSync('/etc/letsencrypt/live/leechba.site/fullchain.pem');
         const credentials = {key: privateKey, cert: certificate};
         const httpsServer = https.createServer(credentials, app);
-        httpsServer.listen(8443, HOST);
+        httpsServer.listen(443, HOST);
     } catch (error) {
         console.warn('Unable to start up HTTPS');
         console.warn(error.message);
     }
 
     const httpServer = http.createServer(app);
-    httpServer.listen(8080, HOST);
+    httpServer.listen(80, HOST);
 };

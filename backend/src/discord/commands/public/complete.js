@@ -3,7 +3,7 @@ const {hasRole, DEFAULT_PREFIX} = require("../utils");
 module.exports = {
     name: 'complete',
     description: 'removes q role from a user',
-    parameters: ["user tag"],
+    parameters: ["@user"],
     help: 'example use: `' + DEFAULT_PREFIX + 'complete @Queuebot#1337`',
     permittedRoles: ["ranks"],
     execute: async (bot, message) => {

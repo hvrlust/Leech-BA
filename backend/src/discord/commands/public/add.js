@@ -2,7 +2,7 @@ const {hasRole, DEFAULT_PREFIX} = require("../utils");
 module.exports = {
     name: 'add',
     description: 'adds customer and q role to a mentioned user',
-    parameters: ["user tag"],
+    parameters: ["@user"],
     help: 'example use: `' + DEFAULT_PREFIX + 'add @Queuebot#2414`',
     permittedRoles: ["ranks"],
     execute: (bot, message) => {
