@@ -3,7 +3,7 @@ module.exports = {
     name: 'help',
     description: 'provides example usage given a command',
     parameters: ["command"],
-    help: 'Example use: `'+ADMIN_PREFIX+'help addcommand`',
+    help: 'Example use: `'+ADMIN_PREFIX+'help addcommand`. If you\'re looking for commands list, use !commands',
     permittedRoles: ["stuff", "Server admin", "developer"],
     execute: async (bot, message, params) => {
         const command = params.args[1];
