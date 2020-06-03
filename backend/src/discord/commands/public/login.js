@@ -3,7 +3,7 @@ module.exports = {
     description: 'generates a login link',
     parameters: [],
     require: [],
-    help: '...',
+    help: '/login lets you sign into the Leech BA website by pming you a login link. This will grant you queue access and other restricted content on the site..',
     permittedRoles: ["ranks", "developer", "Jia", "stuff"],
     execute: async (bot, message) => {
         const code = await bot.database.generateCode(message.author.id, message.author.username);
