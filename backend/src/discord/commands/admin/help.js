@@ -1,7 +1,7 @@
 const {ADMIN_PREFIX} = require("../utils");
 module.exports = {
     name: 'help',
-    description: 'provides example usage given a command',
+    description: 'provides example usage and parameter descriptions given a command',
     parameters: ["command"],
     help: 'Example use: `'+ADMIN_PREFIX+'help addcommand`. If you\'re looking for commands list, use !commands',
     permittedRoles: ["stuff", "Server admin", "developer"],
