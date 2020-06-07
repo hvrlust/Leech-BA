@@ -23,6 +23,39 @@ function removeTimezone(user, callback) {
     }
 }
 
+/*
+ * dumb timezone converter
+ */
+
+function convertTimezone(timezone) {
+    switch(timezone) {
+        case 'GMT':
+        case 'BST':
+        case 'UTC':
+        case 'GMT+0':
+        case 'GMT+1':
+        case 'GMT+2':
+        case 'GMT+3':
+            return 'EU';
+        case 'GMT-5':
+        case 'GMT-6':
+        case 'GMT-7':
+        case 'GMT-8':
+        case 'EST':
+        case 'MST':
+        case 'CST':
+        case 'PST':
+            return 'USA';
+        case 'GMT+5':
+        case 'GMT+6':
+        case 'GMT+7':
+        case 'GMT+8':
+            return 'AUS';
+        default:
+            return timezone;
+    }
+}
+
 module.exports = {
     name: 'timezone',
     description: 'allows you to add/change your timezone role',
@@ -35,7 +68,7 @@ module.exports = {
             return;
         }
         const user = message.member;
-        const timezone = params.args[1].toUpperCase();
+        const timezone = convertTimezone(params.args[1].toUpperCase());
         switch (timezone) {
             case 'EU':
             case 'USA':
@@ -49,7 +82,7 @@ module.exports = {
                     });
                 break;
             default:
-                message.channel.send(this.help);
+                message.channel.send(module.exports.help);
         }
     }
 };
