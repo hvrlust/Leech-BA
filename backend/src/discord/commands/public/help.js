@@ -1,9 +1,9 @@
-const {generateCommandList, DEFAULT_PREFIX} = require("../utils");
+const {DEFAULT_PREFIX} = require("../utils");
 module.exports = {
     name: 'help',
     description: 'provides example usage and parameter descriptions given a command',
     parameters: [],
-    help: 'example use: `' + DEFAULT_PREFIX + 'help confirm`. If you\'re looking for the command list, use /commands',
+    help: 'example use: `' + DEFAULT_PREFIX + 'help commands`. If you\'re looking for the command list, use /commands',
     permittedRoles: [],
     execute: async (bot, message, params) => {
         const command = params.args[1];
