@@ -17,7 +17,7 @@ module.exports = {
     description: 'deletes the previous bot message that was posted in the channel',
     parameters: [],
     help: 'Example of usage: `' + DEFAULT_PREFIX + 'undo`',
-    permittedRoles: ["ranks", "stuff", "Server admin"],
+    permittedRoles: ["ranks", "stuff"],
     execute: async function (bot, message) {
         const user = await bot.getUser();
         message.delete().then((msg) => {
