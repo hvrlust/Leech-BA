@@ -15,7 +15,7 @@ const {console} = require('../../../utils');
 module.exports = {
     name: 'undo',
     description: 'deletes the previous bot message that was posted in the channel',
-    parameters: ["rsn"],
+    parameters: [],
     help: 'Example of usage: `' + DEFAULT_PREFIX + 'undo`',
     permittedRoles: ["ranks", "stuff", "Server admin"],
     execute: async function (bot, message) {
