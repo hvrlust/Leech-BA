@@ -8,6 +8,7 @@ function createCustomCommand(name, roles, response, description, deleteAfter) {
         description: description? description : 'copypasta',
         parameters: [],
         permittedRoles: roles? roles.split(',') : [],
+        custom: true,
         execute: async (bot, message) => {
             if(deleteAfter) {
                 await message.delete();
@@ -50,12 +51,19 @@ async function handleCommand(commands, bot, message, params) {
  */
 function generateCommandList(prefix, commands, member, all) {
     let response = "```asciidoc\nAvailable Commands \n====================";
-    commands.forEach(command => {
+
+    for(let i=0; i<commands.size; i++){
+        const command = commands.get(Array.from(commands.keys())[i]); //come up with a better way to do this...
+
         /* check permissions */
-        if(!isPermitted(member, command.permittedRoles)) return;
+        if(!isPermitted(member, command.permittedRoles)) continue;
 
         /* skip if hidden */
-        if(!all && command.hidden) return;
+        if(!all && command.hidden) continue;
+
+        if(i>0 && !commands.get(Array.from(commands.keys())[i-1]).custom && command.custom) {
+            response += '\n';
+        }
 
         /* appends command to command list */
         response += '\n' + prefix + command.name;
@@ -63,7 +71,7 @@ function generateCommandList(prefix, commands, member, all) {
             response += ' <' + command.parameters[i] + '>';
         }
         response += " :: " + command.description;
-    });
+    }
 
     response += "```";
     return response;

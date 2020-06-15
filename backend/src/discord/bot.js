@@ -57,7 +57,11 @@ exports.run = function (token, database) {
 			this.commands.set(command.command, createCustomCommand(command.command, command.roles, command.response, command.description, command.delete_after));
 		}
 		//sort alphabetically
-		this.commands = this.commands.sort((a, b) => a.name.localeCompare(b.name));
+		this.commands = this.commands.sort((a, b) => {
+			const x = (a.custom ? '1' : '0') + a.name;
+			const y = (b.custom ? '1' : '0') + b.name;
+			return x.localeCompare(y);
+		});
 	};
 
 	this.database = database;
