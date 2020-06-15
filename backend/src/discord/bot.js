@@ -31,6 +31,11 @@ exports.run = function (token, database) {
 		return p.then(() => queueChannel)
 	};
 
+	let user; //must be a better way to do this ugly implementation
+	this.getUser = () => {
+		return p.then(() => user)
+	};
+
 	this.loadCommands = async () => {
 		this.commands = new Discord.Collection();
 		this.adminCommands = new Discord.Collection();
@@ -60,6 +65,7 @@ exports.run = function (token, database) {
 	bot.on('ready', () => {
 		console.log('bot ready');
 		queueChannel = bot.channels.find(channel => channel.name === "queue");
+		user = bot.user;
 		resolve();
 	});
 
@@ -68,7 +74,7 @@ exports.run = function (token, database) {
 	});
 
 	bot.on('error',  (e) => {
-		console.error('Bot error event', e.stack)
+		console.error('Bot error event', e)
 	});
 
 	bot.on('message', async (message) => {
