@@ -66,8 +66,8 @@ function generateCommandList(prefix, commands, member, all) {
 
         count++;
         if(i>0 && !commands.get(Array.from(commands.keys())[i-1]).custom && command.custom) {
-            //don't bother splitting if fewer than 8 commands
-            if(count < 8) {
+            //don't bother splitting if too few commands
+            if(count >= 7) {
                 response += '\n';
             }
         }
