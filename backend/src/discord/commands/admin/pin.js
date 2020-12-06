@@ -4,10 +4,10 @@ module.exports = {
     parameters: [],
     help: 'self explanatory',
     permittedRoles: ["stuff", "Server admin"],
-    execute: (bot, message, params) => {
+    execute: async (bot, message, params) => {
         params.args.splice(0, 1);
         const pinnedMessage = params.args.join(" ");
-        message.channel.send(pinnedMessage).then(m => m.pin()).catch(function () {
+        await message.channel.send(pinnedMessage).then(m => m.pin()).catch(function () {
             message.channel.send("error pinning message");
         });
     }

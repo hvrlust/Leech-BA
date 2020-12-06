@@ -8,7 +8,7 @@ module.exports = {
     permittedRoles: ["stuff", "Server admin"],
     execute: async function (bot, message) {
         await message.reply("refreshing rank list...").then(async (response) => {
-            await Promise.all(message.guild.members.map(async member => {
+            await Promise.all(message.guild.members.cache.map(async member => {
                 if (hasRole(member, "ranks")) {
                     await bot.database.grantRank(member.id);
                 } else {
@@ -17,7 +17,7 @@ module.exports = {
             }));
             bot.database.getRankDiscordTags().then(async rows => {
                 for (const row of rows) {
-                    if(message.guild.members.filter(member => member.id === row['discord_tag']).size === 0) {
+                    if(message.guild.members.cache.filter(member => member.id === row['discord_tag']).size === 0) {
                         bot.database.revokeRank(row['discord_tag']).catch(e => console.error(e));
                     }
                 }

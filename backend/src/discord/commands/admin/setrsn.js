@@ -8,7 +8,7 @@ module.exports = {
     execute: async (bot, message, params) => {
         if (typeof (params.args[1]) === 'undefined' || typeof (params.args[2]) === 'undefined' ||
             message.mentions.users.size === 0) {
-            message.channel.send("Insufficient parameters! \n" + module.exports.help);
+            await message.channel.send("Insufficient parameters! \n" + module.exports.help);
             return;
         }
         const user = message.mentions.members.first();

@@ -274,6 +274,21 @@ class Database {
         return db.changes !== 0;
     }
 
+    //this needs to be a lot smarter..
+    // async editCommand(command, roles, text, description, deleteAfter) {
+    //     const responseSql = text.length > 0 ?
+    //     let response = text.join(" ");
+    //     const statements = [
+    //         [`INSERT INTO commands(command, response, description, delete_after) VALUES (?, ?, ?, ?);`, [command, response, description.join(" "), deleteAfter]]
+    //     ];
+    //     statements.push([`DELETE FROM commands_roles WHERE command_id=(SELECT id FROM commands where command=?)`, command]);
+    //     for(const role of roles) {
+    //         statements.push([`INSERT INTO commands_roles(command_id, role) VALUES ((SELECT id FROM commands where command=?), ?);`, [command, role]]);
+    //     }
+    //     const db = await this.db.runBatchAsync(statements);
+    //     return db.changes !== 0;
+    // }
+
     async removeCommand(command) {
         const db = await this.db.runAsync(`DELETE FROM commands WHERE command=?`, [command]);
         return db.changes !== 0;
