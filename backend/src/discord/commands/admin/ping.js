@@ -5,7 +5,7 @@ module.exports = {
     help: 'self explanatory',
     hidden: true,
     permittedRoles: ["stuff", "Server admin", "developer"],
-    execute(bot, message) {
-        message.channel.send('Pong.');
+    execute: async (bot, message) => {
+        await message.channel.send('Pong.');
     },
 };

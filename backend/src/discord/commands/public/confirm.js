@@ -8,7 +8,7 @@ module.exports = {
     execute: async (bot, message) => {
         const args = message.content.split(' ');
 
-        message.channel.fetchPinnedMessages().then(async messages => {
+        message.channel.messages.fetchPinned().then(async messages => {
             if (messages.size > 0) {
                 if (!args[1]) {
                     await message.channel.send('Please enter the rsn of the person you are confirming or use the word "-all.');

@@ -21,7 +21,7 @@ module.exports = {
     execute: async function (bot, message) {
         const user = await bot.getUser();
         message.delete().then((msg) => {
-            msg.channel.fetchMessages()
+            msg.channel.messages.fetch()
                 .then(messages => {
                     //disgusting
                     const lastBotMessage = messages

@@ -8,14 +8,14 @@ function removeTimezone(user, callback) {
     const timezones = ["EU", "USA", "AUS"];
     const roles = [];
     timezones.forEach(function (timezone) {
-        const role = user.roles.find(x => x.name === timezone);
+        const role = user.roles.cache.find(x => x.name === timezone);
         if (role) {
             roles.push(role);
         }
     });
     if (roles.length > 0) {
         //async function complete then callback
-        user.removeRoles(roles, "requested in changing timezones").then(function () {
+        user.roles.remove(roles, "requested in changing timezones").then(function () {
             callback();
         }).catch(console.error);
     } else {
@@ -62,9 +62,9 @@ module.exports = {
     parameters: ["USA AUS or EU"],
     help: 'timezones to choose from: USA, AUS, and EU. \n Example of usage: `' + DEFAULT_PREFIX + 'timezone EU`',
     permittedRoles: [],
-    execute: (bot, message, params) => {
+    execute: async (bot, message, params) => {
         if (typeof (params.args[1]) === 'undefined') {
-            message.channel.send(module.exports.help);
+            await message.channel.send(module.exports.help);
             return;
         }
         const user = message.member;
@@ -75,14 +75,14 @@ module.exports = {
             case 'AUS':
                 removeTimezone(user,
                     () => {
-                        const role = message.channel.guild.roles.find(x => x.name === timezone);
-                        user.addRole(role.id, "added " + timezone)
+                        const role = message.channel.guild.roles.cache.find(x => x.name === timezone);
+                        user.roles.add(role.id, "added " + timezone)
                             .then(() => message.channel.send("Timezone successfully changed to " + timezone))
                             .catch(console.error);
                     });
                 break;
             default:
-                message.channel.send(module.exports.help);
+                await message.channel.send(module.exports.help);
         }
     }
 };

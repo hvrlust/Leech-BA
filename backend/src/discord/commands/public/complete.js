@@ -1,4 +1,3 @@
-const {console} = require('../../../utils');
 const {hasRole, DEFAULT_PREFIX} = require("../utils");
 module.exports = {
     name: 'complete',
@@ -14,21 +13,18 @@ module.exports = {
         }
         leeches.forEach(leech => {
             //check they have role
-            message.guild.fetchMember(leech).then(member => {
-                if (!hasRole(member, "Q")) {
-                    message.channel.send(member.displayName + " does not have Q role to remove.");
-                    return;
-                }
+            const member = message.guild.member(leech);
+            if (!hasRole(member, "Q")) {
+                message.channel.send(member.displayName + " does not have Q role to remove.");
+                return;
+            }
 
-                member.removeRole(message.channel.guild.roles.find(x => x.name === 'Q').id, "remove leech")
-                    .then(() => {
-                        message.channel.send("Removed Q role from " + member);
-                    }, (error) => {
-                        message.channel.send("Error removing customer role.  Error: " + error.message);
-                    });
-            }).catch(error => {
-                console.log(error);
-            });
+            member.roles.remove(message.channel.guild.roles.cache.find(x => x.name === 'Q').id, "remove leech")
+                .then(() => {
+                    message.channel.send(`Removed Q role from ${member}`);
+                }, (error) => {
+                    message.channel.send("Error removing customer role.  Error: " + error.message);
+                });
         });
     },
 };

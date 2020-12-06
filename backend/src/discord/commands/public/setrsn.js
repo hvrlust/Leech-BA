@@ -7,7 +7,7 @@ module.exports = {
     permittedRoles: ["ranks"],
     execute: async function (bot, message, params) {
         if (typeof (params.args[1]) === 'undefined') {
-            message.channel.send(module.exports.help);
+            await message.channel.send(module.exports.help);
             return;
         }
         const rsn = params.args.slice(1).join(" ");

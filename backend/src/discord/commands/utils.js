@@ -105,7 +105,7 @@ function isPermitted(member, roles) {
  * returns boolean
  */
 function hasRole(member, role) {
-    return member.roles.has(getRoleId(member, role));
+    return member.roles.cache.has(getRoleId(member, role));
 }
 
 /*
@@ -115,7 +115,7 @@ function hasRole(member, role) {
  * returns id
  */
 function getRoleId(member, name) {
-    const role = member.guild.roles.find(x => x.name === name);
+    const role = member.guild.roles.cache.find(x => x.name === name);
     if (role)
         return role.id;
     else
