@@ -21,3 +21,9 @@
 .footer-bar {
   height: 40px;
 }
+
+@media (max-width: 576px) {
+	.container {
+		width: 100%;
+	}
+}

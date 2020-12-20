@@ -1,0 +1,10 @@
+<mat-card>
+	<mat-card-header>
+		<mat-card-title>{{title}}</mat-card-title>
+		<mat-card-subtitle *ngIf="subtitle">{{subtitle}}</mat-card-subtitle>
+		<mat-slide-toggle color="primary" [formControl]="control"></mat-slide-toggle>
+	</mat-card-header>
+	<mat-card-content [ngClass]="{hidden: !control.value}">
+		<ng-content></ng-content>
+	</mat-card-content>
+</mat-card>
