@@ -1,0 +1,465 @@
+import { hmPts, hmXp, nmPts, nmXp } from "./rates";
+import { PtsCounter, RoleOrder, Role, BxpCounter, Skill, RoleSet, Mode } from "./types"
+
+describe('PtsCounter_Select', () => {
+  let tests: {
+    name: string;
+    ctr: PtsCounter;
+    order: RoleOrder;
+    want: Role;
+    wantOk: boolean;
+  }[] = [
+      { name: "empty standard", ctr: new PtsCounter(), order: RoleOrder.Standard, want: Role.Collector, wantOk: false },
+      { name: "empty reverse", ctr: new PtsCounter(), order: RoleOrder.Reverse, want: Role.Collector, wantOk: false },
+
+      { name: "att standard", ctr: new PtsCounter({ Attacker: 1 }), order: RoleOrder.Standard, want: Role.Attacker, wantOk: true },
+      { name: "att reverse", ctr: new PtsCounter({ Attacker: 1 }), order: RoleOrder.Reverse, want: Role.Attacker, wantOk: true },
+
+      { name: "def standard", ctr: new PtsCounter({ Defender: 1 }), order: RoleOrder.Standard, want: Role.Defender, wantOk: true },
+      { name: "def reverse", ctr: new PtsCounter({ Defender: 1 }), order: RoleOrder.Reverse, want: Role.Defender, wantOk: true },
+
+      { name: "heal standard", ctr: new PtsCounter({ Healer: 1 }), order: RoleOrder.Standard, want: Role.Healer, wantOk: true },
+      { name: "heal reverse", ctr: new PtsCounter({ Healer: 1 }), order: RoleOrder.Reverse, want: Role.Healer, wantOk: true },
+
+      { name: "coll standard", ctr: new PtsCounter({ Collector: 1 }), order: RoleOrder.Standard, want: Role.Collector, wantOk: true },
+      { name: "coll reverse", ctr: new PtsCounter({ Collector: 1 }), order: RoleOrder.Reverse, want: Role.Collector, wantOk: true },
+
+      { name: "precedence standard - 1", ctr: new PtsCounter({ Attacker: 1, Defender: 1, Healer: 1, Collector: 1 }), order: RoleOrder.Standard, want: Role.Attacker, wantOk: true },
+      { name: "precedence standard - 2", ctr: new PtsCounter({ Attacker: 0, Defender: 1, Healer: 1, Collector: 1 }), order: RoleOrder.Standard, want: Role.Defender, wantOk: true },
+      { name: "precedence standard - 3", ctr: new PtsCounter({ Attacker: 0, Defender: 0, Healer: 1, Collector: 1 }), order: RoleOrder.Standard, want: Role.Healer, wantOk: true },
+      { name: "precedence standard - 4", ctr: new PtsCounter({ Attacker: 0, Defender: 0, Healer: 0, Collector: 1 }), order: RoleOrder.Standard, want: Role.Collector, wantOk: true },
+
+      { name: "precedence reversed - 1", ctr: new PtsCounter({ Attacker: 1, Defender: 1, Healer: 1, Collector: 1 }), order: RoleOrder.Reverse, want: Role.Collector, wantOk: true },
+      { name: "precedence reversed - 2", ctr: new PtsCounter({ Attacker: 1, Defender: 1, Healer: 1, Collector: 0 }), order: RoleOrder.Reverse, want: Role.Healer, wantOk: true },
+      { name: "precedence reversed - 3", ctr: new PtsCounter({ Attacker: 1, Defender: 1, Healer: 0, Collector: 0 }), order: RoleOrder.Reverse, want: Role.Defender, wantOk: true },
+      { name: "precedence reversed - 4", ctr: new PtsCounter({ Attacker: 1, Defender: 0, Healer: 0, Collector: 0 }), order: RoleOrder.Reverse, want: Role.Attacker, wantOk: true },
+
+      { name: "precedence standard, reversed - 1", ctr: new PtsCounter({ Attacker: 1, Defender: 1, Healer: 1, Collector: 1 }), order: RoleOrder.Reverse, want: Role.Collector, wantOk: true },
+      { name: "precedence standard, reversed - 2", ctr: new PtsCounter({ Attacker: 0, Defender: 1, Healer: 1, Collector: 1 }), order: RoleOrder.Reverse, want: Role.Collector, wantOk: true },
+      { name: "precedence standard, reversed - 3", ctr: new PtsCounter({ Attacker: 0, Defender: 0, Healer: 1, Collector: 1 }), order: RoleOrder.Reverse, want: Role.Collector, wantOk: true },
+      { name: "precedence standard, reversed - 4", ctr: new PtsCounter({ Attacker: 0, Defender: 0, Healer: 0, Collector: 1 }), order: RoleOrder.Reverse, want: Role.Collector, wantOk: true },
+
+      { name: "precedence reversed, standard - 1", ctr: new PtsCounter({ Attacker: 1, Defender: 1, Healer: 1, Collector: 1 }), order: RoleOrder.Standard, want: Role.Attacker, wantOk: true },
+      { name: "precedence reversed, standard - 2", ctr: new PtsCounter({ Attacker: 1, Defender: 1, Healer: 1, Collector: 0 }), order: RoleOrder.Standard, want: Role.Attacker, wantOk: true },
+      { name: "precedence reversed, standard - 3", ctr: new PtsCounter({ Attacker: 1, Defender: 1, Healer: 0, Collector: 0 }), order: RoleOrder.Standard, want: Role.Attacker, wantOk: true },
+      { name: "precedence reversed, standard - 4", ctr: new PtsCounter({ Attacker: 1, Defender: 0, Healer: 0, Collector: 0 }), order: RoleOrder.Standard, want: Role.Attacker, wantOk: true },
+    ];
+
+  tests.forEach(tt => {
+    test(tt.name, () => {
+      let { r, ok } = tt.ctr.Select(tt.order)
+      expect(r).toEqual(tt.want)
+      expect(ok).toEqual(tt.wantOk)
+    });
+  })
+});
+
+describe('PtsCounter_Empty', () => {
+  let tests: {
+    name: string;
+    ctr: PtsCounter;
+    want: boolean;
+  }[] = [
+      { name: "empty", ctr: new PtsCounter(), want: true },
+      { name: "empty", ctr: new PtsCounter({ Attacker: 0 }), want: true },
+      { name: "empty", ctr: new PtsCounter({ Attacker: -1 }), want: true },
+      { name: "empty", ctr: new PtsCounter({ Defender: 0 }), want: true },
+      { name: "empty", ctr: new PtsCounter({ Defender: -1 }), want: true },
+      { name: "empty", ctr: new PtsCounter({ Healer: 0 }), want: true },
+      { name: "empty", ctr: new PtsCounter({ Healer: -1 }), want: true },
+      { name: "empty", ctr: new PtsCounter({ Collector: 0 }), want: true },
+      { name: "empty", ctr: new PtsCounter({ Collector: -1 }), want: true },
+      { name: "not empty", ctr: new PtsCounter({ Attacker: 1 }), want: false },
+      { name: "not empty", ctr: new PtsCounter({ Defender: 1 }), want: false },
+      { name: "not empty", ctr: new PtsCounter({ Healer: 1 }), want: false },
+      { name: "not empty", ctr: new PtsCounter({ Collector: 1 }), want: false },
+    ];
+
+  tests.forEach(tt => {
+    test(tt.name, () => {
+      expect(tt.ctr.Empty()).toEqual(tt.want);
+    })
+  })
+});
+
+describe('BxpCounter_Select', () => {
+  let tests: {
+    name: string;
+    ctr: BxpCounter;
+    want: Skill;
+    wantOk: boolean;
+  }[] = [
+      { name: "empty", ctr: new BxpCounter(), want: 0, wantOk: false },
+
+      { name: "Agility", ctr: new BxpCounter({ Agility: 1 }), want: Skill.Agility, wantOk: true },
+      { name: "Firemaking", ctr: new BxpCounter({ Firemaking: 1 }), want: Skill.Firemaking, wantOk: true },
+      { name: "Mining", ctr: new BxpCounter({ Mining: 1 }), want: Skill.Mining, wantOk: true },
+
+      { name: "precedence - 1", ctr: new BxpCounter({ Agility: 1, Firemaking: 1, Mining: 1 }), want: Skill.Agility, wantOk: true },
+      { name: "precedence - 2", ctr: new BxpCounter({ Agility: 0, Firemaking: 1, Mining: 1 }), want: Skill.Firemaking, wantOk: true },
+      { name: "precedence - 3", ctr: new BxpCounter({ Agility: 0, Firemaking: 0, Mining: 1 }), want: Skill.Mining, wantOk: true },
+    ];
+  tests.forEach(tt => {
+    test(tt.name, () => {
+      let { s, ok } = tt.ctr.Select()
+      expect(s).toEqual(tt.want);
+      expect(ok).toEqual(tt.wantOk);
+    })
+  });
+});
+
+describe('BxpCounter_Empty', () => {
+  let tests: {
+    name: string;
+    ctr: BxpCounter;
+    want: boolean;
+  }[] = [
+      { name: "empty", ctr: new BxpCounter(), want: true },
+      { name: "empty", ctr: new BxpCounter({ Agility: 0 }), want: true },
+      { name: "empty", ctr: new BxpCounter({ Agility: -1 }), want: true },
+      { name: "empty", ctr: new BxpCounter({ Firemaking: 0 }), want: true },
+      { name: "empty", ctr: new BxpCounter({ Firemaking: -1 }), want: true },
+      { name: "empty", ctr: new BxpCounter({ Mining: 0 }), want: true },
+      { name: "empty", ctr: new BxpCounter({ Mining: -1 }), want: true },
+      { name: "not empty", ctr: new BxpCounter({ Agility: 1, Firemaking: 0, Mining: 0 }), want: false },
+      { name: "not empty", ctr: new BxpCounter({ Agility: 0, Firemaking: 1, Mining: 0 }), want: false },
+      { name: "not empty", ctr: new BxpCounter({ Agility: 0, Firemaking: 0, Mining: 1 }), want: false },
+    ];
+  tests.forEach(tt => {
+    test(tt.name, () => {
+      expect(tt.ctr.Empty()).toEqual(tt.want);
+    })
+  });
+});
+
+describe('RoleSet', () => {
+  let s = new RoleSet();
+
+  s.Add(Role.Collector)
+  expect(s.String()).toEqual("C")
+
+  s.Add(Role.Healer)
+  expect(s.String()).toEqual("C, H")
+
+  s.Add(Role.Attacker)
+  expect(s.String()).toEqual("C, H, A")
+
+  s.Add(Role.Defender)
+  expect(s.String()).toEqual("C, H, A, D")
+
+  let s2 = new RoleSet();
+
+  s2.Add(Role.Attacker)
+  expect(s2.String()).toEqual("A")
+
+  s2.Add(Role.Attacker)
+  expect(s2.String()).toEqual("A")
+
+  s2.Add(Role.Defender)
+  expect(s2.String()).toEqual("A, D")
+});
+
+describe('NewRoleSet', () => {
+  let make = function (...roles: Role[]): RoleSet {
+    let rs = new RoleSet();
+    rs.data = roles;
+    return rs;
+  }
+
+  let tests: {
+    name: string;
+    args: Role[];
+    want: RoleSet;
+  }[] = [
+      { name: "empty", args: [], want: new RoleSet() },
+      { name: "not empty", args: [Role.Attacker], want: make(Role.Attacker) },
+      { name: "not empty", args: [Role.Collector], want: make(Role.Collector) },
+      { name: "not empty", args: [Role.Defender, Role.Attacker], want: make(Role.Defender, Role.Attacker) },
+      { name: "not empty", args: [Role.Healer, Role.Collector, Role.Defender], want: make(Role.Healer, Role.Collector, Role.Defender) },
+      { name: "not empty", args: [Role.Defender, Role.Attacker, Role.Collector, Role.Healer], want: make(Role.Defender, Role.Attacker, Role.Collector, Role.Healer) },
+    ];
+
+  tests.forEach(tt => {
+    test(tt.name, () => {
+      expect(new RoleSet(...tt.args)).toEqual(tt.want);
+    })
+  })
+});
+
+describe('RoleSet_Add', () => {
+  let make = function (...roles: Role[]): RoleSet {
+    let rs = new RoleSet();
+    rs.data = roles;
+    return rs;
+  }
+
+  let tests: {
+    name: string;
+    set: RoleSet;
+    r: Role;
+    want: RoleSet;
+  }[] = [
+      { name: "empty           ", set: new RoleSet(), r: Role.Defender, want: make(Role.Defender) },
+      { name: "exists          ", set: new RoleSet(Role.Defender), r: Role.Defender, want: make(Role.Defender) },
+      { name: "not empty       ", set: new RoleSet(Role.Defender), r: Role.Attacker, want: make(Role.Defender, Role.Attacker) },
+      { name: "not empty exists", set: new RoleSet(Role.Defender, Role.Attacker), r: Role.Attacker, want: make(Role.Defender, Role.Attacker) },
+    ];
+
+  tests.forEach(tt => {
+    test(tt.name, () => {
+      tt.set.Add(tt.r);
+      expect(tt.set).toEqual(tt.want);
+    })
+  });
+});
+
+describe('RoleSet_String', () => {
+  let tests: {
+    set: RoleSet;
+    want: string;
+  }[] = [
+      { set: new RoleSet(), want: "" },
+      { set: new RoleSet(Role.Defender), want: "D" },
+      { set: new RoleSet(Role.Defender, Role.Attacker), want: "D, A" },
+      { set: new RoleSet(Role.Attacker, Role.Defender), want: "A, D" },
+      { set: new RoleSet(Role.Defender, Role.Collector, Role.Attacker), want: "D, C, A" },
+      { set: new RoleSet(Role.Defender, Role.Collector, Role.Attacker, Role.Healer), want: "D, C, A, H" },
+    ];
+
+  tests.forEach((tt, i) => {
+    test(i.toString(), () => {
+      expect(tt.set.String()).toEqual(tt.want)
+    })
+  });
+});
+
+describe('RoleSet_Reverse', () => {
+  let tests: {
+    set: RoleSet;
+    want: RoleSet;
+  }[] = [
+      { set: new RoleSet(), want: new RoleSet() },
+      { set: new RoleSet(Role.Defender), want: new RoleSet(Role.Defender) },
+      { set: new RoleSet(Role.Defender, Role.Attacker), want: new RoleSet(Role.Attacker, Role.Defender) },
+      { set: new RoleSet(Role.Attacker, Role.Defender), want: new RoleSet(Role.Defender, Role.Attacker) },
+      { set: new RoleSet(Role.Defender, Role.Collector, Role.Attacker), want: new RoleSet(Role.Attacker, Role.Collector, Role.Defender) },
+      { set: new RoleSet(Role.Defender, Role.Collector, Role.Attacker, Role.Healer), want: new RoleSet(Role.Healer, Role.Attacker, Role.Collector, Role.Defender) },
+    ];
+
+  tests.forEach((tt, i) => {
+    test(i.toString(), () => {
+      tt.set.Reverse()
+      expect(tt.set).toEqual(tt.want);
+    })
+  });
+});
+
+describe('Mode_Pts', () => {
+  let tests: {
+    name: string;
+    m: Mode;
+    wave: number;
+    role: Role;
+    want?: number;
+    wantPanic?: string;
+  }[] = [
+      { name: "invalid mode", m: 999, wave: 5, role: Role.Attacker, wantPanic: "lba: unsupported mode" },
+      { name: "nm invalid wave - 0", m: Mode.NM, wave: 0, role: Role.Attacker, wantPanic: "lba: invalid wave value" },
+      { name: "nm invalid wave - 10", m: Mode.NM, wave: 10, role: Role.Attacker, wantPanic: "lba: invalid wave value" },
+      { name: "nm invalid wave - 11", m: Mode.NM, wave: 11, role: Role.Attacker, wantPanic: "lba: invalid wave value" },
+      { name: "hm invalid wave - 0", m: Mode.HM, wave: 0, role: Role.Attacker, wantPanic: "lba: invalid wave value" },
+      { name: "hm invalid wave - 10", m: Mode.HM, wave: 10, role: Role.Attacker, wantPanic: "lba: invalid wave value" },
+      { name: "hm invalid wave - 11", m: Mode.HM, wave: 11, role: Role.Attacker, wantPanic: "lba: invalid wave value" },
+
+      // nm
+      { name: "nm - 1 - Attacker", m: Mode.NM, wave: 1, role: Role.Attacker, want: nmPts[1][Role.Attacker] },
+      { name: "nm - 2 - Attacker", m: Mode.NM, wave: 2, role: Role.Attacker, want: nmPts[2][Role.Attacker] },
+      { name: "nm - 3 - Attacker", m: Mode.NM, wave: 3, role: Role.Attacker, want: nmPts[3][Role.Attacker] },
+      { name: "nm - 4 - Attacker", m: Mode.NM, wave: 4, role: Role.Attacker, want: nmPts[4][Role.Attacker] },
+      { name: "nm - 5 - Attacker", m: Mode.NM, wave: 5, role: Role.Attacker, want: nmPts[5][Role.Attacker] },
+      { name: "nm - 6 - Attacker", m: Mode.NM, wave: 6, role: Role.Attacker, want: nmPts[6][Role.Attacker] },
+      { name: "nm - 7 - Attacker", m: Mode.NM, wave: 7, role: Role.Attacker, want: nmPts[7][Role.Attacker] },
+      { name: "nm - 8 - Attacker", m: Mode.NM, wave: 8, role: Role.Attacker, want: nmPts[8][Role.Attacker] },
+      { name: "nm - 9 - Attacker", m: Mode.NM, wave: 9, role: Role.Attacker, want: nmPts[9][Role.Attacker] },
+
+      { name: "nm - 1 - Defender", m: Mode.NM, wave: 1, role: Role.Defender, want: nmPts[1][Role.Defender] },
+      { name: "nm - 2 - Defender", m: Mode.NM, wave: 2, role: Role.Defender, want: nmPts[2][Role.Defender] },
+      { name: "nm - 3 - Defender", m: Mode.NM, wave: 3, role: Role.Defender, want: nmPts[3][Role.Defender] },
+      { name: "nm - 4 - Defender", m: Mode.NM, wave: 4, role: Role.Defender, want: nmPts[4][Role.Defender] },
+      { name: "nm - 5 - Defender", m: Mode.NM, wave: 5, role: Role.Defender, want: nmPts[5][Role.Defender] },
+      { name: "nm - 6 - Defender", m: Mode.NM, wave: 6, role: Role.Defender, want: nmPts[6][Role.Defender] },
+      { name: "nm - 7 - Defender", m: Mode.NM, wave: 7, role: Role.Defender, want: nmPts[7][Role.Defender] },
+      { name: "nm - 8 - Defender", m: Mode.NM, wave: 8, role: Role.Defender, want: nmPts[8][Role.Defender] },
+      { name: "nm - 9 - Defender", m: Mode.NM, wave: 9, role: Role.Defender, want: nmPts[9][Role.Defender] },
+
+      { name: "nm - 1 - Healer", m: Mode.NM, wave: 1, role: Role.Healer, want: nmPts[1][Role.Healer] },
+      { name: "nm - 2 - Healer", m: Mode.NM, wave: 2, role: Role.Healer, want: nmPts[2][Role.Healer] },
+      { name: "nm - 3 - Healer", m: Mode.NM, wave: 3, role: Role.Healer, want: nmPts[3][Role.Healer] },
+      { name: "nm - 4 - Healer", m: Mode.NM, wave: 4, role: Role.Healer, want: nmPts[4][Role.Healer] },
+      { name: "nm - 5 - Healer", m: Mode.NM, wave: 5, role: Role.Healer, want: nmPts[5][Role.Healer] },
+      { name: "nm - 6 - Healer", m: Mode.NM, wave: 6, role: Role.Healer, want: nmPts[6][Role.Healer] },
+      { name: "nm - 7 - Healer", m: Mode.NM, wave: 7, role: Role.Healer, want: nmPts[7][Role.Healer] },
+      { name: "nm - 8 - Healer", m: Mode.NM, wave: 8, role: Role.Healer, want: nmPts[8][Role.Healer] },
+      { name: "nm - 9 - Healer", m: Mode.NM, wave: 9, role: Role.Healer, want: nmPts[9][Role.Healer] },
+
+      { name: "nm - 1 - Collector", m: Mode.NM, wave: 1, role: Role.Collector, want: nmPts[1][Role.Collector] },
+      { name: "nm - 2 - Collector", m: Mode.NM, wave: 2, role: Role.Collector, want: nmPts[2][Role.Collector] },
+      { name: "nm - 3 - Collector", m: Mode.NM, wave: 3, role: Role.Collector, want: nmPts[3][Role.Collector] },
+      { name: "nm - 4 - Collector", m: Mode.NM, wave: 4, role: Role.Collector, want: nmPts[4][Role.Collector] },
+      { name: "nm - 5 - Collector", m: Mode.NM, wave: 5, role: Role.Collector, want: nmPts[5][Role.Collector] },
+      { name: "nm - 6 - Collector", m: Mode.NM, wave: 6, role: Role.Collector, want: nmPts[6][Role.Collector] },
+      { name: "nm - 7 - Collector", m: Mode.NM, wave: 7, role: Role.Collector, want: nmPts[7][Role.Collector] },
+      { name: "nm - 8 - Collector", m: Mode.NM, wave: 8, role: Role.Collector, want: nmPts[8][Role.Collector] },
+      { name: "nm - 9 - Collector", m: Mode.NM, wave: 9, role: Role.Collector, want: nmPts[9][Role.Collector] },
+
+      // hm
+      { name: "hm - 1 - Attacker", m: Mode.HM, wave: 1, role: Role.Attacker, want: hmPts[1][Role.Attacker] },
+      { name: "hm - 2 - Attacker", m: Mode.HM, wave: 2, role: Role.Attacker, want: hmPts[2][Role.Attacker] },
+      { name: "hm - 3 - Attacker", m: Mode.HM, wave: 3, role: Role.Attacker, want: hmPts[3][Role.Attacker] },
+      { name: "hm - 4 - Attacker", m: Mode.HM, wave: 4, role: Role.Attacker, want: hmPts[4][Role.Attacker] },
+      { name: "hm - 5 - Attacker", m: Mode.HM, wave: 5, role: Role.Attacker, want: hmPts[5][Role.Attacker] },
+      { name: "hm - 6 - Attacker", m: Mode.HM, wave: 6, role: Role.Attacker, want: hmPts[6][Role.Attacker] },
+      { name: "hm - 7 - Attacker", m: Mode.HM, wave: 7, role: Role.Attacker, want: hmPts[7][Role.Attacker] },
+      { name: "hm - 8 - Attacker", m: Mode.HM, wave: 8, role: Role.Attacker, want: hmPts[8][Role.Attacker] },
+      { name: "hm - 9 - Attacker", m: Mode.HM, wave: 9, role: Role.Attacker, want: hmPts[9][Role.Attacker] },
+
+      { name: "hm - 1 - Defender", m: Mode.HM, wave: 1, role: Role.Defender, want: hmPts[1][Role.Defender] },
+      { name: "hm - 2 - Defender", m: Mode.HM, wave: 2, role: Role.Defender, want: hmPts[2][Role.Defender] },
+      { name: "hm - 3 - Defender", m: Mode.HM, wave: 3, role: Role.Defender, want: hmPts[3][Role.Defender] },
+      { name: "hm - 4 - Defender", m: Mode.HM, wave: 4, role: Role.Defender, want: hmPts[4][Role.Defender] },
+      { name: "hm - 5 - Defender", m: Mode.HM, wave: 5, role: Role.Defender, want: hmPts[5][Role.Defender] },
+      { name: "hm - 6 - Defender", m: Mode.HM, wave: 6, role: Role.Defender, want: hmPts[6][Role.Defender] },
+      { name: "hm - 7 - Defender", m: Mode.HM, wave: 7, role: Role.Defender, want: hmPts[7][Role.Defender] },
+      { name: "hm - 8 - Defender", m: Mode.HM, wave: 8, role: Role.Defender, want: hmPts[8][Role.Defender] },
+      { name: "hm - 9 - Defender", m: Mode.HM, wave: 9, role: Role.Defender, want: hmPts[9][Role.Defender] },
+
+      { name: "hm - 1 - Healer", m: Mode.HM, wave: 1, role: Role.Healer, want: hmPts[1][Role.Healer] },
+      { name: "hm - 2 - Healer", m: Mode.HM, wave: 2, role: Role.Healer, want: hmPts[2][Role.Healer] },
+      { name: "hm - 3 - Healer", m: Mode.HM, wave: 3, role: Role.Healer, want: hmPts[3][Role.Healer] },
+      { name: "hm - 4 - Healer", m: Mode.HM, wave: 4, role: Role.Healer, want: hmPts[4][Role.Healer] },
+      { name: "hm - 5 - Healer", m: Mode.HM, wave: 5, role: Role.Healer, want: hmPts[5][Role.Healer] },
+      { name: "hm - 6 - Healer", m: Mode.HM, wave: 6, role: Role.Healer, want: hmPts[6][Role.Healer] },
+      { name: "hm - 7 - Healer", m: Mode.HM, wave: 7, role: Role.Healer, want: hmPts[7][Role.Healer] },
+      { name: "hm - 8 - Healer", m: Mode.HM, wave: 8, role: Role.Healer, want: hmPts[8][Role.Healer] },
+      { name: "hm - 9 - Healer", m: Mode.HM, wave: 9, role: Role.Healer, want: hmPts[9][Role.Healer] },
+
+      { name: "hm - 1 - Collector", m: Mode.HM, wave: 1, role: Role.Collector, want: hmPts[1][Role.Collector] },
+      { name: "hm - 2 - Collector", m: Mode.HM, wave: 2, role: Role.Collector, want: hmPts[2][Role.Collector] },
+      { name: "hm - 3 - Collector", m: Mode.HM, wave: 3, role: Role.Collector, want: hmPts[3][Role.Collector] },
+      { name: "hm - 4 - Collector", m: Mode.HM, wave: 4, role: Role.Collector, want: hmPts[4][Role.Collector] },
+      { name: "hm - 5 - Collector", m: Mode.HM, wave: 5, role: Role.Collector, want: hmPts[5][Role.Collector] },
+      { name: "hm - 6 - Collector", m: Mode.HM, wave: 6, role: Role.Collector, want: hmPts[6][Role.Collector] },
+      { name: "hm - 7 - Collector", m: Mode.HM, wave: 7, role: Role.Collector, want: hmPts[7][Role.Collector] },
+      { name: "hm - 8 - Collector", m: Mode.HM, wave: 8, role: Role.Collector, want: hmPts[8][Role.Collector] },
+      { name: "hm - 9 - Collector", m: Mode.HM, wave: 9, role: Role.Collector, want: hmPts[9][Role.Collector] },
+    ];
+
+  tests.forEach(tt => {
+    test(tt.name, () => {
+      try {
+        expect(Mode.Pts(tt.m, tt.wave, tt.role)).toEqual(tt.want)
+      } catch (e) {
+        if (!tt.wantPanic) {
+          expect(e).toEqual(new Error(tt.wantPanic));
+        }
+      }
+    });
+  });
+});
+
+describe('Mode_Bxp', () => {
+  let tests: {
+    name: string;
+    m: Mode;
+    wave: number;
+    skill: Skill;
+    want?: number;
+    wantPanic?: string;
+  }[] = [
+      { name: "invalid mode", m: 999, wave: 5, skill: Skill.Agility, wantPanic: "lba: unsupported mode" },
+      { name: "nm invalid wave - 0", m: Mode.NM, wave: 0, skill: Skill.Agility, wantPanic: "lba: invalid wave value" },
+      { name: "nm invalid wave - 11", m: Mode.NM, wave: 0, skill: Skill.Agility, wantPanic: "lba: invalid wave value" },
+      { name: "hm invalid wave - 0", m: Mode.HM, wave: 0, skill: Skill.Agility, wantPanic: "lba: invalid wave value" },
+      { name: "hm invalid wave - 11", m: Mode.HM, wave: 0, skill: Skill.Agility, wantPanic: "lba: invalid wave value" },
+
+      // nm
+      { name: "nm - 1 - Agility", m: Mode.NM, wave: 1, skill: Skill.Agility, want: nmXp[1][Skill.Agility] },
+      { name: "nm - 2 - Agility", m: Mode.NM, wave: 2, skill: Skill.Agility, want: nmXp[2][Skill.Agility] },
+      { name: "nm - 3 - Agility", m: Mode.NM, wave: 3, skill: Skill.Agility, want: nmXp[3][Skill.Agility] },
+      { name: "nm - 4 - Agility", m: Mode.NM, wave: 4, skill: Skill.Agility, want: nmXp[4][Skill.Agility] },
+      { name: "nm - 5 - Agility", m: Mode.NM, wave: 5, skill: Skill.Agility, want: nmXp[5][Skill.Agility] },
+      { name: "nm - 6 - Agility", m: Mode.NM, wave: 6, skill: Skill.Agility, want: nmXp[6][Skill.Agility] },
+      { name: "nm - 7 - Agility", m: Mode.NM, wave: 7, skill: Skill.Agility, want: nmXp[7][Skill.Agility] },
+      { name: "nm - 8 - Agility", m: Mode.NM, wave: 8, skill: Skill.Agility, want: nmXp[8][Skill.Agility] },
+      { name: "nm - 9 - Agility", m: Mode.NM, wave: 9, skill: Skill.Agility, want: nmXp[9][Skill.Agility] },
+      { name: "nm - 10 - Agility", m: Mode.NM, wave: 10, skill: Skill.Agility, want: nmXp[10][Skill.Agility] },
+
+      { name: "nm - 1 - Firemaking", m: Mode.NM, wave: 1, skill: Skill.Firemaking, want: nmXp[1][Skill.Firemaking] },
+      { name: "nm - 2 - Firemaking", m: Mode.NM, wave: 2, skill: Skill.Firemaking, want: nmXp[2][Skill.Firemaking] },
+      { name: "nm - 3 - Firemaking", m: Mode.NM, wave: 3, skill: Skill.Firemaking, want: nmXp[3][Skill.Firemaking] },
+      { name: "nm - 4 - Firemaking", m: Mode.NM, wave: 4, skill: Skill.Firemaking, want: nmXp[4][Skill.Firemaking] },
+      { name: "nm - 5 - Firemaking", m: Mode.NM, wave: 5, skill: Skill.Firemaking, want: nmXp[5][Skill.Firemaking] },
+      { name: "nm - 6 - Firemaking", m: Mode.NM, wave: 6, skill: Skill.Firemaking, want: nmXp[6][Skill.Firemaking] },
+      { name: "nm - 7 - Firemaking", m: Mode.NM, wave: 7, skill: Skill.Firemaking, want: nmXp[7][Skill.Firemaking] },
+      { name: "nm - 8 - Firemaking", m: Mode.NM, wave: 8, skill: Skill.Firemaking, want: nmXp[8][Skill.Firemaking] },
+      { name: "nm - 9 - Firemaking", m: Mode.NM, wave: 9, skill: Skill.Firemaking, want: nmXp[9][Skill.Firemaking] },
+      { name: "nm - 10 - Firemaking", m: Mode.NM, wave: 10, skill: Skill.Firemaking, want: nmXp[10][Skill.Firemaking] },
+
+      { name: "nm - 1 - Mining", m: Mode.NM, wave: 1, skill: Skill.Mining, want: nmXp[1][Skill.Mining] },
+      { name: "nm - 2 - Mining", m: Mode.NM, wave: 2, skill: Skill.Mining, want: nmXp[2][Skill.Mining] },
+      { name: "nm - 3 - Mining", m: Mode.NM, wave: 3, skill: Skill.Mining, want: nmXp[3][Skill.Mining] },
+      { name: "nm - 4 - Mining", m: Mode.NM, wave: 4, skill: Skill.Mining, want: nmXp[4][Skill.Mining] },
+      { name: "nm - 5 - Mining", m: Mode.NM, wave: 5, skill: Skill.Mining, want: nmXp[5][Skill.Mining] },
+      { name: "nm - 6 - Mining", m: Mode.NM, wave: 6, skill: Skill.Mining, want: nmXp[6][Skill.Mining] },
+      { name: "nm - 7 - Mining", m: Mode.NM, wave: 7, skill: Skill.Mining, want: nmXp[7][Skill.Mining] },
+      { name: "nm - 8 - Mining", m: Mode.NM, wave: 8, skill: Skill.Mining, want: nmXp[8][Skill.Mining] },
+      { name: "nm - 9 - Mining", m: Mode.NM, wave: 9, skill: Skill.Mining, want: nmXp[9][Skill.Mining] },
+      { name: "nm - 10 - Mining", m: Mode.NM, wave: 10, skill: Skill.Mining, want: nmXp[10][Skill.Mining] },
+
+      // hm
+      { name: "hm - 1 - Agility", m: Mode.HM, wave: 1, skill: Skill.Agility, want: hmXp[1][Skill.Agility] },
+      { name: "hm - 2 - Agility", m: Mode.HM, wave: 2, skill: Skill.Agility, want: hmXp[2][Skill.Agility] },
+      { name: "hm - 3 - Agility", m: Mode.HM, wave: 3, skill: Skill.Agility, want: hmXp[3][Skill.Agility] },
+      { name: "hm - 4 - Agility", m: Mode.HM, wave: 4, skill: Skill.Agility, want: hmXp[4][Skill.Agility] },
+      { name: "hm - 5 - Agility", m: Mode.HM, wave: 5, skill: Skill.Agility, want: hmXp[5][Skill.Agility] },
+      { name: "hm - 6 - Agility", m: Mode.HM, wave: 6, skill: Skill.Agility, want: hmXp[6][Skill.Agility] },
+      { name: "hm - 7 - Agility", m: Mode.HM, wave: 7, skill: Skill.Agility, want: hmXp[7][Skill.Agility] },
+      { name: "hm - 8 - Agility", m: Mode.HM, wave: 8, skill: Skill.Agility, want: hmXp[8][Skill.Agility] },
+      { name: "hm - 9 - Agility", m: Mode.HM, wave: 9, skill: Skill.Agility, want: hmXp[9][Skill.Agility] },
+      { name: "hm - 10 - Agility", m: Mode.HM, wave: 10, skill: Skill.Agility, want: hmXp[10][Skill.Agility] },
+
+      { name: "hm - 1 - Firemaking", m: Mode.HM, wave: 1, skill: Skill.Firemaking, want: hmXp[1][Skill.Firemaking] },
+      { name: "hm - 2 - Firemaking", m: Mode.HM, wave: 2, skill: Skill.Firemaking, want: hmXp[2][Skill.Firemaking] },
+      { name: "hm - 3 - Firemaking", m: Mode.HM, wave: 3, skill: Skill.Firemaking, want: hmXp[3][Skill.Firemaking] },
+      { name: "hm - 4 - Firemaking", m: Mode.HM, wave: 4, skill: Skill.Firemaking, want: hmXp[4][Skill.Firemaking] },
+      { name: "hm - 5 - Firemaking", m: Mode.HM, wave: 5, skill: Skill.Firemaking, want: hmXp[5][Skill.Firemaking] },
+      { name: "hm - 6 - Firemaking", m: Mode.HM, wave: 6, skill: Skill.Firemaking, want: hmXp[6][Skill.Firemaking] },
+      { name: "hm - 7 - Firemaking", m: Mode.HM, wave: 7, skill: Skill.Firemaking, want: hmXp[7][Skill.Firemaking] },
+      { name: "hm - 8 - Firemaking", m: Mode.HM, wave: 8, skill: Skill.Firemaking, want: hmXp[8][Skill.Firemaking] },
+      { name: "hm - 9 - Firemaking", m: Mode.HM, wave: 9, skill: Skill.Firemaking, want: hmXp[9][Skill.Firemaking] },
+      { name: "hm - 10 - Firemaking", m: Mode.HM, wave: 10, skill: Skill.Firemaking, want: hmXp[10][Skill.Firemaking] },
+
+      { name: "hm - 1 - Mining", m: Mode.HM, wave: 1, skill: Skill.Mining, want: hmXp[1][Skill.Mining] },
+      { name: "hm - 2 - Mining", m: Mode.HM, wave: 2, skill: Skill.Mining, want: hmXp[2][Skill.Mining] },
+      { name: "hm - 3 - Mining", m: Mode.HM, wave: 3, skill: Skill.Mining, want: hmXp[3][Skill.Mining] },
+      { name: "hm - 4 - Mining", m: Mode.HM, wave: 4, skill: Skill.Mining, want: hmXp[4][Skill.Mining] },
+      { name: "hm - 5 - Mining", m: Mode.HM, wave: 5, skill: Skill.Mining, want: hmXp[5][Skill.Mining] },
+      { name: "hm - 6 - Mining", m: Mode.HM, wave: 6, skill: Skill.Mining, want: hmXp[6][Skill.Mining] },
+      { name: "hm - 7 - Mining", m: Mode.HM, wave: 7, skill: Skill.Mining, want: hmXp[7][Skill.Mining] },
+      { name: "hm - 8 - Mining", m: Mode.HM, wave: 8, skill: Skill.Mining, want: hmXp[8][Skill.Mining] },
+      { name: "hm - 9 - Mining", m: Mode.HM, wave: 9, skill: Skill.Mining, want: hmXp[9][Skill.Mining] },
+      { name: "hm - 10 - Mining", m: Mode.HM, wave: 10, skill: Skill.Mining, want: hmXp[10][Skill.Mining] },
+    ];
+
+  tests.forEach(tt => {
+    test(tt.name, () => {
+      try {
+        expect(Mode.Bxp(tt.m, tt.wave, tt.skill)).toEqual(tt.want)
+      } catch (e) {
+        if (!tt.wantPanic) {
+          expect(e).toEqual(new Error(tt.wantPanic));
+        }
+      }
+    });
+  });
+});

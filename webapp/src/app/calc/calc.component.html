@@ -1,0 +1,694 @@
+<mat-card class="intro">
+	<mat-card-header class="centered-header">
+		<mat-card-title>Prices</mat-card-title>
+		<mat-card-subtitle>Please do not hesitate to contact us via the GCC or Discord should you require any
+			assistance. Prices given by the calculators are only approximations.</mat-card-subtitle>
+	</mat-card-header>
+	<mat-card-content>
+		<table>
+			<tr>
+				<th>Round</th>
+				<th class="info-price">Price</th>
+				<th class="info-duration">Time</th>
+			</tr>
+			<tr>
+				<td>Waves 1-10 NM/Queen kill/Completionist requirement</td>
+				<td class="info-price">12,000,000</td>
+				<td class="info-duration">20 min</td>
+			</tr>
+			<tr>
+				<td>Waves 1-10 NM - solo leech</td>
+				<td class="info-price">24,000,000</td>
+				<td class="info-duration">20 min</td>
+			</tr>
+			<tr>
+				<td>Waves 1-9 HM unlock</td>
+				<td class="info-price">10,000,000</td>
+				<td class="info-duration">20 min</td>
+			</tr>
+			<tr>
+				<td>Waves 1-9 HM (if already unlocked, please read information below) ***</td>
+				<td class="info-price">7,000,000</td>
+				<td class="info-duration">20 min</td>
+			</tr>
+			<tr>
+				<td>Waves 1-9 HM (as an ironman)</td>
+				<td class="info-price">12,000,000</td>
+				<td class="info-duration">20 min</td>
+			</tr>
+			<tr>
+				<td>Waves 6-9 HM for BXP</td>
+				<td class="info-price">5,000,000</td>
+				<td class="info-duration">10 min</td>
+			</tr>
+			<tr>
+				<td>Waves 6-9 HM for Points</td>
+				<td class="info-price">6,500,000</td>
+				<td class="info-duration">10 min</td>
+			</tr>
+			<tr>
+				<td>Wave 10 HM/King kill/Trim requirement</td>
+				<td class="info-price">15,000,000</td>
+				<td class="info-duration">20 min</td>
+			</tr>
+			<tr>
+				<td>Wave 10 HM/King kill - if you do not have either a) resonance and surge abilities, or b) level
+					50+ magic or range</td>
+				<td class="info-price">18,000,000</td>
+				<td class="info-duration">20 min</td>
+			</tr>
+		</table>
+
+		<p>
+			Listed prices are rounds done with 2 leeches at once (unless explicitly stated otherwise). You may pay
+			double listed price for an increased chance of leeching faster, to leech alone (please mention when
+			asking).
+		</p>
+
+		<p>
+			For specifics please see the calculators provided (clicking the round in the table above opens the
+			relevant tab).
+			Prices may slightly vary based on if another leech requires 1-9 hard mode to be unlocked. The points/xp
+			obtained
+			from HM 1-5 offsets the extra cost.
+		</p>
+		<p>
+			Calculators will give an estimate of cost and the amount of rounds required. You may also request the
+			specific leech via the calculator.
+		</p>
+		<p>Ironmen have increased cost due to being unable to be traded tickets.</p>
+	</mat-card-content>
+</mat-card>
+
+
+
+<form class="calc-form" [formGroup]="form">
+	<h4>Basic Info</h4>
+	<p>Let's start with some basic information about you and your ba progress</p>
+
+	<mat-card class="formPanel">
+		<mat-card-content>
+			<div class="form-row">
+				<mat-form-field appearance="legacy">
+					<mat-label>Rsn</mat-label>
+					<input matInput type="text" placeholder="Durial321" formControlName="rsn"
+						[errorStateMatcher]="matcher" required>
+				</mat-form-field>
+				<mat-form-field appearance="legacy">
+					<mat-label>Discord Handle</mat-label>
+					<input matInput type="text" placeholder="Durial321#1362" formControlName="discord"
+						[errorStateMatcher]="matcher">
+					<mat-hint>optional</mat-hint>
+				</mat-form-field>
+
+				<mat-form-field appearance="legacy">
+					<mat-label>Ba Progress</mat-label>
+					<mat-select formControlName="progress" [errorStateMatcher]="matcher">
+						<mat-option *ngFor="let kv of progressValues | keyvalue" [value]="+kv.key">
+							{{kv.value}}
+						</mat-option>
+					</mat-select>
+					<mat-hint><a href="" class="link">How do I check?</a></mat-hint>
+				</mat-form-field>
+
+				<mat-form-field appearance="legacy">
+					<mat-label>Enhancer Charges</mat-label>
+					<input matInput type="number" placeholder="0" formControlName="charges"
+						[errorStateMatcher]="matcher">
+				</mat-form-field>
+
+			</div>
+			<div class="form-row" *ngIf="form.contains('tickets')">
+				<mat-form-field appearance="legacy">
+					<mat-label>Hardmode 10 Tickets</mat-label>
+					<input matInput type="number" placeholder="0" formControlName="tickets"
+						[errorStateMatcher]="matcher">
+					<mat-icon class="help" matSuffix matTooltipPosition="above"
+						matTooltip="If you have saved your ticket(s) we will use them for 6-9s and kings when necessary. Otherwise we might have to do 1-9s first.">
+						help_center</mat-icon>
+				</mat-form-field>
+			</div>
+			<div class="form-row">
+				<mat-checkbox color="primary" formControlName="ironman">I'm an ironman</mat-checkbox>
+			</div>
+
+		</mat-card-content>
+	</mat-card>
+
+
+	<h4>Our Services</h4>
+	<p>Below are all the services you provide, you can request a service by clicking the toggle on the right side and
+		filling out the form</p>
+	<app-panel class="formPanel" title="Bxp"
+		subtitle="I need bonus experience in Agility/Firemaking/Mining, maybe stuff about xp rates?"
+		(onExpand)="onExpand('bxp')" (onCollapse)="onCollapse('bxp')" formGroupName="bxp" #bxpPanel
+		[ngClass]="{hidden: form.value.ironman}">
+		<div class="form-row">
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Agility
+					<ba-icon icon="agility"></ba-icon>
+				</mat-label>
+				<input matInput type="string" placeholder="0" formControlName="agility" [errorStateMatcher]="matcher">
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Firemaking
+					<ba-icon icon="firemaking"></ba-icon>
+				</mat-label>
+				<input matInput type="string" placeholder="0" formControlName="firemaking"
+					[errorStateMatcher]="matcher">
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Mining
+					<ba-icon icon="mining"></ba-icon>
+				</mat-label>
+				<input matInput type="string" placeholder="0" formControlName="mining" [errorStateMatcher]="matcher">
+			</mat-form-field>
+		</div>
+	</app-panel>
+
+	<app-panel class="formPanel" title="Comp Requirement - Hardmode Unlock"
+		subtitle="A full normal mode round, including one queen kill" (onExpand)="onExpand('hmUnlock')"
+		(onCollapse)="onCollapse('hmUnlock')" [expanded]="form.value.comp" [disabled]="form.value.progress >= Progress.HM1">
+		<div class="form-row">
+			<mat-checkbox color="primary" formControlName="nmSolo">I'm willing to leech alone so I don't have to wait to
+				be paired with someone else for double the listed price</mat-checkbox>
+		</div>
+	</app-panel>
+
+	<app-panel class="formPanel" title="Trim Requirement - Pts & Levels"
+		subtitle="Max level in every role, including one king kill" (onExpand)="onExpand('lvls')"
+		(onCollapse)="onCollapse('lvls')" formGroupName="lvls" #lvlsPanel>
+		<div class="form-row">
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Need Attacker Lvl
+					<ba-icon icon="attacker"></ba-icon>
+				</mat-label>
+				<mat-select formControlName="needAttLvl" [errorStateMatcher]="matcher">
+					<mat-option [value]="1">1</mat-option>
+					<mat-option [value]="2">2</mat-option>
+					<mat-option [value]="3">3</mat-option>
+					<mat-option [value]="4">4</mat-option>
+					<mat-option [value]="5">5</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Need Defender Lvl
+					<ba-icon icon="defender"></ba-icon>
+				</mat-label>
+				<mat-select formControlName="needDefLvl" [errorStateMatcher]="matcher">
+					<mat-option [value]="1">1</mat-option>
+					<mat-option [value]="2">2</mat-option>
+					<mat-option [value]="3">3</mat-option>
+					<mat-option [value]="4">4</mat-option>
+					<mat-option [value]="5">5</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Need Collector Lvl
+					<ba-icon icon="collector"></ba-icon>
+				</mat-label>
+				<mat-select formControlName="needColLvl" [errorStateMatcher]="matcher">
+					<mat-option [value]="1">1</mat-option>
+					<mat-option [value]="2">2</mat-option>
+					<mat-option [value]="3">3</mat-option>
+					<mat-option [value]="4">4</mat-option>
+					<mat-option [value]="5">5</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Need Healer Lvl
+					<ba-icon icon="healer"></ba-icon>
+				</mat-label>
+				<mat-select formControlName="needHealLvl" [errorStateMatcher]="matcher">
+					<mat-option [value]="1">1</mat-option>
+					<mat-option [value]="2">2</mat-option>
+					<mat-option [value]="3">3</mat-option>
+					<mat-option [value]="4">4</mat-option>
+					<mat-option [value]="5">5</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="form-row">
+			<mat-checkbox color="primary" formControlName="needsKing">I need a king kill too</mat-checkbox>
+			<mat-checkbox color="primary" *ngIf="form.value.lvls.needsKing" [formControl]="form.get('kingSolo')">I'm willing to leech the king kill alone so I don't have to wait to
+				be paired with someone else for double the listed price</mat-checkbox>
+		</div>
+	</app-panel>
+
+	<app-panel class="formPanel" title="Item Leech" subtitle="uh todo?" (onExpand)="onExpand('items')"
+		(onCollapse)="onCollapse('items')" formGroupName="items" #itemsPanel>
+		<h5>Presets</h5>
+		<mat-button-toggle-group multiple="true">
+			<mat-button-toggle [checked]="isPresetApplied('poh')" (click)="togglePreset('poh')">Full POH
+			</mat-button-toggle>
+			<mat-button-toggle [disabled]="form.value.ironman" [checked]="isPresetApplied('insignias')" (click)="!form.value.ironman && togglePreset('insignias')">All insignias
+			</mat-button-toggle>
+		</mat-button-toggle-group>
+
+		<h5>Outfit pieces</h5>
+		<div class="form-row">
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Hats
+					<ba-icon icon="hat"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="hats" [errorStateMatcher]="matcher">
+				<mat-hint>275 pts in each role + Queen</mat-hint>
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Boots
+					<ba-icon icon="boots"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="boots" [errorStateMatcher]="matcher">
+				<mat-hint>100 pts in each role</mat-hint>
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Gloves
+					<ba-icon icon="gloves"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="gloves" [errorStateMatcher]="matcher">
+				<mat-hint>150 pts in each role</mat-hint>
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Torso
+					<ba-icon icon="torso"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="torso" [errorStateMatcher]="matcher">
+				<mat-hint>375 pts in each role + Queen</mat-hint>
+			</mat-form-field>
+		</div>
+		<div class="form-row">
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Skirt
+					<ba-icon icon="skirt"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="skirt" [errorStateMatcher]="matcher">
+				<mat-hint>375 pts in each role + Queen</mat-hint>
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Armour Patches
+					<ba-icon icon="patch"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="armourPatches"
+					[errorStateMatcher]="matcher">
+				<mat-hint>100 pts in any role</mat-hint>
+			</mat-form-field>
+			<mat-form-field appearance="legacy" *ngIf="!form.value.ironman">
+				<mat-label>
+					Penance Trident
+					<ba-icon icon="trident"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="trident" [errorStateMatcher]="matcher">
+				<mat-hint>170 pts in all roles</mat-hint>
+			</mat-form-field>
+			<mat-form-field appearance="legacy" *ngIf="!form.value.ironman">
+				<mat-label>
+					Penance Master Trident
+					<ba-icon icon="master_trident"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="masterTrident"
+					[errorStateMatcher]="matcher">
+				<mat-hint>220 pts in all roles</mat-hint>
+			</mat-form-field>
+		</div>
+
+		<h5 *ngIf="!form.value.ironman">Insignias</h5>
+		<div class="form-row" *ngIf="!form.value.ironman">
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Attacker's Insignia
+					<ba-icon icon="attacker_insignia"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="attackerInsignia"
+				[errorStateMatcher]="matcher">
+				<mat-hint>Lvl 5 + 500 pts + 5 Kings</mat-hint>
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Defender's Insignia
+					<ba-icon icon="defender_insignia"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="defenderInsignia"
+				[errorStateMatcher]="matcher">
+				<mat-hint>Lvl 5 + 500 pts + 5 Kings</mat-hint>
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Collector's Insignia
+					<ba-icon icon="collector_insignia"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="collectorInsignia"
+				[errorStateMatcher]="matcher">
+				<mat-hint>Lvl 5 + 500 pts + 5 Kings</mat-hint>
+			</mat-form-field>
+			<mat-form-field appearance="legacy">
+				<mat-label>
+					Healer's Insignia
+					<ba-icon icon="healer_insignia"></ba-icon>
+				</mat-label>
+				<input matInput type="number" placeholder="0" formControlName="healerInsignia"
+				[errorStateMatcher]="matcher">
+				<mat-hint>Lvl 5 + 500 pts + 5 Kings</mat-hint>
+			</mat-form-field>
+		</div>
+		<div class="form-row" *ngIf="!form.value.ironman && (form.value.items.attackerInsignia > 0 || form.value.items.defenderInsignia > 0 || form.value.items.collectorInsignia > 0 || form.value.items.healerInsignia > 0)">
+			<mat-checkbox color="primary" [formControl]="form.get('kingSolo')">I'm willing to leech the king kills alone so I don't have to wait to
+				be paired with someone else for double the listed price</mat-checkbox>
+		</div>
+	</app-panel>
+
+	<mat-card class="formPanel" *ngIf="needsPts$ | async">
+		<mat-card-header>
+			<mat-card-title>Almost there...</mat-card-title>
+			<mat-card-subtitle>You need to leech points/levels so we need to know what you have</mat-card-subtitle>
+		</mat-card-header>
+		<mat-card-content formGroupName="has">
+			<p>
+				You can use the <span class="blackboard link"
+					(click)="showBlackboard = !showBlackboard">blackboard</span> in
+				Barbarian Assault, upstairs, right next to the bank and ladder.
+				<br>
+				Click it and fill in the info as it is layed out in the board.
+			</p>
+
+			<img class="blackboard image" *ngIf="showBlackboard" (click)="showBlackboard = false"
+				src="assets/blackboard.png" alt="blackboard.png" />
+
+			<div class="currentPtsTable">
+				<table>
+					<thead>
+						<th>Role</th>
+						<th>Current Points</th>
+						<th>Level</th>
+						<!-- <th>Reward next level</th>
+					<th>Points<br/>next<br/>level</th> -->
+					</thead>
+					<tbody>
+						<tr>
+							<td>Attacker</td>
+							<td>
+								<mat-form-field appearance="legacy">
+									<input matInput type="number" formControlName="attackerPts"
+										[errorStateMatcher]="matcher">
+								</mat-form-field>
+							</td>
+							<td>
+								<mat-form-field appearance="legacy">
+									<mat-select formControlName="attackerLvl" [errorStateMatcher]="matcher">
+										<mat-option [value]="1">1</mat-option>
+										<mat-option [value]="2">2</mat-option>
+										<mat-option [value]="3">3</mat-option>
+										<mat-option [value]="4">4</mat-option>
+										<mat-option [value]="5">5</mat-option>
+									</mat-select>
+								</mat-form-field>
+							</td>
+							<!-- <td class="rewardNextLvl">{{rewardNextLvl('attacker')}}</td>
+						<td class="ptsNextLvl">{{ptsNextLvl('attacker')}}</td> -->
+						</tr>
+						<tr>
+							<td>Defender</td>
+							<td>
+								<mat-form-field appearance="legacy">
+									<input matInput type="number" formControlName="defenderPts"
+										[errorStateMatcher]="matcher">
+								</mat-form-field>
+							</td>
+							<td>
+								<mat-form-field appearance="legacy">
+									<mat-select formControlName="defenderLvl" [errorStateMatcher]="matcher">
+										<mat-option [value]="1">1</mat-option>
+										<mat-option [value]="2">2</mat-option>
+										<mat-option [value]="3">3</mat-option>
+										<mat-option [value]="4">4</mat-option>
+										<mat-option [value]="5">5</mat-option>
+									</mat-select>
+								</mat-form-field>
+							</td>
+							<!-- <td class="rewardNextLvl">{{rewardNextLvl('defender')}}</td>
+						<td class="ptsNextLvl">{{ptsNextLvl('defender')}}</td>-->
+						</tr>
+						<tr>
+							<td>Collector</td>
+							<td>
+								<mat-form-field appearance="legacy">
+									<input matInput type="number" formControlName="collectorPts"
+										[errorStateMatcher]="matcher">
+								</mat-form-field>
+							</td>
+							<td>
+								<mat-form-field appearance="legacy">
+									<mat-select formControlName="collectorLvl" [errorStateMatcher]="matcher">
+										<mat-option [value]="1">1</mat-option>
+										<mat-option [value]="2">2</mat-option>
+										<mat-option [value]="3">3</mat-option>
+										<mat-option [value]="4">4</mat-option>
+										<mat-option [value]="5">5</mat-option>
+									</mat-select>
+								</mat-form-field>
+							</td>
+							<!-- <td class="rewardNextLvl">{{rewardNextLvl('collector')}}</td>
+						<td class="ptsNextLvl">{{ptsNextLvl('collector')}}</td>-->
+						</tr>
+						<tr>
+							<td>Healer</td>
+							<td>
+								<mat-form-field appearance="legacy">
+									<input matInput type="number" formControlName="healerPts"
+										[errorStateMatcher]="matcher">
+								</mat-form-field>
+							</td>
+							<td>
+								<mat-form-field appearance="legacy">
+									<mat-select formControlName="healerLvl" [errorStateMatcher]="matcher">
+										<mat-option [value]="1">1</mat-option>
+										<mat-option [value]="2">2</mat-option>
+										<mat-option [value]="3">3</mat-option>
+										<mat-option [value]="4">4</mat-option>
+										<mat-option [value]="5">5</mat-option>
+									</mat-select>
+								</mat-form-field>
+							</td>
+							<!-- <td class="rewardNextLvl">{{rewardNextLvl('healer')}}</td>
+						<td class="ptsNextLvl">{{ptsNextLvl('healer')}}</td> -->
+						</tr>
+					</tbody>
+				</table>
+
+				<div class="img">
+					<img width="100%" src="assets/blackboard.png" alt="blackboard.png" />
+				</div>
+			</div>
+
+			<div *ngIf="form.value.progress === Progress.HM10">
+				And I've killed <mat-form-field class="kingsKilled" appearance="legacy"><input matInput type="number"
+						formControlName="kings" [errorStateMatcher]="matcher"></mat-form-field>
+				Kings.
+			</div>
+		</mat-card-content>
+	</mat-card>
+</form>
+
+<div class="order">
+	<mat-card class="order-header">
+		<mat-card-header class="centered-header">
+			<mat-card-title>Your order</mat-card-title>
+			<mat-card-subtitle>Based on what you've told us, this is what you need.</mat-card-subtitle>
+		</mat-card-header>
+		<mat-card-content>
+			<div class="order-row">
+				<div class="order-column">
+					<h5>Attacker</h5>
+					<p *ngIf="form.valid">{{(request$ | async)?.pts?.attacker || 0 | number}}</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+				<div class="order-column">
+					<h5>Defender</h5>
+					<p *ngIf="form.valid">{{(request$ | async)?.pts?.defender || 0 | number}}</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+				<div class="order-column">
+					<h5>Collector</h5>
+					<p *ngIf="form.valid">{{(request$ | async)?.pts?.collector || 0 | number}}</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+				<div class="order-column">
+					<h5>Healer</h5>
+					<p *ngIf="form.valid">{{(request$ | async)?.pts?.healer || 0 | number}}</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+				<div class="order-column">
+					<h5>Queens</h5>
+					<p *ngIf="form.valid">{{(request$ | async)?.queen || 0 | number}}</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+				<div class="order-column">
+					<h5>Kings</h5>
+					<p *ngIf="form.valid">{{(request$ | async)?.king || 0 | number}}</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+			</div>
+			<div class="order-row" *ngIf="!form.get('ironman').value">
+				<div class="order-column">
+					<h5>Agility</h5>
+					<p *ngIf="form.valid">{{(request$ | async)?.bxp?.agility || 0 | number}}</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+				<div class="order-column">
+					<h5>Firemaking</h5>
+					<p *ngIf="form.valid">{{(request$ | async)?.bxp?.firemaking || 0 | number}}</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+				<div class="order-column">
+					<h5>Mining</h5>
+					<p *ngIf="form.valid">{{(request$ | async)?.bxp?.mining || 0 | number}}</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+			</div>
+		</mat-card-content>
+	</mat-card>
+
+
+	<mat-card class="order-total">
+		<mat-card-content *ngIf="total$ | async as total">
+			<div class="order-row">
+				<div class="order-column">
+					<h5>Estimated Cost</h5>
+					<p *ngIf="form.valid" class="order-total-cost">
+						<span>{{total?.price | number:'1.0-0'}}</span>
+						<ba-icon icon="gp" style="margin-left: 5px;"></ba-icon>
+					</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+				<div class="order-column">
+					<h5>Estimated Time</h5>
+					<p *ngIf="form.valid" class="order-total-time">
+						<span>{{total?.dur | time}}</span>
+						<mat-icon class="help inverted" matSuffix matTooltipPosition="above"
+							matTooltip="This is game time only, it does not include time waiting for a team.">
+							help_center</mat-icon>
+					</p>
+					<p *ngIf="!form.valid">-</p>
+				</div>
+			</div>
+		</mat-card-content>
+		<mat-card-footer *ngIf="total$ | async; else emptyReq">
+			<button *ngIf="form.valid" mat-raised-button (click)="requestLeech$.next(1)">Request this
+				leech</button>
+			<p *ngIf="!form.valid">Please double check you have entered everything correctly.</p>
+		</mat-card-footer>
+		<ng-template #emptyReq>
+			<mat-card-footer>
+				No services requested.
+			</mat-card-footer>
+		</ng-template>
+	</mat-card>
+
+	<mat-card class="order-breakdown" *ngIf="(result$ | async)?.order?.Breakdown as breakdown">
+		<mat-card-header class="centered-header order-breakdown-expand" (click)="showBreakdown = !showBreakdown">
+			<mat-card-title>Breakdown</mat-card-title>
+			<mat-card-subtitle>This is an aproximation of what we'll do to fulfill your request.</mat-card-subtitle>
+			<mat-card-subtitle class="order-breakdown-expand-icon">
+				<mat-icon *ngIf="!showBreakdown">expand_more</mat-icon>
+				<mat-icon *ngIf="showBreakdown">expand_less</mat-icon>
+			</mat-card-subtitle>
+		</mat-card-header>
+		<ng-container *ngFor="let item of breakdown">
+			<mat-card-header class="breakdown-row" *ngIf="showBreakdown && form.valid">
+				<!-- <mat-card-title>{{item.kind}} as {{item.roles.join(', ')}}</mat-card-title>
+				<mat-card-subtitle>{{item.count}}x {{item.mode.mode}}{{item.mode.start}}-{{item.mode.end}}: {{item.count * item.priceDur.price | number:'1.0-0'}}</mat-card-subtitle> -->
+
+				<mat-card-title>{{kind(item)}}: {{item.Count}}x {{mode(item)}}
+				</mat-card-title>
+				<mat-card-subtitle>{{item.Count * item.PriceDur.Price | number:'1.0-0'}}</mat-card-subtitle>
+			</mat-card-header>
+			<mat-card-content *ngIf="showBreakdown && form.valid">
+				<p *ngIf="item.ChargesConsumed > 0">
+					Charges Consumed: {{item.ChargesConsumed}} <br />
+				</p>
+
+				<div class="order-breakdown-pts" *ngIf="hasPts(item)">
+					<div class="breakdown-item" *ngIf="item?.PtsGained?.Attacker">
+						<ba-icon icon="attacker"></ba-icon>
+						{{item?.PtsGained?.Attacker | number:'1.0-0'}}
+						<span *ngIf="item?.PtsWaves?.Attacker > 0">
+							&nbsp;({{item?.PtsWaves?.Attacker / item?.Mode?.Len | number:'1.0-2'}}x)
+						</span>
+					</div>
+					<div class="breakdown-item" *ngIf="item?.PtsGained?.Defender">
+						<ba-icon icon="defender"></ba-icon>
+						{{item?.PtsGained?.Defender | number:'1.0-0'}}
+						<span *ngIf="item?.PtsWaves?.Defender > 0">
+							&nbsp;({{item?.PtsWaves?.Defender / item?.Mode?.Len | number:'1.0-2'}}x)
+						</span>
+					</div>
+					<div class="breakdown-item" *ngIf="item?.PtsGained?.Collector">
+						<ba-icon icon="collector"></ba-icon>
+						{{item?.PtsGained?.Collector | number:'1.0-0'}}
+						<span *ngIf="item?.PtsWaves?.Collector > 0">
+							&nbsp;({{item?.PtsWaves?.Collector / item?.Mode?.Len | number:'1.0-2'}}x)
+						</span>
+					</div>
+					<div class="breakdown-item" *ngIf="item?.PtsGained?.Healer">
+						<ba-icon icon="healer"></ba-icon>
+						{{item?.PtsGained?.Healer | number:'1.0-0'}}
+						<span *ngIf="item?.PtsWaves?.Healer > 0">
+							&nbsp;({{item?.PtsWaves?.Healer / item?.Mode?.Len | number:'1.0-2'}}x)
+						</span>
+					</div>
+				</div>
+
+				<div class="order-breakdown-bxp" *ngIf="hasBxp(item)">
+					<div class="breakdown-item" *ngIf="item?.BxpGained?.Agility">
+						<ba-icon icon="agility"></ba-icon>
+						{{item?.BxpGained?.Agility | number:'1.0-0'}}
+						<span *ngIf="item?.BxpWaves?.Agility > 0">
+							&nbsp;({{item?.BxpWaves?.Agility / item?.Mode?.Len | number:'1.0-2'}}x)
+						</span>
+					</div>
+					<div class="breakdown-item" *ngIf="item?.BxpGained?.Firemaking">
+						<ba-icon icon="firemaking"></ba-icon>
+						{{item?.BxpGained?.Firemaking | number:'1.0-0'}}
+						<span *ngIf="item?.BxpWaves?.Firemaking > 0">
+							&nbsp;({{item?.BxpWaves?.Firemaking / item?.Mode?.Len | number:'1.0-2'}}x)
+						</span>
+					</div>
+					<div class="breakdown-item" *ngIf="item?.BxpGained?.Mining">
+						<ba-icon icon="mining"></ba-icon>
+						{{item?.BxpGained?.Mining | number:'1.0-0'}}
+						<span *ngIf="item?.BxpWaves?.Mining > 0">
+							&nbsp;({{item?.BxpWaves?.Mining / item?.Mode?.Len | number:'1.0-2'}}x)
+						</span>
+					</div>
+				</div>
+			</mat-card-content>
+		</ng-container>
+	</mat-card>
+
+	<!-- <div style="display: flex">
+	<pre>{{form.value | json}}</pre>
+	<pre>{{request$ | async | json}}</pre>
+	<pre>{{result$ | async | json}}</pre>
+</div> -->
+</div>
+
+<div>
+	<p style="width: 33%; float: left">form state</p>
+	<p style="width: 33%; float: left">request state</p>
+	<p style="width: 33%; float: left">result state</p>
+	<pre style="width: 33%; float: left">{{ form.value | json }}</pre>
+	<pre style="width: 33%; float: left">{{ request$ | async | json }}</pre>
+	<pre style="width: 33%; float: left">{{ result$ | async | json }}</pre>
+</div>

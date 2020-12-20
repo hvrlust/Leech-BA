@@ -1,0 +1,19 @@
+:host {
+    display: block;
+}
+
+.hidden {
+    display: none;
+}
+
+mat-card-header {
+    justify-content: space-between;
+}
+
+:host >>> .mat-card-header-text {
+    margin-left: 0;
+}
+
+mat-slide-toggle {
+    align-self: center;
+}
