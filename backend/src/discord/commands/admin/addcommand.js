@@ -14,9 +14,9 @@ function extractArgs(word, args) {
     const parsedArgs = [];
     const index = args.indexOf(word);
     const params = module.exports.parameters.map(param => param.split(' ')[0]);
-    if(index === -1) return parsedArgs;
-    for(let i=index+1; i<args.length; i++){
-        if(params.includes(args[i])){
+    if (index === -1) return parsedArgs;
+    for (let i = index + 1; i < args.length; i++) {
+        if (params.includes(args[i])) {
             return parsedArgs;
         }
         parsedArgs.push(args[i]);
@@ -33,9 +33,9 @@ module.exports = {
         '-description [optional] :: what shows up as info when calling /commands \n' +
         '-roles [optional] :: who can call this command \n' +
         '-deleteafter [optional] :: if the caller message is deleted after posting copypasta' +
-        '\n\nExample usages: \n'+ADMIN_PREFIX+'addcommand -name time -deleteafter -response the time is currently -description ' +
+        '\n\nExample usages: \n' + ADMIN_PREFIX + 'addcommand -name time -deleteafter -response the time is currently -description ' +
         'replies with "the time is currently" \n' +
-        ''+ADMIN_PREFIX+'addcommand -name ranks -response The ranks are the following... -description responds with copypasta ' +
+        '' + ADMIN_PREFIX + 'addcommand -name ranks -response The ranks are the following... -description responds with copypasta ' +
         '-roles ranks customers```',
     parameters: ["-name name", "-response response", "-role role", "-description description", "-deleteafter"],
     permittedRoles: ["Server admin"],
@@ -45,25 +45,25 @@ module.exports = {
         const response = extractArgs("-response", params.args);
         const description = extractArgs("-description", params.args);
 
-        if(name.length !== 1){
-            await message.reply("that command requires -name argument followed by the name, use `"+
-                ADMIN_PREFIX+"help addcommand` for examples");
+        if (name.length !== 1) {
+            await message.reply("that command requires -name argument followed by the name, use `" +
+                ADMIN_PREFIX + "help addcommand` for examples");
             return;
         }
 
-        if(commandAlreadyExists(name[0], bot.commands)) {
+        if (commandAlreadyExists(name[0], bot.commands)) {
             await message.reply("command name already in use");
             return;
         }
 
-        if(role.length > 0 && !areRealRoles(message.member, role)){
+        if (role.length > 0 && !areRealRoles(message.member, role)) {
             await message.reply("some roles don\'t exist!");
             return;
         }
 
-        if(response.length < 1){
-            await message.reply("that command requires -response argument followed by the copypasta response, use `"+
-                ADMIN_PREFIX+"help addcommand` for examples\"");
+        if (response.length < 1) {
+            await message.reply("that command requires -response argument followed by the copypasta response, use `" +
+                ADMIN_PREFIX + "help addcommand` for examples\"");
             return;
         }
 
