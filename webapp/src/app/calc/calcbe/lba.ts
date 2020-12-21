@@ -569,6 +569,18 @@ export function calcPointsRounds(req: Request, ctr: WaveCounter, roleOrder: Role
 		item.AddPtsWave(r, pts)
 	}
 
+	if (req.Bxp.Empty()) {
+		// burn off any extra waves, they might need pts for MQC for ex
+		let spare = ctr.SpareWaves();
+		while(spare > 0) {
+			let wave = ctr.Next();
+			let pts = Mode.Pts(item.Mode.Mode, wave, Role.Collector);
+			req.AddPts(Role.Collector, pts);
+			item.AddPtsWave(Role.Collector, pts);
+			spare = ctr.SpareWaves();
+		}
+	}
+
 	item.Count = ctr.Count
 	item.SpareWaves = ctr.SpareWaves()
 
@@ -1005,7 +1017,6 @@ function calcRound(req: Request, mode: RoundMode, roleOrder: RoleOrder): OrderIt
 //
 // It will return an error if the request isn't valid.
 export function Process(input: Request): { order: Order, error: Error } {
-	console.log("@@process", input)
 	let req = input.clone()
 
 	// has at least 1 thing to do
@@ -1036,7 +1047,6 @@ export function Process(input: Request): { order: Order, error: Error } {
 	// do kings
 	let kingItem = calcKings(req)
 	req.Update(kingItem)
-
 	// wave10unlock
 	// 	needs pts and progress hm1
 	// 	needs xp and progress hm1
@@ -1086,21 +1096,21 @@ export function Process(input: Request): { order: Order, error: Error } {
 			}
 			req.Hm10Tickets -= item69.Count - item19.Count
 			isOn9 = true
-		}
-
-		let ctr = new WaveCounter(Hm6_9)
-		if (!req.Pts.Empty()) {
-			let item = calcPointsRounds(req.clone(), ctr, RoleOrder.Standard)
-			req.Update(item)
-			order.Add(item)
-			isOn9 = true
-		}
-		ctr.Count = 0
-		if (!req.Bxp.Empty()) {
-			let item = calcBxpRounds(req.clone(), ctr)
-			req.Update(item)
-			order.Add(item)
-			isOn9 = true
+		} else {
+			let ctr = new WaveCounter(Hm6_9)
+			if (!req.Pts.Empty()) {
+				let item = calcPointsRounds(req.clone(), ctr, RoleOrder.Standard)
+				req.Update(item)
+				order.Add(item)
+				isOn9 = true
+			}
+			ctr.Count = 0
+			if (!req.Bxp.Empty()) {
+				let item = calcBxpRounds(req.clone(), ctr)
+				req.Update(item)
+				order.Add(item)
+				isOn9 = true
+			}
 		}
 
 		if (kingItem.Count > 0 && isOn9) {

@@ -47,7 +47,7 @@ export class CalcComponent implements OnInit, OnDestroy {
 	};
 
 	public form: FormGroup = new FormGroup({
-		rsn: new FormControl('', Validators.required),
+		rsn: new FormControl('', Validators.compose([Validators.required, Validators.maxLength(12)])),
 		discord: new FormControl(''),
 		charges: new FormControl(undefined, Validators.compose([Validators.min(0), Validators.max(500)])),
 		progress: new FormControl(1, Validators.required),
@@ -241,7 +241,6 @@ export class CalcComponent implements OnInit, OnDestroy {
 	public needsPts$ = this.form.valueChanges.pipe(
 		map(form => {
 			let preprocessed = this.preprocessForm(form);
-			console.log(preprocessed)
 			return (
 				preprocessed.wantsAttackerLvl > 1 ||
 				preprocessed.wantsDefenderLvl > 1 ||
@@ -385,27 +384,6 @@ export class CalcComponent implements OnInit, OnDestroy {
 				}
 			})
 		);
-
-		// disable lvls section if it's filled in
-		this.addSubscription(this.form.get('lvls').valueChanges.subscribe({
-			next: (v) => {
-				// this.lvlsPanel.disabled = !this.form.get('lvls').valid || v.needsKing || this.anyPropsBiggerThan(v, 1);
-			}
-		}));
-
-		// disable bxp section if it's filled in
-		this.addSubscription(this.form.get('bxp').valueChanges.subscribe({
-			next: (v) => {
-				this.bxpPanel.disabled = !this.form.get('bxp').valid || this.anyPropsBiggerThan(v, 0);
-			}
-		}));
-
-		// disable items section if it's filled in
-		this.addSubscription(this.form.get('items').valueChanges.subscribe({
-			next: (v) => {
-				this.itemsPanel.disabled = !this.form.get('items').valid || this.anyPropsBiggerThan(v, 0);
-			}
-		}));
 
 		// listen for submission requests
 		this.addSubscription(
@@ -577,7 +555,7 @@ export class CalcComponent implements OnInit, OnDestroy {
 		}
 
 		// if leech needs king for trim, add it
-		if (form.lvls.needsKing && kings <= 0) {
+		if (form.progress < Progress.HM10 && form.lvls.needsKing && kings <= 0) {
 			kings = 1;
 		}
 
@@ -636,7 +614,7 @@ export class CalcComponent implements OnInit, OnDestroy {
 					needDefLvl: 5,
 					needColLvl: 5,
 					needHealLvl: 5,
-					needsKing: true,
+					needsKing: this.form.value.progress < Progress.HM10,
 				});
 				break;
 		}
@@ -645,19 +623,16 @@ export class CalcComponent implements OnInit, OnDestroy {
 	public onCollapse(section: string) {
 		switch (section) {
 			case "hmUnlock":
+				let previous = this.form.get("comp").value;
 				this.form.get("comp").setValue(false);
 				this.form.get("nmSolo").setValue(false);
-				this.snackBar.openFromComponent(CenteredSnackbarComponent, { duration: 3000, data: "Removed Hardmode Unlock from your request" });
+				if (previous) {
+					this.snackBar.openFromComponent(CenteredSnackbarComponent, { duration: 3000, data: "Removed Hardmode Unlock from your request" });
+				}
 				break;
 			case "lvls":
 				this.snackBar.openFromComponent(CenteredSnackbarComponent, { duration: 3000, data: "Removed Pts & Levels from your request" });
-				this.form.get("lvls").patchValue({
-					needAttLvl: 1,
-					needDefLvl: 1,
-					needColLvl: 1,
-					needHealLvl: 1,
-					needsKing: false,
-				});
+				this.form.get("lvls").reset();
 				break;
 			case "bxp":
 				this.form.get("bxp").reset();

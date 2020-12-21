@@ -37,6 +37,7 @@ export interface DialogData {
       <p>&nbsp;</p>
       <p>A rank will get in touch with you on our CC or <a href="https://discord.gg/j4DgZBj" target="_blank">Discord</a> to confirm your request</p>
       <p *ngIf="data.hasPts && data.hasDisc">In the meantime you can go ahead and post your blackboard screenshot in #customer-chat</p>
+      <p *ngIf="data.hasPts && !data.hasDisc">If you join our <a href="https://discord.gg/j4DgZBj" target="_blank">Discord</a>, post your blackboard screenshot in #customer-chat</p>
       <p *ngIf="data.needsTutorial">Please ensure you've done the tutorial and can go down the ladder at BA before you're called onto a team in order to save time.</p>
       <p>&nbsp;</p>
       <p>After your request is confirmed and you're added to the queue:</p>

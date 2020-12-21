@@ -362,10 +362,11 @@ Items:
     }
 
     getQueueChannel().then(queueChannel => {
-      queueChannel.send("```" + prologue + "```")
+      return queueChannel.send("```" + prologue + "```").then(m => m.pin());
     }).then(() => {
       res.sendStatus(200);
-    }).catch(() => {
+    }).catch((e) => {
+      console.log("unable to send request to channel " + e);
       res.sendStatus(500);
     })
   });
