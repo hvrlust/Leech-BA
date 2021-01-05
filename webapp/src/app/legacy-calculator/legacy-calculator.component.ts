@@ -10,7 +10,7 @@ import {Component, ViewEncapsulation} from '@angular/core';
 export class LegacyCalculatorComponent {
   constructor() {
     this.loadScript('https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js', false, false);
-    this.loadScript('assets/calculator-3.9.2.js', false, false);
+    this.loadScript('assets/calculator-3.9.1.js', false, false);
   }
 
   public loadScript(url, async, defer) {
