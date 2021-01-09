@@ -71,6 +71,9 @@ exports.run = function (database, getQueueChannel) {
   app.get('/queue', sessionChecker, (req, res) => {
     res.sendFile(root + '/index.html');
   });
+  app.get('/mgwqueue', sessionChecker, (req, res) => {
+    res.sendFile(root + '/index.html');
+  });
   app.get('/splits', sessionChecker, (req, res) => {
     res.sendFile(root + '/index.html');
   });
