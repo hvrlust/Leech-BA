@@ -407,11 +407,22 @@ Items:
     const credentials = { key: privateKey, cert: certificate };
     const httpsServer = https.createServer(credentials, app);
     httpsServer.listen(443, HOST);
+
+    const httpServer = express();
+    // set up a route to redirect http to https
+    httpServer.get('*', function(req, res) {
+      res.redirect('https://' + req.headers.host + req.url);
+    });
+
+    httpServer.listen(80, HOST);
+    // can probably assume this is safe because we'll get double port bindings if it fails here
+
   } catch (error) {
     console.warn('Unable to start up HTTPS');
     console.warn(error.message);
+
+    const httpServer = http.createServer(app);
+    httpServer.listen(80, HOST);
   }
 
-  const httpServer = http.createServer(app);
-  httpServer.listen(80, HOST);
 };
