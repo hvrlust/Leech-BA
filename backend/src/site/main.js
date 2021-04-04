@@ -411,7 +411,7 @@ Items:
     const httpServer = express();
     // set up a route to redirect http to https
     httpServer.get('*', function(req, res) {
-      res.redirect('https://' + req.headers.host + req.url);
+      res.redirect('https://' + req.get('host') + req.originalUrl);
     });
 
     httpServer.listen(80, HOST);
