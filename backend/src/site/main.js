@@ -15,7 +15,7 @@ exports.run = function (database, getQueueChannel) {
 
   // Constants
   const HOST = '0.0.0.0';
-  const URL = "leehcba.site";
+  const URL = "leechba.site"; // obtain this instead of hardcoding... stupid reverse proxy cba
 
   const app = express();
   app.use(compression());
