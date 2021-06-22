@@ -76,8 +76,11 @@ async function processQueueReq(mail, database, queueChannel) {
 
         amount = nFormatter(amount, 2);
         let rsn_bxp = data.rsn;
-        let s0 = "RSN: " + data.rsn + "\nLeech: BXP\nSkill: " + data.skill + "\nLevel: " + data.level + "\nAmount: " + data.amount + "\nBA completed up to: " + ba +
-            "\n" + "Priority: " + data.priority + "\n\n\n";
+        let s0 = "RSN: " + data.rsn + "\nLeech: BXP\nSkill: " + data.skill + "\nLevel: " + data.level + "\nAmount: " + data.amount + "\nBA completed up to: " + ba +  "\n";
+        if ('priority' in data) {
+            s0 += "Priority: " + data.priority + '\n';
+        }
+            s0 += "\n\n";
         let s1 = "Summary: \n" + date + "/" + month + ": " + rsn_bxp + " - " + amount + " " + data.skill + " bxp " + ba + "\n\n";
 
         return queueChannel.send("```" + s0 + s1 + "```")
@@ -284,8 +287,10 @@ async function processQueueReq(mail, database, queueChannel) {
         if (data.enhancer > 0) s0 += "Enhancer charges:" + enhancer.replace(/[{()}]/g, '') + "\n";
         s0 += "BA completed up to:" + ba.replace(/[{()}]/g, '') + "\n";
 
-        s0 += "Priority: " + data.priority + "\n";
-        s0 += "\n\n";
+        if('priority' in data) {
+            s0 += "Priority: " + data.priority + "\n";
+            s0 += "\n\n";
+        }
 
         let s1 = "Summary: \n" + date + "/" + month + ": " + data.rsn + " - " + leech_simple + ironsimple + enhancer + ba + "\n\n";
         return queueChannel.send("```" + s0 + s1 + "```")
