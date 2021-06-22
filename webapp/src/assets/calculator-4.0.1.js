@@ -38,23 +38,29 @@ function requestCrossDomain(site, callback) {
 
 const LINK = "/legacy/queue";
 
-var QUEEN = 12000000;//1-10 2L
-var PARTHM = 5000000;//6-9 2L
-var FULLHM = 9000000;//1-9 2L (assuming other guy already has)
-var KING = 12000000;
-var SKILLER_KING = 18000000;
-var POINTS_PART = 6500000; // 6-9 points
-var IRON_POINTS = 12000000; // 1-9 iron
-var FULL_HM_UNLOCK = 10000000; //1-9 not unlocked
-var FULL_HM_ALREADY_UNLOCK = 7000000; // 1-9 already unlocked
+const QUEEN = 30000000;//1-10 2L
+const QUEEN_LOW_LEVEL = 45000000;//1-10 2L
+const QUEEN_SOLO = 60000000;//1-10 2L
+const QUEEN_ONLY = 15000000;
+const PARTHM = 7000000;//6-9 2L bxp
+// const FULLHM = 9000000;//1-9 2L (assuming other guy already has)
+const KING = 35000000;
+const SKILLER_KING = 50000000;
+const POINTS_PART = 20000000; // 6-9 2L points
+const FULL_HM_IRON = 50000000; // 1-9 iron
+const FULL_HM_UNLOCK = 40000000; //1-9 not unlocked
+const FULL_HM_ALREADY_UNLOCK_POINTS = 20000000; // 1-9 already unlocked
+const FULL_HM_ALREADY_UNLOCK_BXP = 10000000; // 1-9 already unlocked
 
 //minigame weekends
-var currentdate = new Date();
-var startdate = new Date('12/15/2017');
-var enddate = new Date('12/18/2017');
-var minigameweekend = false;
-var multiplier = 1; //minigameweekend multiplier
+const currentdate = new Date();
+const startdate = new Date('12/15/2017');
+const enddate = new Date('12/18/2017');
+const minigameweekend = false;
+const multiplier = 1; //minigame weekend multiplier
 
+//game times
+const QUEEN_ONLY_T = 5;
 const QUEEN_T = 20;
 const PARTHM_T = 10;
 const FULLHM_T = 20;
@@ -90,26 +96,26 @@ const NMATT = 250;//normal mode
 const NMDEF = 250;
 const NMHEAL = 250;
 const NMCOL = 250;
-const HMATT = 330;//1-9 hm
-const HMDEF = 350;
-const HMHEAL = 350;
-const HMCOL = 300;
-const PHMATT = 220; //6-9 hm
-const PHMDEF = 251;
-const PHMHEAL = 245;
-const PHMCOL = 179;
+const HMATT = 384;//1-9 hm
+const HMDEF = 443;
+const HMHEAL = 469;
+const HMCOL = 324;
+const PHMATT = 246; //6-9 hm
+const PHMDEF = 276;
+const PHMHEAL = 298;
+const PHMCOL = 205;
 const KINGP = 210; //points for a king
 //DO NOT CHANGE
 
-//minigame weekend changes
-if (currentdate > startdate && currentdate < enddate) {
-  minigameweekend = true;
-  QUEEN = 15000000;
-  PARTHM = 7500000;
-  FULLHM = 13500000;
-  KING = 18000000;
-  multiplier = 2;
-}
+// //minigame weekend changes
+// if (currentdate > startdate && currentdate < enddate) {
+//   minigameweekend = true;
+//   QUEEN = 15000000;
+//   PARTHM = 7500000;
+//   FULLHM = 13500000;
+//   KING = 18000000;
+//   multiplier = 2;
+// }
 
 const leveldifference = [0, 200, 300, 400, 500, 0]; //0,1,2,3,4,5. if level 1, needs 200 to level up, etc. 5 needs 0
 //unlock codes
@@ -122,17 +128,17 @@ $(document).ready(function () {
 											 $('#dev').html(results);
 											 });*/
   //creating ui
-  var main = $(document.createElement('div'));
+  const main = $(document.createElement('div'));
   main.attr({id: "calculator-main"});
-  var tab = $(document.createElement('ul'));
+  const tab = $(document.createElement('ul'));
   tab.attr({id: "tab", class: "tab"});
-  var xptab = $(document.createElement('li'));
-  var xplink = $(document.createElement('a'));
+  const xptab = $(document.createElement('li'));
+  const xplink = $(document.createElement('a'));
   xplink.attr({id: "xptab", class: "tablinks", href: "javascript:void(0)", onclick: "openTab(event, 'XP')"});
   xplink.append("Bonus XP");
   xptab.append(xplink);
-  var pointstab = $(document.createElement('li'));
-  var pointslink = $(document.createElement('a'));
+  const pointstab = $(document.createElement('li'));
+  const pointslink = $(document.createElement('a'));
   pointslink.attr({
     id: "pointstab",
     class: "tablinks",
@@ -141,8 +147,8 @@ $(document).ready(function () {
   });
   pointslink.append("Levels, Points & Misc. Calculator");
   pointstab.append(pointslink);
-  var infotab = $(document.createElement('li'));
-  var infolink = $(document.createElement('a'));
+  const infotab = $(document.createElement('li'));
+  const infolink = $(document.createElement('a'));
   infolink.attr({
     id: "infotab",
     class: "tablinks",
@@ -151,8 +157,8 @@ $(document).ready(function () {
   });
   infolink.append("Prices & information");
   infotab.append(infolink);
-  var creditstab = $(document.createElement('li'));
-  var creditslink = $(document.createElement('a'));
+  const creditstab = $(document.createElement('li'));
+  const creditslink = $(document.createElement('a'));
   creditslink.attr({
     id: "creditstab",
     class: "tablinks",
@@ -163,22 +169,22 @@ $(document).ready(function () {
   creditstab.append(creditslink);
 
   tab.append(infotab);
-  tab.append(xptab)
+  tab.append(xptab);
   tab.append(pointstab);
   tab.append(creditstab);
   main.append(tab);
 
   //credits
-  var formcredits = $(document.createElement('form'));
+  const formcredits = $(document.createElement('form'));
   formcredits.attr({id: "Credits", class: "tabcontent"});
-  formcredits.append("<strong>Credits</strong></br>Application creator: Jia </br> Points research/information gatherer: Shadowstream </br> BXP/level accuracy: Purewct (huge credit, spent over 2 months gathering)</br></br><strong>Additional credits</strong></br>CSS: Sanjan</br>Sledgehammer (testers): Shadowstream, RexT, Mahtiukko</br>Research round helpers: Many</br></br></br><span id='version'><strong>Last updated:</strong> 23/11/2019 &emsp; <strong>Version:</strong> 3.8.4</span></br></br>");
+  formcredits.append("<strong>Credits</strong></br>Application creator: Jia </br> Points research/information gatherer: Shadowstream </br> BXP/level accuracy: Purewct (huge credit, spent over 2 months gathering)</br></br><strong>Additional credits</strong></br>CSS: Sanjan</br>Sledgehammer (testers): Shadowstream, RexT, Mahtiukko</br>Research round helpers: Many</br></br></br><span id='version'><strong>Last updated:</strong> 05/01/2021 &emsp; <strong>Version:</strong> 4.0.1</span></br></br>");
 
   //xp
-  var formxp = $(document.createElement('form'));
+  const formxp = $(document.createElement('form'));
   //formxp.append("BXP Calculator v1.0- put in rsn first to make selection easier");
   //layout
-  var right = $(document.createElement('div'));
-  var left = $(document.createElement('div'));
+  let right = $(document.createElement('div'));
+  let left = $(document.createElement('div'));
   right.attr({id: "rightxp", style: "display:inline-block;padding:0px 10px 0px 0px;vertical-align:top;"});
   left.attr({id: "leftxp", style: "display:inline-block;padding:0px 0px 0px 0px;vertical-align:top;"});
 
@@ -301,7 +307,7 @@ $(document).ready(function () {
   right.append("Automatically updates level from official RS website");
   right.append(skill_levels);
   right.append(hiddendiv);
-  var hlevels = $(document.createElement('input')); //hiddenlevels
+  const hlevels = $(document.createElement('input')); //hiddenlevels
   hlevels.attr({id: "hlevels", type: "text", style: "display:none;"});
   hlevels.val(0, 0, 0);
   right.append(hlevels);
@@ -313,11 +319,11 @@ $(document).ready(function () {
   formxp.append(left);
 
   //points
-  var formp = $(document.createElement('form'));
+  const formp = $(document.createElement('form'));
 
   //layout
-  var right = $(document.createElement('div'));
-  var left = $(document.createElement('div'));
+  right = $(document.createElement('div'));
+  left = $(document.createElement('div'));
   right.attr({id: "leftpoints", style: "display:inline-block;padding:0px 10px 0px 0px;vertical-align:middle;"});
   left.attr({id: "rightpoints", style: "display:inline-block;padding:0px 0px 0px 0px;vertical-align:middle;"});
 
@@ -673,14 +679,17 @@ $(document).ready(function () {
   var table = $(document.createElement('table')).attr({id: "infotbl"});
   table.append("<tr><th>Round</th><th>Price</th><th>Time</th></tr>");
   table.append("<tr><td><a onclick='showtab(1)'>Waves 1-10 NM/Queen kill/Completionist requirement</a></td><td class='tblprice'>" + commaSeparateNumber(QUEEN) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
-  table.append("<tr><td>Waves 1-10 NM - solo leech</td><td class='tblprice'>" + commaSeparateNumber(QUEEN * 2) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
+  table.append("<tr><td><a onclick='showtab(1)'>Waves 1-10 NM - low level</a></td><td class='tblprice'>" + commaSeparateNumber(QUEEN_LOW_LEVEL) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
+  table.append("<tr><td>Waves 1-10 NM - solo leech</td><td class='tblprice'>" + commaSeparateNumber(QUEEN_SOLO) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 1-9 HM unlock</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_UNLOCK) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
-  table.append("<tr><td>Waves 1-9 HM (if already unlocked, please read information below) ***</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_ALREADY_UNLOCK) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
-  table.append("<tr><td>Waves 1-9 HM (as an ironman)</th><td class='tblprice'>" + commaSeparateNumber(IRON_POINTS) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
+  table.append("<tr><td>Waves 1-9 HM Points (if already unlocked)*</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_ALREADY_UNLOCK_POINTS) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
+  table.append("<tr><td>Waves 1-9 HM BXP (if already unlocked)*</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_ALREADY_UNLOCK_BXP) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
+  table.append("<tr><td>Waves 1-9 HM (as an ironman)</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_IRON) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 6-9 HM for BXP</td><td class='tblprice'>" + commaSeparateNumber(PARTHM) + "</td><td class='tblprice'>" + PARTHM_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 6-9 HM for Points</td><td class='tblprice'>" + commaSeparateNumber(POINTS_PART) + "</td><td class='tblprice'>" + PARTHM_T + " minutes</td></tr>");
+  table.append("<tr><td><a onclick='showtab(2)'>Wave 10 NM/Queen kill</a></th><td class='tblprice'>" + commaSeparateNumber(QUEEN_ONLY) + "</td><td class='tblprice'>" + QUEEN_ONLY_T + " minutes</td></tr>");
   table.append("<tr><td><a onclick='showtab(2)'>Wave 10 HM/King kill/Trim requirement</a></th><td class='tblprice'>" + commaSeparateNumber(KING) + "</td><td class='tblprice'>" + KING_T + " minutes</td></tr>");
-  table.append("<tr><td><a onclick='showtab(2)'>Wave 10 HM/King kill - if you do not have either a) resonance and surge abilities, or b) level 50+ magic or range</a></th><td class='tblprice'>" + commaSeparateNumber(SKILLER_KING) + "</td><td class='tblprice'>" + KING_T + " minutes</td></tr>");
+  table.append("<tr><td><a onclick='showtab(2)'>Wave 10 HM/King kill - if you do not have either a) resonance ability, or b) level 50+ magic or range</a></th><td class='tblprice'>" + commaSeparateNumber(SKILLER_KING) + "</td><td class='tblprice'>" + KING_T + " minutes</td></tr>");
   forminfo.append(table);
   forminfo.append($(document.createElement('br')));
   forminfo.append("Listed prices are rounds done with 2 leeches at once (unless explicitly stated otherwise). You may pay double listed price for an increased chance of leeching faster, to leech alone (please mention when asking). <br><br>For specifics please see the calculators provided (clicking the round in the table above opens the relevant tab). Prices may slightly vary based on if another leech requires 1-9 hard mode to be unlocked.  The points/xp obtained from HM 1-5 offsets the extra cost.  <br><br>Calculators will give an estimate of cost and the amount of rounds required. You may also request the specific leech via the calculator.");
@@ -973,11 +982,12 @@ $(document).ready(function () {
 });
 
 function calculateXP(level, bxp, unlock, skill) {
-  var P = 27.5;
-  var F = 38;
-  var NM = 0;
-  var PHM = 0;
-  var FHM = 0;
+  let P = 27.5;
+  let F = 38;
+  let NM = 0;
+  let PHM = 0;
+  let FHM = 0;
+  let HM = 0;
   switch (skill) {
     case 'a':
       NM = NMA;
@@ -989,7 +999,6 @@ function calculateXP(level, bxp, unlock, skill) {
       break;
     case 'm':
       NM = NMM;
-      //www.mathportal.org/calculators/statistics-calculator/correlation-and-regression-calculator.php
       //formula = y = 117.23469387755102x + 97.273
       HM = parseInt(117.237 * level + 97.273);
       break;
@@ -1000,7 +1009,7 @@ function calculateXP(level, bxp, unlock, skill) {
 
   //unlock = see top
   if (bxp <= 0) return 0;
-  if (unlock == 0) {
+  if (unlock === 0) {
     //never done ba
     var tempxp = bxp - (NM * level / 99);
     $("#breakdownxp").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
@@ -1008,15 +1017,14 @@ function calculateXP(level, bxp, unlock, skill) {
     $("#counter").val(parseInt($("#counter").val()) + parseInt(level * NM / 99));
     return QUEEN + calculateXP(level, tempxp, 1, skill);//append queen and rerun
   }
-  if (unlock == 1) {
+  if (unlock === 1) {
     var tempxp = bxp - FHM;
     $("#breakdownxp").append("1x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(FULL_HM_UNLOCK));
     $("#breakdownxp").append($(document.createElement('br')));
     $("#counter").val(parseInt($("#counter").val()) + parseInt(FHM));
     return FULL_HM_UNLOCK + calculateXP(level, tempxp, 2, skill);
-    ;
   }
-  if (unlock == 2) {
+  if (unlock === 2) {
     //everything is unlocked
     var rounds = calculateRoundsXP(level, bxp, PHM);
     $("#breakdownxp").append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(rounds * PARTHM));
@@ -1092,25 +1100,21 @@ function fetchlevel(name, skill) {
 
 //get silverhawk prices
 function getprice(level) {
-  //http://services.runescape.com/m=itemdb_rs/api/graph/30915.json
   $("#silverhawk").show();
   //see if it's empty (no need to load it again
-  if ($("#silverhawkhidden").text().length == 0) {
+  if ($("#silverhawkhidden").text().length === 0) {
     $("#silverhawk").html("Loading silverhawk data...");
     requestCrossDomain(window.location.origin + '/api/getprice/30915', function (results) {
       $("#silverhawk").empty();
       $("#silverhawkhidden").empty();
-      //$("#silverhawkhidden").show();
 
       $("#silverhawkhidden").append(results);
       if ($("#silverhawkhidden").text().length == 0) {
-        //console.log(results);
         $("#silverhawk").empty();
         $("#silverhawk").html("Error getting Silverhawk prices");
       } else {
-        var array = $("#silverhawkhidden").text().split(':');
-        //alert(array[181]);
-        var price = array[181].split('}');
+        const array = $("#silverhawkhidden").text().split(':');
+        const price = array[181].split('}');
         $("#silverhawk").append("GP/Silverhawk: " + commaSeparateNumber(price[0]));
         $("#silverhawk").append($(document.createElement('br')));
         $("#silverhawk").append("XP/feather: " + silverhawkxp(level));
@@ -1118,41 +1122,10 @@ function getprice(level) {
         $("#silverhawk").append("GP/XP (at your level): " + (price[0] / silverhawkxp(level)).toFixed(2));
       }
     });
-    /*
-			$.ajax({
-                   url: 'http://services.runescape.com/m=itemdb_rs/api/graph/30915.json',
-                   type: 'GET',
-                   success: function(res) {
-                       $("#silverhawk").empty();
-                       $("#silverhawkhidden").empty();
-                       //$("#silverhawkhidden").show();
-
-                       $("#silverhawkhidden").append(res.responseText);
-                        if ($("#silverhawkhidden").text().length == 0){
-                           console.log(res.responseText);
-                           $("#silverhawk").empty();
-                           $("#silverhawk").html("Error getting Silverhawk prices");
-                        }else{
-                           var array = $("#silverhawkhidden").text().split(':');
-                           //alert(array[181]);
-                           var price = array[181].split('}');
-                           $("#silverhawk").append("GP/Silverhawk: "+commaSeparateNumber(price[0]));
-                           $("#silverhawk").append($(document.createElement('br')));
-                           $("#silverhawk").append("XP/feather: "+silverhawkxp(level));
-                           $("#silverhawk").append($(document.createElement('br')));
-                           $("#silverhawk").append("GP/XP (at your level): "+(price[0]/silverhawkxp(level)).toFixed(2));
-                    }
-                   },
-                   failure: function(){
-                        $("#silverhawk").empty();
-                        $("#silverhawk").html("Error getting Silverhawk prices");
-                   }
-            });*/
   } else {
     $("#silverhawk").empty();
-    var array = $("#silverhawkhidden").text().split(':');
-    //alert(array[181]);
-    var price = array[181].split('}');
+    const array = $("#silverhawkhidden").text().split(':');
+    const price = array[181].split('}');
     $("#silverhawk").append("GP/Silverhawk: " + commaSeparateNumber(price[0]));
     $("#silverhawk").append($(document.createElement('br')));
     $("#silverhawk").append("XP/feather: " + silverhawkxp(level));
@@ -1162,9 +1135,9 @@ function getprice(level) {
 }
 
 function silverhawkxp(level) {
-  var lvl = level;
-  if (level == 99) lvl = 98;
-  var xp = [0, 6.2, 6.9, 7.7, 8.5, 9.3, 10.4, 12.3, 12.7, 19.4, 15.3, 17.0, 18.8, 20.5, 22.9, 25.2, 26.1, 27.4, 28.5, 29.8, 31.0, 32.4, 33.7, 35.2, 36.7, 38.4, 39.9, 40.5, 41.4, 45.3, 47.3, 49.3, 51.4, 53.6, 55.9, 58.3, 60.8, 63.5, 66.2, 69.1, 72.0, 75.2, 78.4, 81.8, 85.3, 88.9, 92.9, 97.0, 101.2, 105.5, 110.1, 114.8, 120.0, 124.9, 130.4, 136.2, 142.4, 148.5, 154.6, 161.5, 168.4, , 175.7, 183.5, 191.1, 200.4, 210.8, 217.1, 226.9, 237.9, 247.0, 259.2, 269.3, 281, 294.7, 308.2, 321.4, 333.9, 349.6, 364.8, 379.3, 398, 416.6, 434.8, 452.2, 491.9, 515, 537.6, 559.3, 592.3, 612.2, 661.5, 692.9, 692.9, 723.6, 753.3, 806.5, 834.8, 860.2];
+  let lvl = level;
+  if (level === 99) lvl = 98;
+  const xp = [0, 6.2, 6.9, 7.7, 8.5, 9.3, 10.4, 12.3, 12.7, 19.4, 15.3, 17.0, 18.8, 20.5, 22.9, 25.2, 26.1, 27.4, 28.5, 29.8, 31.0, 32.4, 33.7, 35.2, 36.7, 38.4, 39.9, 40.5, 41.4, 45.3, 47.3, 49.3, 51.4, 53.6, 55.9, 58.3, 60.8, 63.5, 66.2, 69.1, 72.0, 75.2, 78.4, 81.8, 85.3, 88.9, 92.9, 97.0, 101.2, 105.5, 110.1, 114.8, 120.0, 124.9, 130.4, 136.2, 142.4, 148.5, 154.6, 161.5, 168.4, , 175.7, 183.5, 191.1, 200.4, 210.8, 217.1, 226.9, 237.9, 247.0, 259.2, 269.3, 281, 294.7, 308.2, 321.4, 333.9, 349.6, 364.8, 379.3, 398, 416.6, 434.8, 452.2, 491.9, 515, 537.6, 559.3, 592.3, 612.2, 661.5, 692.9, 692.9, 723.6, 753.3, 806.5, 834.8, 860.2];
   return xp[lvl];
 }
 
@@ -1491,9 +1464,9 @@ function calculateinsignia(points, role, kingskilled) {
 function calculateP(points, role, unlock, ironman) {
   if (points <= 0) return 0; //sanity check
 
-  var NM = 0;
-  var PHM = 0;
-  var FHM = 0;
+  let NM = 0;
+  let PHM = 0;
+  let FHM = 0;
   switch (role) {
     case 'a':
       NM = NMATT;
@@ -1516,8 +1489,10 @@ function calculateP(points, role, unlock, ironman) {
       FHM = HMHEAL;
       break;
   }
+
+  const breakdown = $("#breakdown");
   if (unlock == 0) {
-    var temp = points - NM;
+    const temp = points - NM;
     $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(1);
@@ -1525,29 +1500,31 @@ function calculateP(points, role, unlock, ironman) {
     return QUEEN + calculateP(temp, role, 1, ironman); //rerun but now hm is unlocked
   }
   if (ironman) {
-    var rounds = calculateFullRounds(points, FHM, ironman);
-    $("#breakdown").append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(rounds * IRON_POINTS));
-    $("#breakdown").append($(document.createElement('br')));
+    const rounds = calculateFullRounds(points, FHM, ironman);
+    breakdown.append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(rounds * FULL_HM_IRON));
+    breakdown.append($(document.createElement('br')));
     $("#unlockstatus").val(2);
-    return rounds * IRON_POINTS;
+    return rounds * FULL_HM_IRON;
   }
   if (unlock == 1) {
-    var rounds = calculateFullRounds(points, FHM, ironman);
-    var temp = points - rounds * FHM;
-    $("#breakdown").append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(rounds * FULL_HM_UNLOCK));
-    $("#breakdown").append($(document.createElement('br')));
+    console.log('hi');
+    const rounds = calculateFullRounds(points, FHM, ironman);
+    console.log(rounds);
+    const temp = points - rounds * FHM;
+    breakdown.append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(rounds * FULL_HM_UNLOCK));
+    breakdown.append($(document.createElement('br')));
     $("#unlockstatus").val(2);
     return rounds * FULL_HM_UNLOCK + calculateP(temp, role, 2, ironman);
   }
   if (unlock >= 2) {
     //everything is unlocked
-    var enhancer = $("#enhancer_h").val()
+    const enhancer = $("#enhancer_h").val();
     if (enhancer > 0) {
-      $("#breakdown").append("---Enhancer charges would be used here");
-      $("#breakdown").append($(document.createElement('br')));
+      breakdown.append("---Enhancer charges would be used here");
+      breakdown.append($(document.createElement('br')));
     }
-    var rounds = calculateRounds(points, PHM);
-    $("#breakdown").append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(rounds * POINTS_PART));
+    const rounds = calculateRounds(points, PHM);
+    breakdown.append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(rounds * POINTS_PART));
     return POINTS_PART * rounds;
   }
 }
@@ -1555,8 +1532,8 @@ function calculateP(points, role, unlock, ironman) {
 function calculateFullRounds(points, FHM, ironman) {
   //the amount of rounds of 1-9s needed (if ironman)
   if (!ironman) return 1;
-  var rounds = 1;
-  var roundpoints = FHM;
+  let rounds = 1;
+  let roundpoints = FHM;
   if ($("#enhancer_h").val() > 0) {
     //only consume 4 charges
     roundpoints = parseInt((roundpoints) + (roundpoints * Math.min($("#enhancer_h").val(), 9)) / 9);
