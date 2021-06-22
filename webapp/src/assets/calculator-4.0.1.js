@@ -688,14 +688,13 @@ $(document).ready(function () {
   table.append("<tr><th>Round</th><th>Price</th><th>Time</th></tr>");
   table.append("<tr><td><a onclick='showtab(1)'>Waves 1-10 NM/Queen kill/Completionist requirement</a></td><td class='tblprice'>" + commaSeparateNumber(QUEEN) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
   table.append("<tr><td><a onclick='showtab(1)'>Waves 1-10 NM - low level</a></td><td class='tblprice'>" + commaSeparateNumber(QUEEN_LOW_LEVEL) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
-  table.append("<tr><td>Waves 1-10 NM - solo leech</td><td class='tblprice'>" + commaSeparateNumber(QUEEN_SOLO) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
+  table.append("<tr><td><a onclick='showtab(1)'>Waves 1-10 NM - solo leech</a></td><td class='tblprice'>" + commaSeparateNumber(QUEEN_SOLO) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 1-9 HM unlock</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_UNLOCK) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 1-9 HM Points (if already unlocked)*</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_ALREADY_UNLOCK_POINTS) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 1-9 HM BXP (if already unlocked)*</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_ALREADY_UNLOCK_BXP) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 1-9 HM (as an ironman)</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_IRON) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 6-9 HM for BXP</td><td class='tblprice'>" + commaSeparateNumber(PARTHM) + "</td><td class='tblprice'>" + PARTHM_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 6-9 HM for Points</td><td class='tblprice'>" + commaSeparateNumber(POINTS_PART) + "</td><td class='tblprice'>" + PARTHM_T + " minutes</td></tr>");
-  table.append("<tr><td><a onclick='showtab(2)'>Wave 10 NM/Queen kill</a></th><td class='tblprice'>" + commaSeparateNumber(QUEEN_ONLY) + "</td><td class='tblprice'>" + QUEEN_ONLY_T + " minutes</td></tr>");
   table.append("<tr><td><a onclick='showtab(2)'>Wave 10 HM/King kill/Trim requirement</a></th><td class='tblprice'>" + commaSeparateNumber(KING) + "</td><td class='tblprice'>" + KING_T + " minutes</td></tr>");
   table.append("<tr><td><a onclick='showtab(2)'>Wave 10 HM/King kill - if you do not have either a) resonance ability, or b) level 50+ magic or range</a></th><td class='tblprice'>" + commaSeparateNumber(SKILLER_KING) + "</td><td class='tblprice'>" + KING_T + " minutes</td></tr>");
   forminfo.append(table);
