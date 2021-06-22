@@ -684,6 +684,7 @@ $(document).ready(function () {
   if (minigameweekend) {
     forminfo.append("<div class='noticecontainer'><span class='tblnotice'>Minigame weekend prices are active, 1.5x the normal rate, the calculator has automatically adjusted its calculations to take it into consideration.</span></div><br>");
   }
+
   var table = $(document.createElement('table')).attr({id: "infotbl"});
   table.append("<tr><th>Round</th><th>Price</th><th>Time</th></tr>");
   table.append("<tr><td><a onclick='showtab(1)'>Waves 1-10 NM/Queen kill/Completionist requirement</a></td><td class='tblprice'>" + commaSeparateNumber(QUEEN) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
