@@ -251,7 +251,11 @@ $(document).ready(function () {
   ba.append(hardmode);
   ba.append(king);
   left.append(ba);
-  left.append($(document.createElement('br')));
+  left.append(createSpace());
+
+  const priorityBxp = createRadioGroup("Priority queue: ", "xp_priority");
+  left.append(priorityBxp);
+  left.append(createSpace());
 
   //calculate button
   calculate.attr({type: "button", id: "calculatexp", style: "float:right;"});
@@ -537,6 +541,10 @@ $(document).ready(function () {
   ba_container.append($(document.createElement('br')));
   left.append(ba_container);
   left.append(unlockstatus);
+
+  const priorityPoints = createRadioGroup("Priority queue: ", "points_priority");
+  left.append(priorityPoints);
+  left.append(createSpace());
 
   var enhancercontainer = $(document.createElement('div'));
   var enhancer = $(document.createElement('input'));
@@ -1600,8 +1608,8 @@ function submitform(button) {
   var form = $(button).parents('form:first');
 
   //encode inputs
-  $("#points_rsn").val(encode($("#points_rsn").val()));
-  $("#rsn").val(encode($("#rsn").val()));
+  $("#points_rsn").val($("#points_rsn").val());
+  $("#rsn").val($("#rsn").val());
   form.submit();
 }
 
@@ -1647,16 +1655,33 @@ function showtab(option) {
   loadpreset();
 }
 
-function encode(str) {
-  var badwords = ["poker"];
-  var encoded = str;
-  for (var i = 0; i < badwords.length; i++) {
-    var badword = badwords[i];
-    if ((str.toLowerCase()).includes(badword)) {
-      //encode it, include a backslash somewhere
-      var pos = str.indexOf(badword) + 1;
-      encoded = [str.slice(0, pos), "/", str.slice(pos)].join('');
-    }
-  }
-  return encoded;
+function createSpace() {
+  return $(document.createElement('br'));
+}
+
+
+// creates a radio group with yes no
+function createRadioGroup(label, name) {
+  const priority = $(document.createElement('div')).attr({id: name+"-container", style: ""});
+  priority.append(label);
+  const priorityYes = $(document.createElement('input')).attr({
+    type: "radio",
+    id: name+"-y",
+    name: name,
+    value: "yes"
+  });
+  const priorityNo = $(document.createElement('input')).attr({
+    type: "radio",
+    id: name+"-n",
+    name: name,
+    value: "no",
+    checked: "checked"
+  });
+  priority.append($(document.createElement('span')).attr({style: "padding: 0 10px;"}));
+  priority.append("Yes ");
+  priority.append(priorityYes);
+  priority.append($(document.createElement('span')).attr({style: "padding: 0 10px;"}));
+  priority.append("No ");
+  priority.append(priorityNo);
+  return priority;
 }

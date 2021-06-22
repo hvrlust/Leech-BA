@@ -9,6 +9,7 @@ function process(req, database, getQueueChannel) {
                 level: data['xp_level'],
                 ba: data['xp_ba'],
                 amount: data['xp_amount'],
+                priority: data['xp_priority']
             },
         }, database, queueChannel));
 
@@ -38,6 +39,7 @@ function process(req, database, getQueueChannel) {
                 enhancer: parseInt(data['enhancer'], 10),
                 ironman: data['ironman'],
                 kingkills: parseInt(data['kingskilled'], 10),
+                priority: data['points_priority']
             },
         }, database, queueChannel));
     }
@@ -74,7 +76,8 @@ async function processQueueReq(mail, database, queueChannel) {
 
         amount = nFormatter(amount, 2);
         let rsn_bxp = data.rsn;
-        let s0 = "RSN: " + data.rsn + "\nLeech: BXP\nSkill: " + data.skill + "\nLevel: " + data.level + "\nAmount: " + data.amount + "\nBA completed up to: " + ba + "\n\n\n";
+        let s0 = "RSN: " + data.rsn + "\nLeech: BXP\nSkill: " + data.skill + "\nLevel: " + data.level + "\nAmount: " + data.amount + "\nBA completed up to: " + ba +
+            "\n" + "Priority: " + data.priority + "\n\n\n";
         let s1 = "Summary: \n" + date + "/" + month + ": " + rsn_bxp + " - " + amount + " " + data.skill + " bxp " + ba + "\n\n";
 
         return queueChannel.send("```" + s0 + s1 + "```")
@@ -280,6 +283,8 @@ async function processQueueReq(mail, database, queueChannel) {
         s0 += ironman;
         if (data.enhancer > 0) s0 += "Enhancer charges:" + enhancer.replace(/[{()}]/g, '') + "\n";
         s0 += "BA completed up to:" + ba.replace(/[{()}]/g, '') + "\n";
+
+        s0 += "Priority: " + data.priority + "\n";
         s0 += "\n\n";
 
         let s1 = "Summary: \n" + date + "/" + month + ": " + data.rsn + " - " + leech_simple + ironsimple + enhancer + ba + "\n\n";
