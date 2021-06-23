@@ -1,3 +1,7 @@
+p {
+    text-align: left;
+}
+
 #version {
     float: right;
 }
@@ -6,7 +10,7 @@ input[type="text"], select, input[type="number"] {
     font-size: 16px;
 }
 
-.noticecontainer {
+#calculator .noticecontainer {
     background-color: #fff0b3;
     padding: 5px 5px 1px 5px;
     border-radius: 5px;
@@ -47,8 +51,7 @@ input[type="text"], select, input[type="number"] {
 }
 
 #infotbl tr, #infotbl th {
-    background: none;
-    background-color: #ffffff;
+    background: #ffffff none;
     color: #000000;
     font-family: Tahoma, Geneva, sans-serif;
     font-size: 16px;
@@ -59,6 +62,7 @@ input[type="text"], select, input[type="number"] {
     background-color: inherit;
     font-family: Tahoma, Geneva, sans-serif;
     font-size: 16px;
+    vertical-align: top;
 }
 
 #infotbl th {
@@ -66,21 +70,27 @@ input[type="text"], select, input[type="number"] {
     text-align: center;
 }
 
+#infotbl td, #infotbl th {
+    padding: 6px;
+}
+
 #infotbl .tblprice {
     text-align: right;
+    width: 80px;
 }
 
 #infotbl .tblrequest {
     text-align: center;
 }
 
+#infotbl tr:nth-child(even){background-color: #f2f2f2;}
+
 #infotbl tr:hover {
-    background-color: #f1f1f1;
+    background-color: #ddd;
 }
 
 #infotbl a {
     cursor: pointer;
-    cursor: hand;
 }
 
 #calculator br {
@@ -146,6 +156,7 @@ input[type="text"], select, input[type="number"] {
 
 #calculator button:hover {
     cursor: pointer;
+    cursor: hand;
     border: 1px solid rgba(178, 178, 178, 1);
     color: rgba(76, 76, 76, 1);
     -webkit-box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.8) inset, 0 1px 0 0 rgba(0, 0, 0, 0.298039);
@@ -175,7 +186,7 @@ input[type="text"], select, input[type="number"] {
 }
 
 #calculator-main {
-    width: 650px;
+    width: 700px;
     background-color: #ffffff;
     vertical-align: middle;
     border-radius: 5px;
@@ -206,42 +217,40 @@ ul.tab li a {
     display: inline-block;
     color: black;
     text-align: center;
-    padding: 8px 14px;
+    padding: 8px 20px;
     text-decoration: none;
     transition: 0.3s;
-    font-size: 17px;
     text-shadow: none;
-    font-weight: bold;
     font: normal normal bold 1em/2em Arial, Helvetica, sans-serif;
 }
 
 /* Change background color of links on hover */
-ul.tab li a:hover {
+#calculator ul.tab li a:hover {
     background-color: #ddd;
 }
 
 /* Create an active/current tablink class */
-ul.tab li a:focus, .active {
+#calculator ul.tab li a:focus, #calculator .active {
     background-color: #ccc;
 }
 
-.tablinks {
+#calculator .tablinks {
     border-right: 1px solid #A9A9A9;
 }
 
-ul.tab li:last-child a {
+#calculator ul.tab li:last-child a {
     border-right: none;
-    padding: 8px 16px;
+    padding: 8px 23px;
 }
 
 /* Style the tab content */
-.tabcontent {
+#calculator .tabcontent {
     display: none;
     padding: 6px 12px;
     border-top: none;
 }
 
-.tabcontent {
+#calculator .tabcontent {
     -webkit-animation: fadeEffect 1s;
     animation: fadeEffect 0.5s; /* Fading effect takes 1 second */
 }
@@ -262,4 +271,30 @@ ul.tab li:last-child a {
     to {
         opacity: 1;
     }
+}
+
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+    cursor: pointer;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 400px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
 }
