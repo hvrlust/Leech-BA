@@ -45,6 +45,7 @@ const QUEEN_ONLY = 15000000;
 const PARTHM = 7000000;//6-9 2L bxp
 // const FULLHM = 9000000;//1-9 2L (assuming other guy already has)
 const KING = 35000000;
+const KING_CAP = 50000000;
 const SKILLER_KING = 50000000;
 const POINTS_PART = 20000000; // 6-9 2L points
 const FULL_HM_IRON = 50000000; // 1-9 iron
@@ -52,12 +53,14 @@ const FULL_HM_UNLOCK = 40000000; //1-9 not unlocked
 const FULL_HM_ALREADY_UNLOCK_POINTS = 20000000; // 1-9 already unlocked
 const FULL_HM_ALREADY_UNLOCK_BXP = 10000000; // 1-9 already unlocked
 
+const PRIORITY_MULTIPLIER = 1.5;
+let multiplier = 1;
+
 //minigame weekends
 const currentdate = new Date();
 const startdate = new Date('12/15/2017');
 const enddate = new Date('12/18/2017');
 const minigameweekend = false;
-const multiplier = 1; //minigame weekend multiplier
 
 //game times
 const QUEEN_ONLY_T = 5;
@@ -542,10 +545,6 @@ $(document).ready(function () {
   left.append(ba_container);
   left.append(unlockstatus);
 
-  const priorityPoints = createRadioGroup("Priority queue: ", "points_priority");
-  left.append(priorityPoints);
-  left.append(createSpace());
-
   var enhancercontainer = $(document.createElement('div'));
   var enhancer = $(document.createElement('input'));
   var enhancerhidden = $(document.createElement('input'));
@@ -584,6 +583,11 @@ $(document).ready(function () {
   ironcontainer.append("No ");
   ironcontainer.append(radiono);
   left.append(ironcontainer);
+
+  left.append(createSpace());
+  const priorityPoints = createRadioGroup("Priority queue: ", "points_priority");
+  left.append(priorityPoints);
+  left.append(createSpace());
 
   //kings
   var kingcontainer = $(document.createElement('div')).attr({id: "kingcontainer", style: "display:none;"});
@@ -746,21 +750,25 @@ $(document).ready(function () {
     $("#breakdownxp").empty();
     $("#breakdownxp").append("Breakdown: ");
     $("#breakdownxp").append($(document.createElement('br')));
+
+    // priority
+    let priority = $("#xp_priority-y:checked").val();
+
     //reset counter
     $("#counter").val(0);
     if ($("#skill").find('option:selected').val() == "agility") {
       //calculate agility
-      cost = calculateXP(level, amount, unlock, 'a');
+      cost = calculateXP(level, amount, unlock, 'a', priority);
       getprice(level);
     }
     if ($("#skill").find('option:selected').val() == "mining") {
       //calculate mining
-      cost = calculateXP(level, amount, unlock, 'm');
+      cost = calculateXP(level, amount, unlock, 'm', priority);
       $("#silverhawk").hide();
     }
     if ($("#skill").find('option:selected').val() == "firemaking") {
       //calculate firemaking
-      cost = calculateXP(level, amount, unlock, 'f');
+      cost = calculateXP(level, amount, unlock, 'f', priority);
       $("#silverhawk").hide();
     }
     //output
@@ -860,10 +868,13 @@ $(document).ready(function () {
     $("#breakdown").empty();
     $("#cost").empty();
     $("#enhancer_h").val(parseInt($("#enhancer").val()));
-    var font = $(document.createElement('font')).attr({size: "6"});
-    var cost = 0;
+    let font = $(document.createElement('font')).attr({size: "6"});
+    let cost = 0;
     //ironman
-    var ironman = false;
+    let ironman = false;
+
+    const priority = $("#points_priority-y:checked").val();
+
     if ($("#ironmany").is(":checked")) ironman = true;
 
     if ($("#presets").val() != "nm" && $("#presets").val() != "king") {
@@ -901,35 +912,35 @@ $(document).ready(function () {
       $("#excess").val(0);
       //if the user wants points/torso/etc
       if ($("#presets").val() != "insignia_A" && $("#presets").val() != "insignia_D" && $("#presets").val() != "insignia_H" && $("#presets").val() != "insignia_C") {
-        cost = calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, ironman);
+        cost = calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, ironman, priority);
       }
       if ($("#presets").val() == "insignia_A") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needApoints, 'a', kingskilled);
+        cost = calculateinsignia(needApoints, 'a', kingskilled, priority);
       }
       if ($("#presets").val() == "insignia_D") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needDpoints, 'd', kingskilled);
+        cost = calculateinsignia(needDpoints, 'd', kingskilled, priority);
       }
       if ($("#presets").val() == "insignia_H") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needHpoints, 'h', kingskilled);
+        cost = calculateinsignia(needHpoints, 'h', kingskilled, priority);
       }
       if ($("#presets").val() == "insignia_C") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needCpoints, 'c', kingskilled);
+        cost = calculateinsignia(needCpoints, 'c', kingskilled, priority);
       }
       //output
       //show excess points
@@ -939,12 +950,12 @@ $(document).ready(function () {
     } else {
       //if nm append
       if ($("#presets").val() == "nm") {
-        cost = QUEEN;
+        cost = QUEEN * (priority? PRIORITY_MULTIPLIER : 1);
       }
       //if king append
       if ($("#presets").val() == "king") {
         //check amount of ba done
-        cost = calculateking(ironman);
+        cost = calculateking(ironman, priority);
       }
     }
     font.append("Cost: ");
@@ -992,7 +1003,7 @@ $(document).ready(function () {
   });
 });
 
-function calculateXP(level, bxp, unlock, skill) {
+function calculateXP(level, bxp, unlock, skill, priority) {
   let P = 27.5;
   let F = 38;
   let NM = 0;
@@ -1014,6 +1025,9 @@ function calculateXP(level, bxp, unlock, skill) {
       HM = parseInt(117.237 * level + 97.273);
       break;
   }
+
+  const priorityMultiplier = priority ? PRIORITY_MULTIPLIER : 1;
+
   PHM = multiplier * HM * P;
   FHM = multiplier * HM * F;
   NM = multiplier * NM;
@@ -1022,34 +1036,37 @@ function calculateXP(level, bxp, unlock, skill) {
   if (bxp <= 0) return 0;
   if (unlock === 0) {
     //never done ba
-    var tempxp = bxp - (NM * level / 99);
-    $("#breakdownxp").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
+    const tempXP = bxp - (NM * level / 99);
+    const cost = QUEEN * priorityMultiplier;
+    $("#breakdownxp").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(cost));
     $("#breakdownxp").append($(document.createElement('br')));
     $("#counter").val(parseInt($("#counter").val()) + parseInt(level * NM / 99));
-    return QUEEN + calculateXP(level, tempxp, 1, skill);//append queen and rerun
+    return cost + calculateXP(level, tempXP, 1, skill, priority);//append queen and rerun
   }
   if (unlock === 1) {
-    var tempxp = bxp - FHM;
-    $("#breakdownxp").append("1x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(FULL_HM_UNLOCK));
+    const tempXP = bxp - FHM;
+    const cost = FULL_HM_UNLOCK * priorityMultiplier;
+    $("#breakdownxp").append("1x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(cost));
     $("#breakdownxp").append($(document.createElement('br')));
     $("#counter").val(parseInt($("#counter").val()) + parseInt(FHM));
-    return FULL_HM_UNLOCK + calculateXP(level, tempxp, 2, skill);
+    return cost + calculateXP(level, tempXP, 2, skill, priority);
   }
   if (unlock === 2) {
     //everything is unlocked
-    var rounds = calculateRoundsXP(level, bxp, PHM);
-    $("#breakdownxp").append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(rounds * PARTHM));
+    const rounds = calculateRoundsXP(level, bxp, PHM);
+    const cost = rounds * PARTHM * priorityMultiplier;
+    $("#breakdownxp").append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(cost));
     $("#breakdownxp").append($(document.createElement('br')));
     $("#counter").val(parseInt($("#counter").val()) + parseInt(rounds * PHM));
-    return PARTHM * rounds;
+    return cost;
   }
   return -1;
 }
 
 function calculateRoundsXP(level, bxp, PHM) {
   //the amount of rounds of 6-9s needed
-  var xp = PHM;
-  var rounds = 1;
+  const xp = PHM;
+  const rounds = 1;
   if (bxp - xp <= 0) {
     return rounds;
   }
@@ -1289,6 +1306,7 @@ function reset() {
   $("#enhancercontainer").show();
   $("#pointsrequest").html("Request this leech");
   $("#pointsrequest").attr("disabled", true);
+  updateunlock();
 }
 
 function updateunlock() {
@@ -1310,32 +1328,35 @@ function updateunlock() {
   $("#unlockstatus").val(unlock);
 }
 
-function calculateking(ironman) {
-  var cost = 0;
-  var unlock = parseInt($("#unlockstatus").val());
+function calculateking(ironman, priority) {
+  let cost = 0;
+  let unlock = parseInt($("#unlockstatus").val());
+  const priorityMultiplier = priority? PRIORITY_MULTIPLIER : 1;
   switch (unlock) {
     case 0:
-      cost = cost + QUEEN + FULL_HM_UNLOCK + KING;
+      cost = cost + priorityMultiplier * QUEEN;
       updateunlock(1);
-      $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
+      $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN * priorityMultiplier));
       $("#breakdown").append($(document.createElement('br')));
-      break;
     case 1:
-      cost = cost + FULL_HM_UNLOCK + KING;
+      cost =  cost + FULL_HM_UNLOCK * priorityMultiplier;
       updateunlock(2);
-      break;
+      $("#breakdown").append("1x&nbsp; 1-9HM unlock &nbsp;" + commaSeparateNumber(FULL_HM_UNLOCK * priorityMultiplier));
+      $("#breakdown").append($(document.createElement('br')));
     default:
-      cost = cost + KING;
+      cost =  cost + Math.min(KING * priorityMultiplier, KING_CAP);
       updateunlock(3);
+      $("#breakdown").append("1x&nbsp; King kill &nbsp;" + commaSeparateNumber(Math.min(KING * priorityMultiplier, KING_CAP)));
+      $("#breakdown").append($(document.createElement('br')));
   }
   return cost;
 }
 
-function calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, ironman) {
-  var cost = 0;
+function calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, ironman, priority) {
+  let cost = 0;
   $("#breakdown").append("Attacker role");
   $("#breakdown").append($(document.createElement('br')));
-  cost = cost + calculateP(needApoints, 'a', $("#unlockstatus").val(), ironman);
+  cost = cost + calculateP(needApoints, 'a', $("#unlockstatus").val(), ironman, priority);
   $("#excess").val(parseInt($("#excess").val()) + parseInt($("#actual").val()) - needApoints); //works out how much excess points there are
   $("#breakdown").append($(document.createElement('br')));
   $("#breakdown").append($(document.createElement('br')));
@@ -1358,7 +1379,7 @@ function calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, iro
     $("#excess").val(parseInt($("#excess").val()) - HMCOL);
     needCpoints -= HMCOL;
   }
-  cost = cost + calculateP(needCpoints, 'c', $("#unlockstatus").val(), ironman);
+  cost = cost + calculateP(needCpoints, 'c', $("#unlockstatus").val(), ironman, priority);
   $("#excess").val(parseInt($("#excess").val()) + parseInt($("#actual").val()) - needCpoints); //works out how much excess points there are
   $("#breakdown").append($(document.createElement('br')));
   $("#breakdown").append($(document.createElement('br')));
@@ -1381,7 +1402,7 @@ function calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, iro
     $("#excess").val(parseInt($("#excess").val()) - HMDEF);
     needDpoints -= HMDEF;
   }
-  cost = cost + calculateP(needDpoints, 'd', $("#unlockstatus").val(), ironman);
+  cost = cost + calculateP(needDpoints, 'd', $("#unlockstatus").val(), ironman, priority);
   $("#excess").val(parseInt($("#excess").val()) + parseInt($("#actual").val()) - needDpoints); //works out how much excess points there are
   $("#breakdown").append($(document.createElement('br')));
   $("#breakdown").append($(document.createElement('br')));
@@ -1404,13 +1425,13 @@ function calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, iro
     $("#excess").val(parseInt($("#excess").val()) - HMHEAL);
     needHpoints -= HMHEAL;
   }
-  cost = cost + calculateP(needHpoints, 'h', $("#unlockstatus").val(), ironman);
+  cost = cost + calculateP(needHpoints, 'h', $("#unlockstatus").val(), ironman, priority);
   $("#excess").val(parseInt($("#excess").val()) + parseInt($("#actual").val()) - needHpoints); //works out how
   return cost;
 }
 
 //calculates the amount of points from kings
-function calculateinsignia(points, role, kingskilled) {
+function calculateinsignia(points, role, kingskilled, priority) {
   var NM = 0;
   var PHM = 0;
   var FHM = 0;
@@ -1436,43 +1457,45 @@ function calculateinsignia(points, role, kingskilled) {
       FHM = HMHEAL;
       break;
   }
-  var cost = 0;
-  var newunlock = $("#unlockstatus").val();
-  var temp = points;
-  var pointsneeded = points;
-  if (newunlock == 0) {
-    temp = temp - NM;
+  let cost = 0;
+  let newunlock = parseInt($("#unlockstatus").val());
+  let temp = points;
+  let pointsneeded = points;
+
+  const priorityMultiplier = (priority? PRIORITY_MULTIPLIER : 1);
+  if (newunlock === 0) {
+    temp -= NM;
     newunlock = 1;
-    $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
+    $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(priorityMultiplier * QUEEN));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(1);
     $("#actual").val(parseInt($("#actual").val()) + NM);
-    cost = cost + QUEEN;
+    cost = cost + priorityMultiplier * QUEEN;
   }
-  if (newunlock == 1) {
-    temp = temp - FHM;
+  if (newunlock === 1) {
+    temp -= FHM;
     newunlock = 2;
-    $("#breakdown").append("1x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(FULL_HM_UNLOCK));
+    $("#breakdown").append("1x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(priorityMultiplier * FULL_HM_UNLOCK));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(2);
     $("#actual").val(parseInt($("#actual").val()) + FHM);
-    cost = cost + FULL_HM_UNLOCK;
+    cost = cost + priorityMultiplier * FULL_HM_UNLOCK;
   }
   if (newunlock >= 2) {
     var rounds = 5 - kingskilled;
     temp = temp - rounds * KINGP;
-    $("#breakdown").append(rounds + "x&nbsp; King &nbsp;" + commaSeparateNumber(rounds * KING));
+    $("#breakdown").append(rounds + "x&nbsp; King &nbsp;" + commaSeparateNumber(rounds * Math.min(KING * priorityMultiplier, KING_CAP)));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(2);
     $("#actual").val(parseInt($("#actual").val()) + rounds * KINGP);
-    cost = cost + rounds * KING;
-    cost = cost + calculateP(temp, role, newunlock, false);
+    cost = cost + rounds * Math.min(KING * priorityMultiplier, KING_CAP);
+    cost = cost + calculateP(temp, role, newunlock, false, priority);
   }
   $("#excess").val(parseInt($("#actual").val()) - pointsneeded);
   return cost;
 }
 
-function calculateP(points, role, unlock, ironman) {
+function calculateP(points, role, unlock, ironman, priority) {
   if (points <= 0) return 0; //sanity check
 
   let NM = 0;
@@ -1501,31 +1524,33 @@ function calculateP(points, role, unlock, ironman) {
       break;
   }
 
+  const priorityMultiplier = priority? PRIORITY_MULTIPLIER : 1;
   const breakdown = $("#breakdown");
   if (unlock == 0) {
     const temp = points - NM;
-    $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
+    const cost = priorityMultiplier * QUEEN;
+    $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(cost));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(1);
     $("#actual").val(parseInt($("#actual").val()) + NM);
-    return QUEEN + calculateP(temp, role, 1, ironman); //rerun but now hm is unlocked
+    return cost + calculateP(temp, role, 1, ironman, priority); //rerun but now hm is unlocked
   }
   if (ironman) {
     const rounds = calculateFullRounds(points, FHM, ironman);
-    breakdown.append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(rounds * FULL_HM_IRON));
+    const cost = rounds * priorityMultiplier * FULL_HM_IRON;
+    breakdown.append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(cost));
     breakdown.append($(document.createElement('br')));
     $("#unlockstatus").val(2);
-    return rounds * FULL_HM_IRON;
+    return cost;
   }
   if (unlock == 1) {
-    console.log('hi');
     const rounds = calculateFullRounds(points, FHM, ironman);
-    console.log(rounds);
     const temp = points - rounds * FHM;
-    breakdown.append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(rounds * FULL_HM_UNLOCK));
+    const cost = rounds * priorityMultiplier * FULL_HM_UNLOCK;
+    breakdown.append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(cost));
     breakdown.append($(document.createElement('br')));
     $("#unlockstatus").val(2);
-    return rounds * FULL_HM_UNLOCK + calculateP(temp, role, 2, ironman);
+    return cost + calculateP(temp, role, 2, ironman, priority);
   }
   if (unlock >= 2) {
     //everything is unlocked
@@ -1535,8 +1560,9 @@ function calculateP(points, role, unlock, ironman) {
       breakdown.append($(document.createElement('br')));
     }
     const rounds = calculateRounds(points, PHM);
-    breakdown.append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(rounds * POINTS_PART));
-    return POINTS_PART * rounds;
+    const cost = rounds * priorityMultiplier * POINTS_PART;
+    breakdown.append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(cost));
+    return cost;
   }
 }
 
@@ -1663,10 +1689,18 @@ function createSpace() {
 }
 
 
-// creates a radio group with yes no
+// creates a priority radio group with yes no
 function createRadioGroup(label, name) {
   const priority = $(document.createElement('div')).attr({id: name+"-container", style: ""});
   priority.append(label);
+
+  const tooltip = $(document.createElement('div')).attr({class: 'tooltip'});
+  tooltip.append('?');
+  const tooltipText = $(document.createElement('span')).attr({class: 'tooltiptext'});
+  tooltipText.append("Priority leeching will increase your price by 1.5 times and move you to the top of the queue, increasing your chances of leeching sooner than other customers");
+  tooltip.append(tooltipText);
+  priority.append(tooltip);
+
   const priorityYes = $(document.createElement('input')).attr({
     type: "radio",
     id: name+"-y",

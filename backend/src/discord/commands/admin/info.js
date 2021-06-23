@@ -20,7 +20,7 @@ module.exports = {
                         "asked in <#361546164530708480>. \n\n" +
                         "**2.** Please change your nickname to your current RSN + make sure your Discord status is " +
                         "not set to offline. \n\n" +
-                        "**3.** You are encouraged to **guest** in the CC **'Leech BA'**. Let us know if you are " +
+                        "**3.** You are encouraged to **guest** in the CC '**Leech BA**'. Let us know if you are " +
                         "not planning to do this.\n\n" +
                         "**4.** Prices and a calculator can be found [here](https://leechba.site/calculator). " +
                         "Please use \"request this leech\".\n\n" +
@@ -29,10 +29,9 @@ module.exports = {
                         "everything above the [FAQ](https://leechba.site/info).\n\n" +
                         "**6.** The leeching process: \n" +
                         "**>** When a team forms, the CC and Discord will be checked for available leeches\n" +
-                        "**>** The host rank will post an open call out for available customers\n" +
-                        "**>** If you are available, respond with \"Yes\"" +
-                        "**>** The host will take the two customers who are highest on the queue, with Priority " +
-                        "Leeches being above standard"
+                        "**>** The host rank will post an open call for available customers\n" +
+                        "**>** If you are available, respond with \"Yes\"\n" +
+                        "**>** The host will take the 2 customers who are highest on the queue, with priority before standard"
                 },
                     {
                         name: '\u200b',
