@@ -277,13 +277,22 @@ ul.tab li a {
 .tooltip {
     position: relative;
     display: inline-block;
-    border-bottom: 1px dotted black;
     cursor: pointer;
+
+    border: 2px solid #5a82d6;
+    background-color: #5f92dd;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    width: 16px;
+    height: 16px;
+    font-size: 14px;
+    font-family: "Helvetica Neue", sans-serif;
 }
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 400px;
+    width: 500px;
     background-color: black;
     color: #fff;
     text-align: center;
