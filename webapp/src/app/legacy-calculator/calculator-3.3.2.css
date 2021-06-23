@@ -272,3 +272,38 @@ ul.tab li a {
     opacity: 1;
   }
 }
+
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+
+  border: 2px solid #5a82d6;
+  background-color: #5f92dd;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+  font-size: 14px;
+  font-family: "Helvetica Neue", sans-serif;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 500px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
