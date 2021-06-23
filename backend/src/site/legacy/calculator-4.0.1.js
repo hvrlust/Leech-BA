@@ -918,28 +918,28 @@ $(document).ready(function () {
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needApoints, 'a', kingskilled);
+        cost = calculateinsignia(needApoints, 'a', kingskilled, priority);
       }
       if ($("#presets").val() == "insignia_D") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needDpoints, 'd', kingskilled);
+        cost = calculateinsignia(needDpoints, 'd', kingskilled, priority);
       }
       if ($("#presets").val() == "insignia_H") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needHpoints, 'h', kingskilled);
+        cost = calculateinsignia(needHpoints, 'h', kingskilled, priority);
       }
       if ($("#presets").val() == "insignia_C") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needCpoints, 'c', kingskilled);
+        cost = calculateinsignia(needCpoints, 'c', kingskilled, priority);
       }
       //output
       //show excess points
@@ -1455,14 +1455,14 @@ function calculateinsignia(points, role, kingskilled, priority) {
       FHM = HMHEAL;
       break;
   }
-  var cost = 0;
-  var newunlock = $("#unlockstatus").val();
-  var temp = points;
-  var pointsneeded = points;
+  let cost = 0;
+  let newunlock = parseInt($("#unlockstatus").val());
+  let temp = points;
+  let pointsneeded = points;
 
   const priorityMultiplier = (priority? PRIORITY_MULTIPLIER : 1);
-  if (newunlock == 0) {
-    temp = temp - NM;
+  if (newunlock === 0) {
+    temp -= NM;
     newunlock = 1;
     $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(priorityMultiplier * QUEEN));
     $("#breakdown").append($(document.createElement('br')));
@@ -1470,8 +1470,8 @@ function calculateinsignia(points, role, kingskilled, priority) {
     $("#actual").val(parseInt($("#actual").val()) + NM);
     cost = cost + priorityMultiplier * QUEEN;
   }
-  if (newunlock == 1) {
-    temp = temp - FHM;
+  if (newunlock === 1) {
+    temp -= FHM;
     newunlock = 2;
     $("#breakdown").append("1x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(priorityMultiplier * FULL_HM_UNLOCK));
     $("#breakdown").append($(document.createElement('br')));
@@ -1485,8 +1485,8 @@ function calculateinsignia(points, role, kingskilled, priority) {
     $("#breakdown").append(rounds + "x&nbsp; King &nbsp;" + commaSeparateNumber(rounds * priorityMultiplier * KING));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(2);
-    $("#actual").val(parseInt($("#actual").val()) + rounds * KING);
-    cost = cost + rounds * priorityMultiplier * FULL_HM_UNLOCK;
+    $("#actual").val(parseInt($("#actual").val()) + rounds * KINGP);
+    cost = cost + rounds * priorityMultiplier * KING;
     cost = cost + calculateP(temp, role, newunlock, false, priority);
   }
   $("#excess").val(parseInt($("#actual").val()) - pointsneeded);
