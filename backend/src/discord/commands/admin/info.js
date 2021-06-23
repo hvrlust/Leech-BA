@@ -28,10 +28,11 @@ module.exports = {
                         "**@customers** role. You may use the \"/timezone\" command to add your timezone. Read " +
                         "everything above the [FAQ](https://leechba.site/info).\n\n" +
                         "**6.** The leeching process: \n" +
-                        "**>** When a team forms, the CC then Discord will be checked for any leech not offline\n" +
-                        "**>** If you're up next, you will be tagged in <#361546164530708480>\n" +
-                        "**>** Customers in CC will have priority over those not in CC at the time the team is " +
-                        "being formed."
+                        "**>** When a team forms, the CC and Discord will be checked for available leeches\n" +
+                        "**>** The host rank will post an open call out for available customers\n" +
+                        "**>** If you are available, respond with \"Yes\"" +
+                        "**>** The host will take the two customers who are highest on the queue, with Priority " +
+                        "Leeches being above standard"
                 },
                     {
                         name: '\u200b',

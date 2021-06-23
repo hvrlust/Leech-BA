@@ -45,6 +45,7 @@ const QUEEN_ONLY = 15000000;
 const PARTHM = 7000000;//6-9 2L bxp
 // const FULLHM = 9000000;//1-9 2L (assuming other guy already has)
 const KING = 35000000;
+const KING_CAP = 50000000;
 const SKILLER_KING = 50000000;
 const POINTS_PART = 20000000; // 6-9 2L points
 const FULL_HM_IRON = 50000000; // 1-9 iron
@@ -1305,6 +1306,7 @@ function reset() {
   $("#enhancercontainer").show();
   $("#pointsrequest").html("Request this leech");
   $("#pointsrequest").attr("disabled", true);
+  updateunlock();
 }
 
 function updateunlock() {
@@ -1342,9 +1344,9 @@ function calculateking(ironman, priority) {
       $("#breakdown").append("1x&nbsp; 1-9HM unlock &nbsp;" + commaSeparateNumber(FULL_HM_UNLOCK * priorityMultiplier));
       $("#breakdown").append($(document.createElement('br')));
     default:
-      cost =  cost + KING * priorityMultiplier;
+      cost =  cost + Math.min(KING * priorityMultiplier, KING_CAP);
       updateunlock(3);
-      $("#breakdown").append("1x&nbsp; King kill &nbsp;" + commaSeparateNumber(KING * priorityMultiplier));
+      $("#breakdown").append("1x&nbsp; King kill &nbsp;" + commaSeparateNumber(Math.min(KING * priorityMultiplier, KING_CAP)));
       $("#breakdown").append($(document.createElement('br')));
   }
   return cost;
@@ -1482,11 +1484,11 @@ function calculateinsignia(points, role, kingskilled, priority) {
   if (newunlock >= 2) {
     var rounds = 5 - kingskilled;
     temp = temp - rounds * KINGP;
-    $("#breakdown").append(rounds + "x&nbsp; King &nbsp;" + commaSeparateNumber(rounds * priorityMultiplier * KING));
+    $("#breakdown").append(rounds + "x&nbsp; King &nbsp;" + commaSeparateNumber(rounds * Math.min(KING * priorityMultiplier, KING_CAP)));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(2);
     $("#actual").val(parseInt($("#actual").val()) + rounds * KINGP);
-    cost = cost + rounds * priorityMultiplier * KING;
+    cost = cost + rounds * Math.min(KING * priorityMultiplier, KING_CAP);
     cost = cost + calculateP(temp, role, newunlock, false, priority);
   }
   $("#excess").val(parseInt($("#actual").val()) - pointsneeded);
