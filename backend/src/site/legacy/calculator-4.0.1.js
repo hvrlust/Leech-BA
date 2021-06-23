@@ -949,12 +949,12 @@ $(document).ready(function () {
     } else {
       //if nm append
       if ($("#presets").val() == "nm") {
-        cost = QUEEN;
+        cost = QUEEN * (priority? PRIORITY_MULTIPLIER : 1);
       }
       //if king append
       if ($("#presets").val() == "king") {
         //check amount of ba done
-        cost = calculateking(ironman);
+        cost = calculateking(ironman, priority);
       }
     }
     font.append("Cost: ");
@@ -1326,23 +1326,26 @@ function updateunlock() {
   $("#unlockstatus").val(unlock);
 }
 
-function calculateking(ironman) {
-  var cost = 0;
-  var unlock = parseInt($("#unlockstatus").val());
+function calculateking(ironman, priority) {
+  let cost = 0;
+  let unlock = parseInt($("#unlockstatus").val());
+  const priorityMultiplier = priority? PRIORITY_MULTIPLIER : 1;
   switch (unlock) {
     case 0:
-      cost = cost + QUEEN + FULL_HM_UNLOCK + KING;
+      cost = cost + priorityMultiplier * QUEEN;
       updateunlock(1);
-      $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
+      $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN * priorityMultiplier));
       $("#breakdown").append($(document.createElement('br')));
-      break;
     case 1:
-      cost = cost + FULL_HM_UNLOCK + KING;
+      cost =  cost + FULL_HM_UNLOCK * priorityMultiplier;
       updateunlock(2);
-      break;
+      $("#breakdown").append("1x&nbsp; 1-9HM unlock &nbsp;" + commaSeparateNumber(FULL_HM_UNLOCK * priorityMultiplier));
+      $("#breakdown").append($(document.createElement('br')));
     default:
-      cost = cost + KING;
+      cost =  cost + KING * priorityMultiplier;
       updateunlock(3);
+      $("#breakdown").append("1x&nbsp; King kill &nbsp;" + commaSeparateNumber(KING * priorityMultiplier));
+      $("#breakdown").append($(document.createElement('br')));
   }
   return cost;
 }
