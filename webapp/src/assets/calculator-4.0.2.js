@@ -38,23 +38,32 @@ function requestCrossDomain(site, callback) {
 
 const LINK = "/legacy/queue";
 
-var QUEEN = 12000000;//1-10 2L
-var PARTHM = 5000000;//6-9 2L
-var FULLHM = 9000000;//1-9 2L (assuming other guy already has)
-var KING = 12000000;
-var SKILLER_KING = 18000000;
-var POINTS_PART = 6500000; // 6-9 points
-var IRON_POINTS = 12000000; // 1-9 iron
-var FULL_HM_UNLOCK = 10000000; //1-9 not unlocked
-var FULL_HM_ALREADY_UNLOCK = 7000000 // 1-9 already unlocked
+const QUEEN = 30000000;//1-10 2L
+const QUEEN_LOW_LEVEL = 45000000;//1-10 2L
+const QUEEN_SOLO = 60000000;//1-10 2L
+const QUEEN_ONLY = 15000000;
+const PARTHM = 7000000;//6-9 2L bxp
+// const FULLHM = 9000000;//1-9 2L (assuming other guy already has)
+const KING = 35000000;
+const KING_CAP = 50000000;
+const SKILLER_KING = 50000000;
+const POINTS_PART = 20000000; // 6-9 2L points
+const FULL_HM_IRON = 50000000; // 1-9 iron
+const FULL_HM_UNLOCK = 40000000; //1-9 not unlocked
+const FULL_HM_ALREADY_UNLOCK_POINTS = 20000000; // 1-9 already unlocked
+const FULL_HM_ALREADY_UNLOCK_BXP = 10000000; // 1-9 already unlocked
+
+const PRIORITY_MULTIPLIER = 1.5;
+let multiplier = 1;
 
 //minigame weekends
-var currentdate = new Date();
-var startdate = new Date('12/15/2017');
-var enddate = new Date('12/18/2017');
-var minigameweekend = false;
-var multiplier = 1; //minigameweekend multiplier
+const currentdate = new Date();
+const startdate = new Date('12/15/2017');
+const enddate = new Date('12/18/2017');
+const minigameweekend = false;
 
+//game times
+const QUEEN_ONLY_T = 5;
 const QUEEN_T = 20;
 const PARTHM_T = 10;
 const FULLHM_T = 20;
@@ -90,26 +99,26 @@ const NMATT = 250;//normal mode
 const NMDEF = 250;
 const NMHEAL = 250;
 const NMCOL = 250;
-const HMATT = 330;//1-9 hm
-const HMDEF = 350;
-const HMHEAL = 350;
-const HMCOL = 300;
-const PHMATT = 220; //6-9 hm
-const PHMDEF = 251;
-const PHMHEAL = 245;
-const PHMCOL = 179;
+const HMATT = 384;//1-9 hm
+const HMDEF = 443;
+const HMHEAL = 469;
+const HMCOL = 324;
+const PHMATT = 246; //6-9 hm
+const PHMDEF = 276;
+const PHMHEAL = 298;
+const PHMCOL = 205;
 const KINGP = 210; //points for a king
 //DO NOT CHANGE
 
-//minigame weekend changes
-if (currentdate > startdate && currentdate < enddate) {
-  minigameweekend = true;
-  QUEEN = 15000000;
-  PARTHM = 7500000;
-  FULLHM = 13500000;
-  KING = 18000000;
-  multiplier = 2;
-}
+// //minigame weekend changes
+// if (currentdate > startdate && currentdate < enddate) {
+//   minigameweekend = true;
+//   QUEEN = 15000000;
+//   PARTHM = 7500000;
+//   FULLHM = 13500000;
+//   KING = 18000000;
+//   multiplier = 2;
+// }
 
 const leveldifference = [0, 200, 300, 400, 500, 0]; //0,1,2,3,4,5. if level 1, needs 200 to level up, etc. 5 needs 0
 //unlock codes
@@ -122,17 +131,17 @@ $(document).ready(function () {
 											 $('#dev').html(results);
 											 });*/
   //creating ui
-  var main = $(document.createElement('div'));
+  const main = $(document.createElement('div'));
   main.attr({id: "calculator-main"});
-  var tab = $(document.createElement('ul'));
+  const tab = $(document.createElement('ul'));
   tab.attr({id: "tab", class: "tab"});
-  var xptab = $(document.createElement('li'));
-  var xplink = $(document.createElement('a'));
+  const xptab = $(document.createElement('li'));
+  const xplink = $(document.createElement('a'));
   xplink.attr({id: "xptab", class: "tablinks", href: "javascript:void(0)", onclick: "openTab(event, 'XP')"});
   xplink.append("Bonus XP");
   xptab.append(xplink);
-  var pointstab = $(document.createElement('li'));
-  var pointslink = $(document.createElement('a'));
+  const pointstab = $(document.createElement('li'));
+  const pointslink = $(document.createElement('a'));
   pointslink.attr({
     id: "pointstab",
     class: "tablinks",
@@ -141,8 +150,8 @@ $(document).ready(function () {
   });
   pointslink.append("Levels, Points & Misc. Calculator");
   pointstab.append(pointslink);
-  var infotab = $(document.createElement('li'));
-  var infolink = $(document.createElement('a'));
+  const infotab = $(document.createElement('li'));
+  const infolink = $(document.createElement('a'));
   infolink.attr({
     id: "infotab",
     class: "tablinks",
@@ -151,8 +160,8 @@ $(document).ready(function () {
   });
   infolink.append("Prices & information");
   infotab.append(infolink);
-  var creditstab = $(document.createElement('li'));
-  var creditslink = $(document.createElement('a'));
+  const creditstab = $(document.createElement('li'));
+  const creditslink = $(document.createElement('a'));
   creditslink.attr({
     id: "creditstab",
     class: "tablinks",
@@ -163,22 +172,22 @@ $(document).ready(function () {
   creditstab.append(creditslink);
 
   tab.append(infotab);
-  tab.append(xptab)
+  tab.append(xptab);
   tab.append(pointstab);
   tab.append(creditstab);
   main.append(tab);
 
   //credits
-  var formcredits = $(document.createElement('form'));
+  const formcredits = $(document.createElement('form'));
   formcredits.attr({id: "Credits", class: "tabcontent"});
-  formcredits.append("<strong>Credits</strong></br>Application creator: Jia </br> Points research/information gatherer: Shadowstream </br> BXP/level accuracy: Purewct (huge credit, spent over 2 months gathering)</br></br><strong>Additional credits</strong></br>CSS: Sanjan</br>Sledgehammer (testers): Shadowstream, RexT, Mahtiukko</br>Research round helpers: Many</br></br></br><span id='version'><strong>Last updated:</strong> 23/11/2019 &emsp; <strong>Version:</strong> 3.8.4</span></br></br>");
+  formcredits.append("<strong>Credits</strong></br>Application creator: Jia </br> Points research/information gatherer: Shadowstream </br> BXP/level accuracy: Purewct (huge credit, spent over 2 months gathering)</br></br><strong>Additional credits</strong></br>CSS: Sanjan</br>Sledgehammer (testers): Shadowstream, RexT, Mahtiukko</br>Research round helpers: Many</br></br></br><span id='version'><strong>Last updated:</strong> 05/01/2021 &emsp; <strong>Version:</strong> 4.0.2</span></br></br>");
 
   //xp
-  var formxp = $(document.createElement('form'));
+  const formxp = $(document.createElement('form'));
   //formxp.append("BXP Calculator v1.0- put in rsn first to make selection easier");
   //layout
-  var right = $(document.createElement('div'));
-  var left = $(document.createElement('div'));
+  let right = $(document.createElement('div'));
+  let left = $(document.createElement('div'));
   right.attr({id: "rightxp", style: "display:inline-block;padding:0px 10px 0px 0px;vertical-align:top;"});
   left.attr({id: "leftxp", style: "display:inline-block;padding:0px 0px 0px 0px;vertical-align:top;"});
 
@@ -245,7 +254,11 @@ $(document).ready(function () {
   ba.append(hardmode);
   ba.append(king);
   left.append(ba);
-  left.append($(document.createElement('br')));
+  left.append(createSpace());
+
+  const priorityBxp = createRadioGroup("Priority queue: ", "xp_priority");
+  left.append(priorityBxp);
+  left.append(createSpace());
 
   //calculate button
   calculate.attr({type: "button", id: "calculatexp", style: "float:right;"});
@@ -301,7 +314,7 @@ $(document).ready(function () {
   right.append("Automatically updates level from official RS website");
   right.append(skill_levels);
   right.append(hiddendiv);
-  var hlevels = $(document.createElement('input')); //hiddenlevels
+  const hlevels = $(document.createElement('input')); //hiddenlevels
   hlevels.attr({id: "hlevels", type: "text", style: "display:none;"});
   hlevels.val(0, 0, 0);
   right.append(hlevels);
@@ -313,11 +326,11 @@ $(document).ready(function () {
   formxp.append(left);
 
   //points
-  var formp = $(document.createElement('form'));
+  const formp = $(document.createElement('form'));
 
   //layout
-  var right = $(document.createElement('div'));
-  var left = $(document.createElement('div'));
+  right = $(document.createElement('div'));
+  left = $(document.createElement('div'));
   right.attr({id: "leftpoints", style: "display:inline-block;padding:0px 10px 0px 0px;vertical-align:middle;"});
   left.attr({id: "rightpoints", style: "display:inline-block;padding:0px 0px 0px 0px;vertical-align:middle;"});
 
@@ -571,6 +584,11 @@ $(document).ready(function () {
   ironcontainer.append(radiono);
   left.append(ironcontainer);
 
+  left.append(createSpace());
+  const priorityPoints = createRadioGroup("Priority queue: ", "points_priority");
+  left.append(priorityPoints);
+  left.append(createSpace());
+
   //kings
   var kingcontainer = $(document.createElement('div')).attr({id: "kingcontainer", style: "display:none;"});
   kingcontainer.append("How many kings have you killed: ");
@@ -596,18 +614,18 @@ $(document).ready(function () {
     onclick: "submitform(this);"
   });
   request.append("Request this leech");
-  left.append($(document.createElement('br')));
+  left.append(createSpace());
   left.append(request);
   left.append(calculate);
 
   //output ui
-  left.append($(document.createElement('br')));
-  left.append($(document.createElement('br')));
+  left.append(createSpace());
+  left.append(createSpace());
   left.append(output);
   output.attr({id: "cost", style: "display:none;"});
   output.append("Cost: ");
   output.append($(document.createElement('br')));
-  left.append($(document.createElement('br')));
+  left.append(createSpace());
   left.append(breakdown);
   breakdown.attr({id: "breakdown", style: "display:none;"});
   breakdown.append("Breakdown: ");
@@ -670,20 +688,26 @@ $(document).ready(function () {
   if (minigameweekend) {
     forminfo.append("<div class='noticecontainer'><span class='tblnotice'>Minigame weekend prices are active, 1.5x the normal rate, the calculator has automatically adjusted its calculations to take it into consideration.</span></div><br>");
   }
+
   var table = $(document.createElement('table')).attr({id: "infotbl"});
   table.append("<tr><th>Round</th><th>Price</th><th>Time</th></tr>");
   table.append("<tr><td><a onclick='showtab(1)'>Waves 1-10 NM/Queen kill/Completionist requirement</a></td><td class='tblprice'>" + commaSeparateNumber(QUEEN) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
-  table.append("<tr><td>Waves 1-10 NM - solo leech</td><td class='tblprice'>" + commaSeparateNumber(QUEEN * 2) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
+  table.append("<tr><td><a onclick='showtab(1)'>Waves 1-10 NM - low level</a></td><td class='tblprice'>" + commaSeparateNumber(QUEEN_LOW_LEVEL) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
+  table.append("<tr><td><a onclick='showtab(1)'>Waves 1-10 NM - solo leech</a></td><td class='tblprice'>" + commaSeparateNumber(QUEEN_SOLO) + "</td><td class='tblprice'>" + QUEEN_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 1-9 HM unlock</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_UNLOCK) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
-  table.append("<tr><td>Waves 1-9 HM (if already unlocked, please read information below) ***</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_ALREADY_UNLOCK) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
-  table.append("<tr><td>Waves 1-9 HM (as an ironman)</th><td class='tblprice'>" + commaSeparateNumber(IRON_POINTS) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
+  table.append("<tr><td>Waves 1-9 HM Points (if already unlocked)*</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_ALREADY_UNLOCK_POINTS) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
+  table.append("<tr><td>Waves 1-9 HM BXP (if already unlocked)*</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_ALREADY_UNLOCK_BXP) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
+  table.append("<tr><td>Waves 1-9 HM (as an ironman)</th><td class='tblprice'>" + commaSeparateNumber(FULL_HM_IRON) + "</td><td class='tblprice'>" + FULLHM_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 6-9 HM for BXP</td><td class='tblprice'>" + commaSeparateNumber(PARTHM) + "</td><td class='tblprice'>" + PARTHM_T + " minutes</td></tr>");
   table.append("<tr><td>Waves 6-9 HM for Points</td><td class='tblprice'>" + commaSeparateNumber(POINTS_PART) + "</td><td class='tblprice'>" + PARTHM_T + " minutes</td></tr>");
   table.append("<tr><td><a onclick='showtab(2)'>Wave 10 HM/King kill/Trim requirement</a></th><td class='tblprice'>" + commaSeparateNumber(KING) + "</td><td class='tblprice'>" + KING_T + " minutes</td></tr>");
-  table.append("<tr><td><a onclick='showtab(2)'>Wave 10 HM/King kill - if you do not have either a) resonance and surge abilities, or b) level 50+ magic or range</a></th><td class='tblprice'>" + commaSeparateNumber(SKILLER_KING) + "</td><td class='tblprice'>" + KING_T + " minutes</td></tr>");
+  table.append("<tr><td><a onclick='showtab(2)'>Wave 10 HM/King kill - if you do not have either a) resonance ability, or b) level 50+ magic or range</a></th><td class='tblprice'>" + commaSeparateNumber(SKILLER_KING) + "</td><td class='tblprice'>" + KING_T + " minutes</td></tr>");
   forminfo.append(table);
   forminfo.append($(document.createElement('br')));
   forminfo.append("Listed prices are rounds done with 2 leeches at once (unless explicitly stated otherwise). You may pay double listed price for an increased chance of leeching faster, to leech alone (please mention when asking). <br><br>For specifics please see the calculators provided (clicking the round in the table above opens the relevant tab). Prices may slightly vary based on if another leech requires 1-9 hard mode to be unlocked.  The points/xp obtained from HM 1-5 offsets the extra cost.  <br><br>Calculators will give an estimate of cost and the amount of rounds required. You may also request the specific leech via the calculator.");
+  forminfo.append($(document.createElement('br')));
+  forminfo.append($(document.createElement('br')));
+  forminfo.append("Priority leeching will increase your price by 1.5x and move you to the top of the queue, increasing your chances of leeching sooner than other customers.");
   forminfo.append($(document.createElement('br')));
   forminfo.append($(document.createElement('br')));
   forminfo.append("Ironmen have increased cost due to being unable to be traded tickets.");
@@ -726,21 +750,25 @@ $(document).ready(function () {
     $("#breakdownxp").empty();
     $("#breakdownxp").append("Breakdown: ");
     $("#breakdownxp").append($(document.createElement('br')));
+
+    // priority
+    let priority = $("#xp_priority-y:checked").val();
+
     //reset counter
     $("#counter").val(0);
     if ($("#skill").find('option:selected').val() == "agility") {
       //calculate agility
-      cost = calculateXP(level, amount, unlock, 'a');
+      cost = calculateXP(level, amount, unlock, 'a', priority);
       getprice(level);
     }
     if ($("#skill").find('option:selected').val() == "mining") {
       //calculate mining
-      cost = calculateXP(level, amount, unlock, 'm');
+      cost = calculateXP(level, amount, unlock, 'm', priority);
       $("#silverhawk").hide();
     }
     if ($("#skill").find('option:selected').val() == "firemaking") {
       //calculate firemaking
-      cost = calculateXP(level, amount, unlock, 'f');
+      cost = calculateXP(level, amount, unlock, 'f', priority);
       $("#silverhawk").hide();
     }
     //output
@@ -840,10 +868,13 @@ $(document).ready(function () {
     $("#breakdown").empty();
     $("#cost").empty();
     $("#enhancer_h").val(parseInt($("#enhancer").val()));
-    var font = $(document.createElement('font')).attr({size: "6"});
-    var cost = 0;
+    let font = $(document.createElement('font')).attr({size: "6"});
+    let cost = 0;
     //ironman
-    var ironman = false;
+    let ironman = false;
+
+    const priority = $("#points_priority-y:checked").val();
+
     if ($("#ironmany").is(":checked")) ironman = true;
 
     if ($("#presets").val() != "nm" && $("#presets").val() != "king") {
@@ -881,35 +912,35 @@ $(document).ready(function () {
       $("#excess").val(0);
       //if the user wants points/torso/etc
       if ($("#presets").val() != "insignia_A" && $("#presets").val() != "insignia_D" && $("#presets").val() != "insignia_H" && $("#presets").val() != "insignia_C") {
-        cost = calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, ironman);
+        cost = calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, ironman, priority);
       }
       if ($("#presets").val() == "insignia_A") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needApoints, 'a', kingskilled);
+        cost = calculateinsignia(needApoints, 'a', kingskilled, priority);
       }
       if ($("#presets").val() == "insignia_D") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needDpoints, 'd', kingskilled);
+        cost = calculateinsignia(needDpoints, 'd', kingskilled, priority);
       }
       if ($("#presets").val() == "insignia_H") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needHpoints, 'h', kingskilled);
+        cost = calculateinsignia(needHpoints, 'h', kingskilled, priority);
       }
       if ($("#presets").val() == "insignia_C") {
         //get number of kings already killed
         var kingskilled = 0;
         var unlock = $("#unlockstatus").val();
         if ($("#ba").val() == "king") kingskilled = $("#kingskilled").val();
-        cost = calculateinsignia(needCpoints, 'c', kingskilled);
+        cost = calculateinsignia(needCpoints, 'c', kingskilled, priority);
       }
       //output
       //show excess points
@@ -919,12 +950,12 @@ $(document).ready(function () {
     } else {
       //if nm append
       if ($("#presets").val() == "nm") {
-        cost = QUEEN;
+        cost = QUEEN * (priority? PRIORITY_MULTIPLIER : 1);
       }
       //if king append
       if ($("#presets").val() == "king") {
         //check amount of ba done
-        cost = calculateking(ironman);
+        cost = calculateking(ironman, priority);
       }
     }
     font.append("Cost: ");
@@ -972,12 +1003,13 @@ $(document).ready(function () {
   });
 });
 
-function calculateXP(level, bxp, unlock, skill) {
-  var P = 27.5;
-  var F = 38;
-  var NM = 0;
-  var PHM = 0;
-  var FHM = 0;
+function calculateXP(level, bxp, unlock, skill, priority) {
+  let P = 27.5;
+  let F = 38;
+  let NM = 0;
+  let PHM = 0;
+  let FHM = 0;
+  let HM = 0;
   switch (skill) {
     case 'a':
       NM = NMA;
@@ -989,48 +1021,52 @@ function calculateXP(level, bxp, unlock, skill) {
       break;
     case 'm':
       NM = NMM;
-      //www.mathportal.org/calculators/statistics-calculator/correlation-and-regression-calculator.php
       //formula = y = 117.23469387755102x + 97.273
       HM = parseInt(117.237 * level + 97.273);
       break;
   }
+
+  const priorityMultiplier = priority ? PRIORITY_MULTIPLIER : 1;
+
   PHM = multiplier * HM * P;
   FHM = multiplier * HM * F;
   NM = multiplier * NM;
 
   //unlock = see top
   if (bxp <= 0) return 0;
-  if (unlock == 0) {
+  if (unlock === 0) {
     //never done ba
-    var tempxp = bxp - (NM * level / 99);
-    $("#breakdownxp").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
+    const tempXP = bxp - (NM * level / 99);
+    const cost = QUEEN * priorityMultiplier;
+    $("#breakdownxp").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(cost));
     $("#breakdownxp").append($(document.createElement('br')));
     $("#counter").val(parseInt($("#counter").val()) + parseInt(level * NM / 99));
-    return QUEEN + calculateXP(level, tempxp, 1, skill);//append queen and rerun
+    return cost + calculateXP(level, tempXP, 1, skill, priority);//append queen and rerun
   }
-  if (unlock == 1) {
-    var tempxp = bxp - FHM;
-    $("#breakdownxp").append("1x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(FULL_HM_UNLOCK));
+  if (unlock === 1) {
+    const tempXP = bxp - FHM;
+    const cost = FULL_HM_UNLOCK * priorityMultiplier;
+    $("#breakdownxp").append("1x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(cost));
     $("#breakdownxp").append($(document.createElement('br')));
     $("#counter").val(parseInt($("#counter").val()) + parseInt(FHM));
-    return FULL_HM_UNLOCK + calculateXP(level, tempxp, 2, skill);
-    ;
+    return cost + calculateXP(level, tempXP, 2, skill, priority);
   }
-  if (unlock == 2) {
+  if (unlock === 2) {
     //everything is unlocked
-    var rounds = calculateRoundsXP(level, bxp, PHM);
-    $("#breakdownxp").append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(rounds * PARTHM));
+    const rounds = calculateRoundsXP(level, bxp, PHM);
+    const cost = rounds * PARTHM * priorityMultiplier;
+    $("#breakdownxp").append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(cost));
     $("#breakdownxp").append($(document.createElement('br')));
     $("#counter").val(parseInt($("#counter").val()) + parseInt(rounds * PHM));
-    return PARTHM * rounds;
+    return cost;
   }
   return -1;
 }
 
 function calculateRoundsXP(level, bxp, PHM) {
   //the amount of rounds of 6-9s needed
-  var xp = PHM;
-  var rounds = 1;
+  const xp = PHM;
+  const rounds = 1;
   if (bxp - xp <= 0) {
     return rounds;
   }
@@ -1092,25 +1128,21 @@ function fetchlevel(name, skill) {
 
 //get silverhawk prices
 function getprice(level) {
-  //http://services.runescape.com/m=itemdb_rs/api/graph/30915.json
   $("#silverhawk").show();
   //see if it's empty (no need to load it again
-  if ($("#silverhawkhidden").text().length == 0) {
+  if ($("#silverhawkhidden").text().length === 0) {
     $("#silverhawk").html("Loading silverhawk data...");
     requestCrossDomain(window.location.origin + '/api/getprice/30915', function (results) {
       $("#silverhawk").empty();
       $("#silverhawkhidden").empty();
-      //$("#silverhawkhidden").show();
 
       $("#silverhawkhidden").append(results);
       if ($("#silverhawkhidden").text().length == 0) {
-        //console.log(results);
         $("#silverhawk").empty();
         $("#silverhawk").html("Error getting Silverhawk prices");
       } else {
-        var array = $("#silverhawkhidden").text().split(':');
-        //alert(array[181]);
-        var price = array[181].split('}');
+        const array = $("#silverhawkhidden").text().split(':');
+        const price = array[181].split('}');
         $("#silverhawk").append("GP/Silverhawk: " + commaSeparateNumber(price[0]));
         $("#silverhawk").append($(document.createElement('br')));
         $("#silverhawk").append("XP/feather: " + silverhawkxp(level));
@@ -1118,41 +1150,10 @@ function getprice(level) {
         $("#silverhawk").append("GP/XP (at your level): " + (price[0] / silverhawkxp(level)).toFixed(2));
       }
     });
-    /*
-			$.ajax({
-                   url: 'http://services.runescape.com/m=itemdb_rs/api/graph/30915.json',
-                   type: 'GET',
-                   success: function(res) {
-                       $("#silverhawk").empty();
-                       $("#silverhawkhidden").empty();
-                       //$("#silverhawkhidden").show();
-
-                       $("#silverhawkhidden").append(res.responseText);
-                        if ($("#silverhawkhidden").text().length == 0){
-                           console.log(res.responseText);
-                           $("#silverhawk").empty();
-                           $("#silverhawk").html("Error getting Silverhawk prices");
-                        }else{
-                           var array = $("#silverhawkhidden").text().split(':');
-                           //alert(array[181]);
-                           var price = array[181].split('}');
-                           $("#silverhawk").append("GP/Silverhawk: "+commaSeparateNumber(price[0]));
-                           $("#silverhawk").append($(document.createElement('br')));
-                           $("#silverhawk").append("XP/feather: "+silverhawkxp(level));
-                           $("#silverhawk").append($(document.createElement('br')));
-                           $("#silverhawk").append("GP/XP (at your level): "+(price[0]/silverhawkxp(level)).toFixed(2));
-                    }
-                   },
-                   failure: function(){
-                        $("#silverhawk").empty();
-                        $("#silverhawk").html("Error getting Silverhawk prices");
-                   }
-            });*/
   } else {
     $("#silverhawk").empty();
-    var array = $("#silverhawkhidden").text().split(':');
-    //alert(array[181]);
-    var price = array[181].split('}');
+    const array = $("#silverhawkhidden").text().split(':');
+    const price = array[181].split('}');
     $("#silverhawk").append("GP/Silverhawk: " + commaSeparateNumber(price[0]));
     $("#silverhawk").append($(document.createElement('br')));
     $("#silverhawk").append("XP/feather: " + silverhawkxp(level));
@@ -1162,9 +1163,9 @@ function getprice(level) {
 }
 
 function silverhawkxp(level) {
-  var lvl = level;
-  if (level == 99) lvl = 98;
-  var xp = [0, 6.2, 6.9, 7.7, 8.5, 9.3, 10.4, 12.3, 12.7, 19.4, 15.3, 17.0, 18.8, 20.5, 22.9, 25.2, 26.1, 27.4, 28.5, 29.8, 31.0, 32.4, 33.7, 35.2, 36.7, 38.4, 39.9, 40.5, 41.4, 45.3, 47.3, 49.3, 51.4, 53.6, 55.9, 58.3, 60.8, 63.5, 66.2, 69.1, 72.0, 75.2, 78.4, 81.8, 85.3, 88.9, 92.9, 97.0, 101.2, 105.5, 110.1, 114.8, 120.0, 124.9, 130.4, 136.2, 142.4, 148.5, 154.6, 161.5, 168.4, , 175.7, 183.5, 191.1, 200.4, 210.8, 217.1, 226.9, 237.9, 247.0, 259.2, 269.3, 281, 294.7, 308.2, 321.4, 333.9, 349.6, 364.8, 379.3, 398, 416.6, 434.8, 452.2, 491.9, 515, 537.6, 559.3, 592.3, 612.2, 661.5, 692.9, 692.9, 723.6, 753.3, 806.5, 834.8, 860.2];
+  let lvl = level;
+  if (parseInt(level) === 99) lvl = 98;
+  const xp = [0, 6.2, 6.9, 7.7, 8.5, 9.3, 10.4, 12.3, 12.7, 19.4, 15.3, 17.0, 18.8, 20.5, 22.9, 25.2, 26.1, 27.4, 28.5, 29.8, 31.0, 32.4, 33.7, 35.2, 36.7, 38.4, 39.9, 40.5, 41.4, 45.3, 47.3, 49.3, 51.4, 53.6, 55.9, 58.3, 60.8, 63.5, 66.2, 69.1, 72.0, 75.2, 78.4, 81.8, 85.3, 88.9, 92.9, 97.0, 101.2, 105.5, 110.1, 114.8, 120.0, 124.9, 130.4, 136.2, 142.4, 148.5, 154.6, 161.5, 168.4, , 175.7, 183.5, 191.1, 200.4, 210.8, 217.1, 226.9, 237.9, 247.0, 259.2, 269.3, 281, 294.7, 308.2, 321.4, 333.9, 349.6, 364.8, 379.3, 398, 416.6, 434.8, 452.2, 491.9, 515, 537.6, 559.3, 592.3, 612.2, 661.5, 692.9, 692.9, 723.6, 753.3, 806.5, 834.8, 860.2];
   return xp[lvl];
 }
 
@@ -1305,6 +1306,7 @@ function reset() {
   $("#enhancercontainer").show();
   $("#pointsrequest").html("Request this leech");
   $("#pointsrequest").attr("disabled", true);
+  updateunlock();
 }
 
 function updateunlock() {
@@ -1326,32 +1328,37 @@ function updateunlock() {
   $("#unlockstatus").val(unlock);
 }
 
-function calculateking(ironman) {
-  var cost = 0;
-  var unlock = parseInt($("#unlockstatus").val());
+function calculateking(ironman, priority) {
+  let cost = 0;
+  let unlock = parseInt($("#unlockstatus").val());
+  const priorityMultiplier = priority? PRIORITY_MULTIPLIER : 1;
   switch (unlock) {
     case 0:
-      cost = cost + QUEEN + FULL_HM_UNLOCK + KING;
+      cost = cost + priorityMultiplier * QUEEN;
       updateunlock(1);
-      $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
+      $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN * priorityMultiplier));
       $("#breakdown").append($(document.createElement('br')));
-      break;
+      // no break intentional
     case 1:
-      cost = cost + FULL_HM_UNLOCK + KING;
+      const unlockCost = (ironman? FULL_HM_IRON : FULL_HM_UNLOCK) * priorityMultiplier;
+      cost =  cost + unlockCost;
       updateunlock(2);
-      break;
+      $("#breakdown").append("1x&nbsp; 1-9HM unlock &nbsp;" + commaSeparateNumber(unlockCost));
+      $("#breakdown").append($(document.createElement('br')));
     default:
-      cost = cost + KING;
+      cost =  cost + Math.min(KING * priorityMultiplier, KING_CAP);
       updateunlock(3);
+      $("#breakdown").append("1x&nbsp; King kill &nbsp;" + commaSeparateNumber(Math.min(KING * priorityMultiplier, KING_CAP)));
+      $("#breakdown").append($(document.createElement('br')));
   }
   return cost;
 }
 
-function calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, ironman) {
-  var cost = 0;
+function calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, ironman, priority) {
+  let cost = 0;
   $("#breakdown").append("Attacker role");
   $("#breakdown").append($(document.createElement('br')));
-  cost = cost + calculateP(needApoints, 'a', $("#unlockstatus").val(), ironman);
+  cost = cost + calculateP(needApoints, 'a', $("#unlockstatus").val(), ironman, priority);
   $("#excess").val(parseInt($("#excess").val()) + parseInt($("#actual").val()) - needApoints); //works out how much excess points there are
   $("#breakdown").append($(document.createElement('br')));
   $("#breakdown").append($(document.createElement('br')));
@@ -1374,7 +1381,7 @@ function calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, iro
     $("#excess").val(parseInt($("#excess").val()) - HMCOL);
     needCpoints -= HMCOL;
   }
-  cost = cost + calculateP(needCpoints, 'c', $("#unlockstatus").val(), ironman);
+  cost = cost + calculateP(needCpoints, 'c', $("#unlockstatus").val(), ironman, priority);
   $("#excess").val(parseInt($("#excess").val()) + parseInt($("#actual").val()) - needCpoints); //works out how much excess points there are
   $("#breakdown").append($(document.createElement('br')));
   $("#breakdown").append($(document.createElement('br')));
@@ -1397,7 +1404,7 @@ function calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, iro
     $("#excess").val(parseInt($("#excess").val()) - HMDEF);
     needDpoints -= HMDEF;
   }
-  cost = cost + calculateP(needDpoints, 'd', $("#unlockstatus").val(), ironman);
+  cost = cost + calculateP(needDpoints, 'd', $("#unlockstatus").val(), ironman, priority);
   $("#excess").val(parseInt($("#excess").val()) + parseInt($("#actual").val()) - needDpoints); //works out how much excess points there are
   $("#breakdown").append($(document.createElement('br')));
   $("#breakdown").append($(document.createElement('br')));
@@ -1420,13 +1427,13 @@ function calculatepoints(needApoints, needDpoints, needCpoints, needHpoints, iro
     $("#excess").val(parseInt($("#excess").val()) - HMHEAL);
     needHpoints -= HMHEAL;
   }
-  cost = cost + calculateP(needHpoints, 'h', $("#unlockstatus").val(), ironman);
+  cost = cost + calculateP(needHpoints, 'h', $("#unlockstatus").val(), ironman, priority);
   $("#excess").val(parseInt($("#excess").val()) + parseInt($("#actual").val()) - needHpoints); //works out how
   return cost;
 }
 
 //calculates the amount of points from kings
-function calculateinsignia(points, role, kingskilled) {
+function calculateinsignia(points, role, kingskilled, priority) {
   var NM = 0;
   var PHM = 0;
   var FHM = 0;
@@ -1452,48 +1459,50 @@ function calculateinsignia(points, role, kingskilled) {
       FHM = HMHEAL;
       break;
   }
-  var cost = 0;
-  var newunlock = $("#unlockstatus").val();
-  var temp = points;
-  var pointsneeded = points;
-  if (newunlock == 0) {
-    temp = temp - NM;
+  let cost = 0;
+  let newunlock = parseInt($("#unlockstatus").val());
+  let temp = points;
+  let pointsneeded = points;
+
+  const priorityMultiplier = (priority? PRIORITY_MULTIPLIER : 1);
+  if (newunlock === 0) {
+    temp -= NM;
     newunlock = 1;
-    $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
+    $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(priorityMultiplier * QUEEN));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(1);
     $("#actual").val(parseInt($("#actual").val()) + NM);
-    cost = cost + QUEEN;
+    cost = cost + priorityMultiplier * QUEEN;
   }
-  if (newunlock == 1) {
-    temp = temp - FHM;
+  if (newunlock === 1) {
+    temp -= FHM;
     newunlock = 2;
-    $("#breakdown").append("1x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(FULL_HM_UNLOCK));
+    $("#breakdown").append("1x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(priorityMultiplier * FULL_HM_UNLOCK));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(2);
     $("#actual").val(parseInt($("#actual").val()) + FHM);
-    cost = cost + FULL_HM_UNLOCK;
+    cost = cost + priorityMultiplier * FULL_HM_UNLOCK;
   }
   if (newunlock >= 2) {
     var rounds = 5 - kingskilled;
     temp = temp - rounds * KINGP;
-    $("#breakdown").append(rounds + "x&nbsp; King &nbsp;" + commaSeparateNumber(rounds * KING));
+    $("#breakdown").append(rounds + "x&nbsp; King &nbsp;" + commaSeparateNumber(rounds * Math.min(KING * priorityMultiplier, KING_CAP)));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(2);
     $("#actual").val(parseInt($("#actual").val()) + rounds * KINGP);
-    cost = cost + rounds * KING;
-    cost = cost + calculateP(temp, role, newunlock, false);
+    cost = cost + rounds * Math.min(KING * priorityMultiplier, KING_CAP);
+    cost = cost + calculateP(temp, role, newunlock, false, priority);
   }
   $("#excess").val(parseInt($("#actual").val()) - pointsneeded);
   return cost;
 }
 
-function calculateP(points, role, unlock, ironman) {
+function calculateP(points, role, unlock, ironman, priority) {
   if (points <= 0) return 0; //sanity check
 
-  var NM = 0;
-  var PHM = 0;
-  var FHM = 0;
+  let NM = 0;
+  let PHM = 0;
+  let FHM = 0;
   switch (role) {
     case 'a':
       NM = NMATT;
@@ -1516,47 +1525,54 @@ function calculateP(points, role, unlock, ironman) {
       FHM = HMHEAL;
       break;
   }
+
+  const priorityMultiplier = priority? PRIORITY_MULTIPLIER : 1;
+  const breakdown = $("#breakdown");
   if (unlock == 0) {
-    var temp = points - NM;
-    $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(QUEEN));
+    const temp = points - NM;
+    const cost = priorityMultiplier * QUEEN;
+    $("#breakdown").append("1x&nbsp; 1-10NM &nbsp;" + commaSeparateNumber(cost));
     $("#breakdown").append($(document.createElement('br')));
     $("#unlockstatus").val(1);
     $("#actual").val(parseInt($("#actual").val()) + NM);
-    return QUEEN + calculateP(temp, role, 1, ironman); //rerun but now hm is unlocked
+    return cost + calculateP(temp, role, 1, ironman, priority); //rerun but now hm is unlocked
   }
   if (ironman) {
-    var rounds = calculateFullRounds(points, FHM, ironman);
-    $("#breakdown").append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(rounds * IRON_POINTS));
-    $("#breakdown").append($(document.createElement('br')));
+    const rounds = calculateFullRounds(points, FHM, ironman);
+    const cost = rounds * priorityMultiplier * FULL_HM_IRON;
+    breakdown.append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(cost));
+    breakdown.append($(document.createElement('br')));
     $("#unlockstatus").val(2);
-    return rounds * IRON_POINTS;
+    return cost;
   }
   if (unlock == 1) {
-    var rounds = calculateFullRounds(points, FHM, ironman);
-    var temp = points - rounds * FHM;
-    $("#breakdown").append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(rounds * FULL_HM_UNLOCK));
-    $("#breakdown").append($(document.createElement('br')));
+    const rounds = calculateFullRounds(points, FHM, ironman);
+    const temp = points - rounds * FHM;
+    const cost = rounds * priorityMultiplier * FULL_HM_UNLOCK;
+    breakdown.append(rounds + "x&nbsp; 1-9HM &nbsp;" + commaSeparateNumber(cost));
+    breakdown.append($(document.createElement('br')));
     $("#unlockstatus").val(2);
-    return rounds * FULL_HM_UNLOCK + calculateP(temp, role, 2, ironman);
+    return cost + calculateP(temp, role, 2, ironman, priority);
   }
   if (unlock >= 2) {
     //everything is unlocked
-    var enhancer = $("#enhancer_h").val()
+    const enhancer = $("#enhancer_h").val();
     if (enhancer > 0) {
-      $("#breakdown").append("---Enhancer charges would be used here");
-      $("#breakdown").append($(document.createElement('br')));
+      breakdown.append("---Enhancer charges would be used here");
+      breakdown.append($(document.createElement('br')));
     }
-    var rounds = calculateRounds(points, PHM);
-    $("#breakdown").append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(rounds * POINTS_PART));
-    return POINTS_PART * rounds;
+    const rounds = calculateRounds(points, PHM);
+    const cost = rounds * priorityMultiplier * POINTS_PART;
+    breakdown.append(rounds + "x&nbsp; 6-9HM &nbsp;" + commaSeparateNumber(cost));
+    return cost;
   }
 }
 
 function calculateFullRounds(points, FHM, ironman) {
   //the amount of rounds of 1-9s needed (if ironman)
   if (!ironman) return 1;
-  var rounds = 1;
-  var roundpoints = FHM;
+  let rounds = 1;
+  let roundpoints = FHM;
   if ($("#enhancer_h").val() > 0) {
     //only consume 4 charges
     roundpoints = parseInt((roundpoints) + (roundpoints * Math.min($("#enhancer_h").val(), 9)) / 9);
@@ -1623,8 +1639,8 @@ function submitform(button) {
   var form = $(button).parents('form:first');
 
   //encode inputs
-  $("#points_rsn").val(encode($("#points_rsn").val()));
-  $("#rsn").val(encode($("#rsn").val()));
+  $("#points_rsn").val($("#points_rsn").val());
+  $("#rsn").val($("#rsn").val());
   form.submit();
 }
 
@@ -1670,16 +1686,41 @@ function showtab(option) {
   loadpreset();
 }
 
-function encode(str) {
-  var badwords = ["poker"];
-  var encoded = str;
-  for (var i = 0; i < badwords.length; i++) {
-    var badword = badwords[i];
-    if ((str.toLowerCase()).includes(badword)) {
-      //encode it, include a backslash somewhere
-      var pos = str.indexOf(badword) + 1;
-      encoded = [str.slice(0, pos), "/", str.slice(pos)].join('');
-    }
-  }
-  return encoded;
+function createSpace() {
+  return $(document.createElement('br'));
+}
+
+
+// creates a priority radio group with yes no
+function createRadioGroup(label, name) {
+  const priority = $(document.createElement('div')).attr({id: name+"-container", style: ""});
+  priority.append(label);
+
+  const tooltip = $(document.createElement('div')).attr({class: 'tooltip'});
+  tooltip.append('?');
+  const tooltipText = $(document.createElement('span')).attr({class: 'tooltiptext'});
+  tooltipText.append("Priority leeching will increase your price by 1.5 times and move you to the top of the queue, increasing your chances of leeching sooner than other customers");
+  tooltip.append(tooltipText);
+  priority.append(tooltip);
+
+  const priorityYes = $(document.createElement('input')).attr({
+    type: "radio",
+    id: name+"-y",
+    name: name,
+    value: "yes"
+  });
+  const priorityNo = $(document.createElement('input')).attr({
+    type: "radio",
+    id: name+"-n",
+    name: name,
+    value: "no",
+    checked: "checked"
+  });
+  priority.append($(document.createElement('span')).attr({style: "padding: 0 10px;"}));
+  priority.append("Yes ");
+  priority.append(priorityYes);
+  priority.append($(document.createElement('span')).attr({style: "padding: 0 10px;"}));
+  priority.append("No ");
+  priority.append(priorityNo);
+  return priority;
 }
