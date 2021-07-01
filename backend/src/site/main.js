@@ -21,16 +21,15 @@ exports.run = function (database, getQueueChannel) {
     const app = express();
     app.use(compression());
 
-    const allowedOrigins = ['http://' + HOST, 'http://localhost', 'http://localhost:4200', 'http://' + URL,
-        'http://ubitquitin.github.io'
-    ];
+    const allowedOrigins = [HOST, 'localhost', 'localhost:4200', URL, 'ubitquitin.github.io'];
 
     app.use(cors({
         origin: function(origin, callback){
             // allow requests with no origin
             // (like mobile apps or curl requests)
             if(!origin) return callback(null, true);
-            if(allowedOrigins.indexOf(origin) === -1){
+            const protocol = /^((https|http):\/\/)?/;
+            if(allowedOrigins.indexOf(origin.replace(protocol, '')) === -1){
                 const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
                 return callback(new Error(msg), false);
             }
