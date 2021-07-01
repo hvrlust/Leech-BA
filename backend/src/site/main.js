@@ -195,7 +195,7 @@ exports.run = function (database, getQueueChannel) {
     app.post('/api/v1/queue', async (req, res) => {
         if (req.session.user || req.body && await database.isValidApiToken(req.body.token) || req.query && await
             database.isValidApiToken(req.query.token)) {
-            await res.json({response: await database.getSimpleQueue(), update: await database.getLastUpdate()});
+            await res.json({queue: await database.getSimpleQueue()});
         } else {
             res.status(403).json({error: 'invalid access'});
         }
@@ -203,7 +203,7 @@ exports.run = function (database, getQueueChannel) {
 
     app.get('/api/mgw/queue', async (req, res) => {
         if (req.session.user) {
-            await res.json({queue: await database.getQueue(true)});
+            await res.json({queue: await database.getQueue(true), update: await database.getLastUpdate()});
         } else {
             res.status(403).json({error: 'not logged in'});
         }
