@@ -21,9 +21,10 @@ exports.run = function (database, getQueueChannel) {
     const app = express();
     app.use(compression());
 
-    //app.use('/', router);
+    const allowedOrigins = ['http://' + HOST, 'http://localhost', 'http://localhost:4200', 'http://' + URL,
+        'http://ubitquitin.github.io'
+    ];
 
-    const allowedOrigins = ['http://' + HOST, 'http://localhost', 'http://' + URL];
     app.use(cors({
         origin: function(origin, callback){
             // allow requests with no origin
