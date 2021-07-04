@@ -21,7 +21,7 @@ exports.run = function (database, getQueueChannel) {
     const app = express();
     app.use(compression());
 
-    const allowedOrigins = [HOST, 'localhost', 'localhost:4200', URL, 'ubitquitin.github.io'];
+    const allowedOrigins = [HOST, 'localhost', 'localhost:4200', 'localhost:8080', URL, 'ubitquitin.github.io'];
 
     app.use(cors({
         origin: function(origin, callback){
@@ -328,7 +328,7 @@ exports.run = function (database, getQueueChannel) {
           Ironman: ${req.body.ironman} (${req.body.hm10tickets} tickets)
           BA completed up to: ${progress}
           Enhancer charges: ${req.body.charges} charges
-          
+
           Net:`;
 
         if (
@@ -360,8 +360,8 @@ exports.run = function (database, getQueueChannel) {
             prologue += "\n";
             prologue += `
               Levels:
-              Current: A[L${req.body.has.attackerLvl},${req.body.has.attackerPts}] C[L${req.body.has.collectorLvl},${req.body.has.collectorPts}] D[L${req.body.has.defenderLvl},${req.body.has.defenderPts}] H[L${req.body.has.healerLvl},${req.body.has.healerPts}] 
-              Needs: A[L${req.body.lvls.needAttLvl}] C[L${req.body.lvls.needColLvl}] D[L${req.body.lvls.needDefLvl}] H[L${req.body.lvls.needHealLvl}] 
+              Current: A[L${req.body.has.attackerLvl},${req.body.has.attackerPts}] C[L${req.body.has.collectorLvl},${req.body.has.collectorPts}] D[L${req.body.has.defenderLvl},${req.body.has.defenderPts}] H[L${req.body.has.healerLvl},${req.body.has.healerPts}]
+              Needs: A[L${req.body.lvls.needAttLvl}] C[L${req.body.lvls.needColLvl}] D[L${req.body.lvls.needDefLvl}] H[L${req.body.lvls.needHealLvl}]
             `;
         }
 

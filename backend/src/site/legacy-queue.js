@@ -49,10 +49,17 @@ function process(req, database, getQueueChannel) {
 async function processQueueReq(mail, database, queueChannel) {
     let month = ('0' + (new Date().getMonth() + 1)).slice(-2);
     let date = ('0' + new Date().getDate()).slice(-2);
+    let data = mail.text;
+
+    let priority = "";
+    let priosimple = "";
+    if (data.priority && data.priority === "yes") {
+        priority = "Priority: yes\n";
+        priosimple = " (PRIO)";
+    }
 
     // XP REQUEST =================================================================================================================================================
     if (mail.subject === "xp") {
-        let data = mail.text;
         //filter ba
         let ba;
         switch (data.ba) {
@@ -76,12 +83,8 @@ async function processQueueReq(mail, database, queueChannel) {
 
         amount = nFormatter(amount, 2);
         let rsn_bxp = data.rsn;
-        let s0 = "RSN: " + data.rsn + "\nLeech: BXP\nSkill: " + data.skill + "\nLevel: " + data.level + "\nAmount: " + data.amount + "\nBA completed up to: " + ba +  "\n";
-        if ('priority' in data && data.priority) {
-            s0 += "Priority: " + data.priority + '\n';
-        }
-            s0 += "\n\n";
-        let s1 = "Summary: \n" + date + "/" + month + ": " + rsn_bxp + " - " + amount + " " + data.skill + " bxp " + ba + "\n\n";
+        let s0 = "RSN: " + data.rsn + "\nLeech: BXP\nSkill: " + data.skill + "\nLevel: " + data.level + "\nAmount: " + data.amount + "\nBA completed up to: " + ba +  "\n" + priority + "\n\n";
+        let s1 = "Summary: \n" + date + "/" + month + ": " + rsn_bxp + " - " + amount + " " + data.skill + " bxp " + ba + priosimple;
 
         return queueChannel.send("```" + s0 + s1 + "```")
             .then(m => m.pin())
@@ -90,7 +93,6 @@ async function processQueueReq(mail, database, queueChannel) {
 
     // ITEM REQUEST =================================================================================================================================================
     if (mail.subject === "item") {
-        let data = mail.text;
         let ba;
         let current = "";
         let need = "";
@@ -205,8 +207,6 @@ async function processQueueReq(mail, database, queueChannel) {
             if (!insignia) {
                 leech_simple = n;
             }
-            if (data.enhancer > 0)
-                enhancer = " (" + data.enhancer + " charges)"
         }
 
         if (leech.includes("insignia")) {
@@ -223,27 +223,27 @@ async function processQueueReq(mail, database, queueChannel) {
             switch (temp[1]) {
                 case 'A':
                     leech = "Attacker's insignia";
-                    leech_simple = ":BA_A: Insignia";
+                    leech_simple = "Att Insignia";
                     points = needA;
-                    role = ":BA_A:";
+                    role = "att";
                     break;
                 case 'C':
                     leech = "Collector's insignia";
-                    leech_simple = ":BA_C: Insignia";
+                    leech_simple = "Coll Insignia";
                     points = needC;
-                    role = ":BA_C:";
+                    role = "coll";
                     break;
                 case 'D':
                     leech = "Defender's insignia";
-                    leech_simple = ":BA_D: Insignia";
+                    leech_simple = "Def Insignia";
                     points = needD;
-                    role = ":BA_D:";
+                    role = "def";
                     break;
                 case 'H':
                     leech = "Healer's insignia";
-                    leech_simple = ":BA_H: Insignia";
+                    leech_simple = "Heal Insignia";
                     points = needH;
-                    role = ":BA_H:";
+                    role = "heal";
                     break;
             }
             if (kingsneeded > 0) {
@@ -279,20 +279,24 @@ async function processQueueReq(mail, database, queueChannel) {
             ironsimple = " (Ironman)";
         }
 
+        let enhancersimple = "";
+        if (data.enhancer > 0) {
+            enhancer = "Enhancer charges: " + data.enhancer + " charges\n";
+            enhancersimple = " (" + data.enhancer + " charges)";
+        }
+
         let s0 = "RSN: " + data.rsn + "\nLeech: " + leech + "\n";
         s0 += current;
         s0 += need;
         s0 += net;
         s0 += ironman;
-        if (data.enhancer > 0) s0 += "Enhancer charges:" + enhancer.replace(/[{()}]/g, '') + "\n";
+        s0 += enhancer;
         s0 += "BA completed up to:" + ba.replace(/[{()}]/g, '') + "\n";
+        s0 += priority;
+        s0 += "\n\n";
 
-        if('priority' in data && data.priority) {
-            s0 += "Priority: " + data.priority + "\n";
-            s0 += "\n\n";
-        }
+        let s1 = "Summary: \n" + date + "/" + month + ": " + data.rsn + " - " + leech_simple + ironsimple + enhancersimple + ba + priosimple;
 
-        let s1 = "Summary: \n" + date + "/" + month + ": " + data.rsn + " - " + leech_simple + ironsimple + enhancer + ba + "\n\n";
         return queueChannel.send("```" + s0 + s1 + "```")
             .then(m => m.pin());
     }
