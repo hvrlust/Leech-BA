@@ -181,3 +181,11 @@ CREATE TABLE commands_roles
     FOREIGN KEY (command_id) REFERENCES commands (id) ON DELETE CASCADE,
     UNIQUE (command_id, role)
 );
+
+DROP TABLE IF EXISTS api_tokens;
+CREATE TABLE api_tokens
+(
+    id INTEGER PRIMARY KEY,
+    token TEXT NOT NULL,
+    user TEXT NOT NULL
+);

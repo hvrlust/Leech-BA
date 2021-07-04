@@ -209,6 +209,10 @@ class Database {
         }
     }
 
+    async getSimpleQueue() {
+        return await this.db.getAllAsync(`SELECT id, date, rsn, services, ba FROM queue ORDER by id asc`);
+    }
+
     async getSplits() {
         return await this.db.getAllAsync(`SELECT * FROM splits`);
     }
@@ -296,6 +300,11 @@ class Database {
 
     async loadCommands() {
         return await this.db.getAllAsync(`SELECT commands.command, commands.response, commands.description, commands.delete_after, GROUP_CONCAT(roles.role) as roles FROM commands LEFT OUTER JOIN commands_roles roles ON commands.id = roles.command_id GROUP BY commands.id`, []);
+    }
+
+    async isValidApiToken(token) {
+        if (token == null) return false;
+        return await this.db.getAsync(`SELECT 1 from api_tokens WHERE token=?`, [token]) !== undefined;
     }
 
     close() {
