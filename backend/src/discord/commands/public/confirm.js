@@ -24,16 +24,16 @@ module.exports = {
                     });
                     await message.channel.send('Confirmed.  Remember to confirm with the customer in FC/CC.');
                 } else {
-                    const userRequests = messages.filter(m => m.content.toLowerCase().includes(args[1].toLowerCase()));
+                    const userRequests = messages.filter(m => m.author.bot && m.content.toLowerCase().includes(args[1].toLowerCase()));
 
                     if (userRequests.size === 0) {
                         await message.channel.send('No request exists.');
                         await message.delete();
                     } else {
-                        var rsns = [];
+                        let rsns = [];
                         userRequests.forEach(function (m) {
-                            var firstLine = m.content.split('\n')[0];
-                            var rsn = firstLine.split('RSN: ')[1];
+                            let firstLine = m.content.split('\n')[0];
+                            let rsn = firstLine.split('RSN: ')[1];
                             rsns.push(rsn);
                             m.unpin().catch(error => {
                                 console.log('error from fetching pinned messages in confirm ' + rsn + error);
