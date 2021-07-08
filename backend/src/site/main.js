@@ -21,15 +21,16 @@ exports.run = function (database, getQueueChannel) {
     const app = express();
     app.use(compression());
 
-    const allowedOrigins = [HOST, 'localhost', 'localhost:4200', 'localhost:8080', URL, 'ubitquitin.github.io'];
+    const allowedOrigins = [HOST, 'localhost', 'localhost:4200', 'localhost:8080', URL, 'ubitquitin.github.io',
+        'lbahosthelper.web.app'];
 
     app.use(cors({
-        origin: function(origin, callback){
+        origin: function (origin, callback) {
             // allow requests with no origin
             // (like mobile apps or curl requests)
-            if(!origin) return callback(null, true);
+            if (!origin) return callback(null, true);
             const protocol = /^((https|http):\/\/)?/;
-            if(allowedOrigins.indexOf(origin.replace(protocol, '')) === -1){
+            if (allowedOrigins.indexOf(origin.replace(protocol, '')) === -1) {
                 const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
                 return callback(new Error(msg), false);
             }
@@ -381,20 +382,20 @@ exports.run = function (database, getQueueChannel) {
         ) {
             prologue += "\n";
             prologue += `
-Items:
-  Hats: ${req.body.items.hats}
-  Boots: ${req.body.items.boots}
-  Gloves: ${req.body.items.gloves}
-  Torso: ${req.body.items.torso}
-  Skirt: ${req.body.items.skirt}
-  Trident: ${req.body.items.trident}
-  Master Trident: ${req.body.items.masterTrident}
-  Armour Patches: ${req.body.items.armourPatches}
-  Attacker Insignia: ${req.body.items.attackerInsignia}
-  Defender Insignia: ${req.body.items.defenderInsignia}
-  Healer Insignia: ${req.body.items.healerInsignia}
-  Collector Insignia: ${req.body.items.collectorInsignia}
-      `;
+                Items:
+                  Hats: ${req.body.items.hats}
+                  Boots: ${req.body.items.boots}
+                  Gloves: ${req.body.items.gloves}
+                  Torso: ${req.body.items.torso}
+                  Skirt: ${req.body.items.skirt}
+                  Trident: ${req.body.items.trident}
+                  Master Trident: ${req.body.items.masterTrident}
+                  Armour Patches: ${req.body.items.armourPatches}
+                  Attacker Insignia: ${req.body.items.attackerInsignia}
+                  Defender Insignia: ${req.body.items.defenderInsignia}
+                  Healer Insignia: ${req.body.items.healerInsignia}
+                  Collector Insignia: ${req.body.items.collectorInsignia}
+            `;
         }
 
         getQueueChannel().then(queueChannel => {
