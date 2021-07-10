@@ -21,6 +21,8 @@ RUN ./node_modules/.bin/node-pre-gyp install --directory=./node_modules/sqlite3 
 RUN ./node_modules/.bin/node-pre-gyp install --directory=./node_modules/sqlite3 --target_platform=win32 --target_arch=ia32 --target=10.15.0
 
 WORKDIR /usr/src/webapp
+# remove cache clean after bu
+RUN npm cache clean --forceild fixed
 RUN npm i typescript@3.1.6 --save-dev --save-exact && npm install
 COPY ./webapp ./
 RUN npm run ng config cli.warnings.typescriptMismatch false
