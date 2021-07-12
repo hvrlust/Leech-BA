@@ -36,3 +36,12 @@ a > img:hover {
   -webkit-box-shadow: 0 0 9px #262626;
   border-radius: 100%;
 }
+
+.grid-bottom {
+  padding-top: 4rem;
+}
+
+.grid-left {
+  width: 100%;
+  text-align: left;
+}
