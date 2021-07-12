@@ -10,8 +10,9 @@
       <a mat-button [routerLink]="['/calculator']" routerLinkActive="active">Calculator</a>
       <a mat-button [routerLink]="['/ranks']" routerLinkActive="active">Ranks</a>
       <a mat-button [routerLink]="['/queue']" routerLinkActive="active" *ngIf="user">Queue</a>
-<!--      <a mat-button [routerLink]="['/mgwqueue']" routerLinkActive="active" *ngIf="user">MGW Queue</a>-->
-      <a mat-button [routerLink]="['/splits']" routerLinkActive="active" *ngIf="user">Splits</a>
+      <!-- <a mat-button [routerLink]="['/mgwqueue']" routerLinkActive="active" *ngIf="user">MGW Queue</a> -->
+      <!-- <a mat-button [routerLink]="['/splits']" routerLinkActive="active" *ngIf="user">Splits</a> -->
+      <a mat-button href="https://docs.google.com/spreadsheets/d/1KpIFqRhV5m-5ycHPfOQKnavl0QzX267b7NjrWof3T2o/edit#gid=0" target="_blank">Splits</a>
       <a mat-button [routerLink]="['/']" routerLinkActive="active" *ngIf="user" (click)="logout()">Logout</a>
     </mat-toolbar-row>
   </mat-toolbar>
