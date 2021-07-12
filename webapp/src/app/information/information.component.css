@@ -11,6 +11,10 @@ ol li br {
 }
 
 a {
-  color: white;
+  color: rgb(168, 203, 243);
   text-decoration: underline;
+}
+
+.queue {
+  color:#e4b3f1;
 }
