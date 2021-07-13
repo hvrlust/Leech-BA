@@ -10,6 +10,27 @@
   border-radius: 10px 10px 0 0;
 }
 
+.column {
+  float: left;
+  height: 140px;
+}
+
+.left, .right {
+  width: 25%;
+}
+
+.middle {
+  width: 50%;
+}
+
+.lf-osrs {
+  margin-top: 8px;
+}
+
+.links-title {
+  margin-top: 0px;
+}
+
 @media (min-width: 576px) {
   .banner {
     width: 540px;
@@ -34,11 +55,8 @@ a > img:hover {
   border-radius: 100%;
 }
 
-.grid-bottom {
-  padding-top: 4rem;
-}
-
-.grid-left {
-  width: 100%;
-  text-align: left;
+@media (max-width: 576px) {
+  .column {
+    width: 100%;
+  }
 }
