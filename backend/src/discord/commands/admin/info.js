@@ -22,8 +22,7 @@ module.exports = {
                         "**1.** Prices and a calculator can be found [here](https://leechba.site/calculator). " +
                         "Please use \"Calculate\" then \"Request this leech\" buttons.\n\n" +
                         "**2.** After sending a queue request, ask in <#361546164530708480> or the CC for the " +
-                        "**@Q** role. Note that you will be added to the queue only AFTER a rank confirms your request. " +
-                        "You may use the \"/timezone\" command to add your timezone. Read " +
+                        "**@Q** role. Note that you will be added to the queue only AFTER a rank confirms your request. Read " +
                         "everything above the [FAQ](https://leechba.site/info).\n\n" +
                         "**3.** Change your nickname to your current RSN + make sure your Discord status is " +
                         "not set to offline. \n\n" +

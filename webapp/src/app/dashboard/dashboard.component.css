@@ -3,7 +3,6 @@
   height: 70px;
 }
 
-
 .banner {
   margin-left: -20px;
   margin-top: -10px;
@@ -26,8 +25,6 @@
     width: 900px;
   }
 }
-
-
 
 a > img:hover {
   -webkit-animation-name: hoverOver;
