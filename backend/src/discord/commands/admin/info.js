@@ -14,25 +14,26 @@ module.exports = {
                     name: "Welcome to the RS3 Leech Ba Discord Server",
                     icon_url: message.guild.iconURL
                 },
+                description: "Please read the following before asking any questions. Any further questions should be " +
+                "asked in <#361546164530708480>.",
                 fields: [{
-                    name: "Customer Information",
-                    value: "**1.** Please read the following asking any questions. Any further questions should be " +
-                        "asked in <#361546164530708480>. \n\n" +
-                        "**2.** Please change your nickname to your current RSN + make sure your Discord status is " +
-                        "not set to offline. \n\n" +
-                        "**3.** You are encouraged to **guest** in the CC '**Leech BA**'. Let us know if you are " +
-                        "not planning to do this.\n\n" +
-                        "**4.** Prices and a calculator can be found [here](https://leechba.site/calculator). " +
-                        "Please use \"request this leech\".\n\n" +
-                        "**5.** After sending a queue request, ask in <#361546164530708480> or the CC for the " +
-                        "**@customers** role. You may use the \"/timezone\" command to add your timezone. Read " +
+                    name: "\n\nCustomer Information",
+                    value:
+                        "**1.** Prices and a calculator can be found [here](https://leechba.site/calculator). " +
+                        "Please use \"Calculate\" then \"Request this leech\" buttons.\n\n" +
+                        "**2.** After sending a queue request, ask in <#361546164530708480> or the CC for the " +
+                        "**@Q** role. Note that you will be added to the queue only AFTER a rank confirms your request. Read " +
                         "everything above the [FAQ](https://leechba.site/info).\n\n" +
-                        "**6.** The leeching process: \n" +
+                        "**3.** Change your nickname to your current RSN + make sure your Discord status is " +
+                        "not set to offline. \n\n" +
+                        "**4.** You are encouraged to **guest** in the CC '**Leech BA**'. Let us know if you are " +
+                        "not planning to do this.\n\n" +
+                        "**5.** The leeching process: \n" +
                         "**>** When a team forms, the CC and Discord will be checked for available leeches\n" +
                         "**>** The host rank will post an open call for available customers\n" +
                         "**>** If you are available, respond with \"Yes\"\n" +
                         "**>** The host will take the 2 customers who are highest on the queue, with priority before standard"
-                },
+                    },
                     {
                         name: '\u200b',
                         value: '\u200b',
@@ -45,9 +46,9 @@ module.exports = {
                             "**-** Website:    [leechba.site](https://leechba.site)\n" +
                             "**-** Prices & Calculator:    [rs3.leechba.site](https://leechba.site/calculator)\n" +
                             "**-** Information & FAQ:    [info.leechba.site](https://leechba.site/info)\n" +
-                            "**-** Leeching King Guide:    [https://leechba.site/howtoleech](https://leechba.site/howtoleech)\n" +
+                            "**-** Leeching Guides:    [https://leechba.site/howtoleech](https://leechba.site/howtoleech), <#715317143448584194>\n" +
                             "**-** RSOF & Reviews:    " +
-                            "[QFC 194-195-569-64782885](http://services.runescape.com/m=forum/forums.ws?194,195,569,64782885)\n\n"
+                            "[QFC 194-195-569-64782885](http://services.runescape.com/m=forum/forums.ws?194,195,569,64782885), <#858765763292168212>\n\n"
                     }
                 ],
                 footer: {

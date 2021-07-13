@@ -3,12 +3,32 @@
   height: 70px;
 }
 
-
 .banner {
   margin-left: -20px;
   margin-top: -10px;
   width: 900px;
   border-radius: 10px 10px 0 0;
+}
+
+.column {
+  float: left;
+  height: 140px;
+}
+
+.left, .right {
+  width: 25%;
+}
+
+.middle {
+  width: 50%;
+}
+
+.lf-osrs {
+  margin-top: 8px;
+}
+
+.links-title {
+  margin-top: 0px;
 }
 
 @media (min-width: 576px) {
@@ -27,12 +47,16 @@
   }
 }
 
-
-
 a > img:hover {
   -webkit-animation-name: hoverOver;
   -webkit-animation-duration: 2s;
   -webkit-animation-iteration-count: 1;
   -webkit-box-shadow: 0 0 9px #262626;
   border-radius: 100%;
+}
+
+@media (max-width: 576px) {
+  .column {
+    width: 100%;
+  }
 }
