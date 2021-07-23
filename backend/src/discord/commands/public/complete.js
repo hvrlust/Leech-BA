@@ -14,14 +14,14 @@ module.exports = {
         leeches.forEach(leech => {
             //check they have role
             const member = message.guild.member(leech);
-            if (!hasRole(member, "Q")) {
-                message.channel.send(member.displayName + " does not have Q role to remove.");
+            if (!hasRole(member, "Queue")) {
+                message.channel.send(member.displayName + " does not have Queue role to remove.");
                 return;
             }
 
-            member.roles.remove(message.channel.guild.roles.cache.find(x => x.name === 'Q').id, "remove leech")
+            member.roles.remove(message.channel.guild.roles.cache.find(x => x.name === 'Queue').id, "remove leech")
                 .then(() => {
-                    message.channel.send(`Removed Q role from ${member}`);
+                    message.channel.send(`Removed Queue role from ${member}`);
                 }, (error) => {
                     message.channel.send("Error removing customer role.  Error: " + error.message);
                 });
