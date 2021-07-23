@@ -15,8 +15,8 @@ module.exports = {
         leeches.forEach(function (leech) {
             const rolesToAdd = [];
             const member = message.guild.member(leech);
-            if (!hasRole(member, "Q"))
-                rolesToAdd.push(rolesList.find(x => x.name === 'Q').id); //if they don't have the roles already
+            if (!hasRole(member, "Queue"))
+                rolesToAdd.push(rolesList.find(x => x.name === 'Queue').id); //if they don't have the roles already
 
             if (!hasRole(member, "customers"))
                 rolesToAdd.push(rolesList.find(x => x.name === 'customers').id);
