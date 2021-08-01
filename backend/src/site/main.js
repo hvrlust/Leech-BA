@@ -22,7 +22,7 @@ exports.run = function (database, getQueueChannel) {
     app.use(compression());
 
     const allowedOrigins = [HOST, 'localhost', 'localhost:4200', 'localhost:8080', URL, 'ubitquitin.github.io',
-        'lbahosthelper.web.app'];
+        'lbahosthelper.web.app', 'lbahost.herokuapp.com'];
 
     app.use(cors({
         origin: function (origin, callback) {
