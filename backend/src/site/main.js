@@ -196,7 +196,16 @@ exports.run = function (database, getQueueChannel) {
     app.post('/api/v1/queue', async (req, res) => {
         if (req.session.user || req.body && await database.isValidApiToken(req.body.token) || req.query && await
             database.isValidApiToken(req.query.token)) {
-            await res.json({queue: await database.getSimpleQueue()});
+            await res.json({queue: await database.getQueueV1()});
+        } else {
+            res.status(403).json({error: 'invalid access'});
+        }
+    });
+
+    app.post('/api/v2/queue', async (req, res) => {
+        if (req.session.user || req.body && await database.isValidApiToken(req.body.token) || req.query && await
+            database.isValidApiToken(req.query.token)) {
+            await res.json({queue: await database.getQueueV2()});
         } else {
             res.status(403).json({error: 'invalid access'});
         }
