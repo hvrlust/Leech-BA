@@ -210,7 +210,7 @@ class Database {
     }
 
     async getSimpleQueue() {
-        return await this.db.getAllAsync(`SELECT id, date, rsn, services, ba FROM queue ORDER by id asc`);
+        return await this.db.getAllAsync(`SELECT * FROM queue ORDER by id asc`);
     }
 
     async getSplits() {
@@ -334,4 +334,3 @@ class Database {
 }
 
 module.exports = Database;
-
