@@ -209,8 +209,12 @@ class Database {
         }
     }
 
-    async getSimpleQueue() {
-        return await this.db.getAllAsync(`SELECT * FROM queue ORDER by id asc`);
+    async getQueueV1() {
+        return await this.db.getAllAsync(`SELECT id, date, rsn, services, ba FROM queue ORDER by id asc`);
+    }
+
+    async getQueueV2() {
+        return await this.db.getAllAsync(`SELECT id, date, rsn, services, ba, notes, discord FROM queue ORDER by id asc`);
     }
 
     async getSplits() {
