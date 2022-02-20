@@ -13,6 +13,7 @@ exports.run = function (database, getQueueChannel) {
     const https = require('https');
     const fs = require('fs');
     const cors = require('cors');
+    const api = require("./api");
 
     // Constants
     const HOST = '0.0.0.0';
@@ -190,24 +191,6 @@ exports.run = function (database, getQueueChannel) {
             await res.json({response: await database.getQueue(), update: await database.getLastUpdate()});
         } else {
             res.status(403).json({error: 'not logged in'});
-        }
-    });
-
-    app.post('/api/v1/queue', async (req, res) => {
-        if (req.session.user || req.body && await database.isValidApiToken(req.body.token) || req.query && await
-            database.isValidApiToken(req.query.token)) {
-            await res.json({queue: await database.getQueueV1()});
-        } else {
-            res.status(403).json({error: 'invalid access'});
-        }
-    });
-
-    app.post('/api/v2/queue', async (req, res) => {
-        if (req.session.user || req.body && await database.isValidApiToken(req.body.token) || req.query && await
-            database.isValidApiToken(req.query.token)) {
-            await res.json({queue: await database.getQueueV2()});
-        } else {
-            res.status(403).json({error: 'invalid access'});
         }
     });
 
@@ -437,6 +420,7 @@ exports.run = function (database, getQueueChannel) {
         res.sendFile(legacy + '/main.html');
     });
 
+    app.use(api.api(database));
 
     // anything else
     // route for handling 404 requests(unavailable routes)
