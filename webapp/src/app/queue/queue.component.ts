@@ -37,7 +37,7 @@ export class QueueComponent {
     }
   };
   columnDefs = [
-    {headerName: '#', field: 'number', width: 28, cellClass: ['cell-wrap-text', 'cell-padding'] },
+    {headerName: '#', field: 'number', width: 46, cellClass: ['cell-wrap-text', 'cell-padding'] },
     {headerName: 'Date', field: 'date', width: 46, cellClass: ['cell-wrap-text', 'cell-padding'], comparator: this.dateComparator },
     {headerName: 'Rsn', field: 'rsn', width: 94, autoHeight: true, cellClass: ['cell-wrap-text', 'break-word', 'cell-padding']},
     {headerName: 'Services required', field: 'need', autoHeight: true, cellRendererFramework: ServiceComponent,
