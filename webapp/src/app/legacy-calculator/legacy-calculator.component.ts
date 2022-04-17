@@ -11,7 +11,7 @@ export class LegacyCalculatorComponent {
   constructor() {
     this.loadScript('https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js', false, false);
 
-    this.loadScript('assets/calculator-4.0.2.js', false, false);
+    this.loadScript('assets/calculator-4.1.1.js', false, false);
   }
 
   public loadScript(url, async, defer) {
