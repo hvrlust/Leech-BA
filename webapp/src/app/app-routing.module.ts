@@ -7,6 +7,7 @@ import { CustomReuseStrategy } from './routing';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SplitsComponent } from './splits/splits.component';
 import { LegacyCalculatorComponent } from './legacy-calculator/legacy-calculator.component';
+import { RequestConfirmationComponent } from './request-confirmation/request-confirmation.component';
 import { InformationComponent } from './information/information.component';
 import { LeechingGuideComponent } from './leeching-guide/leeching-guide.component';
 import { RankListComponent } from "./rank-list/rank-list.component";
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'howtoleech', component: LeechingGuideComponent },
   { path: 'ranks', component: RankListComponent },
   { path: 'calculator', component: LegacyCalculatorComponent },
+  { path: 'request-confirmation', component: RequestConfirmationComponent },
   { path: 'betacalculator', component: CalcComponent },
   { path: 'queue', component: QueueComponent },
   { path: 'mgwqueue', component: MgwQueueComponent },
