@@ -1,0 +1,24 @@
+ul {
+  list-style-position: inside;
+  text-align: left;
+}
+
+.request-confirmation{
+  text-align: left;
+}
+
+.link:link{
+  color:blue;
+}
+.link:visited{
+  color:blue;
+}
+.link:hover{
+  color:orange;
+}
+.link:focus{
+  color:blue;
+}
+.link:active{
+  color:blue;
+}

@@ -14,6 +14,7 @@ import { MAT_DATE_LOCALE } from '@angular/material';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SplitsModule } from './splits/splits.module';
 import { LegacyCalculatorComponent } from './legacy-calculator/legacy-calculator.component';
+import { RequestConfirmationComponent } from './request-confirmation/request-confirmation.component';
 import { InformationComponent } from './information/information.component';
 import { LeechingGuideComponent } from './leeching-guide/leeching-guide.component';
 import { RankListModule } from "./rank-list/rank-list.module";
@@ -24,6 +25,7 @@ import { CalcModule } from './calc/calc.module';
     AppComponent,
     DashboardComponent,
     LegacyCalculatorComponent,
+    RequestConfirmationComponent,
     InformationComponent,
     LeechingGuideComponent,
   ],
