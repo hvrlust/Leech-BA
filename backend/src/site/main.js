@@ -95,6 +95,9 @@ exports.run = function (database, getQueueChannel) {
     app.get('/splits', sessionChecker, (req, res) => {
         res.sendFile(root + '/index.html');
     });
+    app.get('/request-confirmation', sessionChecker, (req, res) => {
+        res.sendFile(root + '/index.html');
+    });
     app.use(express.static(root));
 
     app.route('/login/:oneTimeCode') // autodirects to 404 if empty
