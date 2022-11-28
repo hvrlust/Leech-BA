@@ -3,7 +3,7 @@ const {console} = require('../utils');
 
 const fs = require('fs');
 const Discord = require('discord.js');
-const bot = new Discord.Client();
+const bot = new Discord.Client({intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES]});
 
 const commandUtils = require('./commands/utils.js');
 const {createCustomCommand} = require("./commands/utils");
